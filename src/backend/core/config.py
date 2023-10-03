@@ -14,6 +14,11 @@ DEFAULT_STATIC_DIR = os.path.join(
 STATIC_DIR = config("STATIC_DIR", default=DEFAULT_STATIC_DIR)
 logger.debug(f"默认web路径：{STATIC_DIR}")
 
+# 认证
+JWT_SECRET = config("JWT_SECRET", default="develop")
+JWT_ALG = config("JWT_ALG", default="HS256")
+JWT_EXP = config("JWT_EXP", cast=int, default=24*60*60)   # Seconds
+
 # 数据库
 DATABASE_HOSTNAME = config("DATABASE_HOSTNAME")
 DATABASE_NAME = config("DATABASE_NAME", default="appscheduler")
@@ -25,7 +30,10 @@ DATABASE_ENGINE_MAX_OVERFLOW = config("DATABASE_ENGINE_MAX_OVERFLOW", cast=int, 
 DATABASE_URI = f"mysql+pymysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_NAME}"
 logger.debug(f"数据库连接地址：{DATABASE_URI}")
 
-# 认证
-JWT_SECRET = config("JWT_SECRET", default="develop")
-JWT_ALG = config("JWT_ALG", default="HS256")
-JWT_EXP = config("JWT_EXP", cast=int, default=24*60*60)   # Seconds
+# 数据库迁移 配置文件路径
+ALEMBIC_INI_PATH = config(
+    "ALEMBIC_INI_PATH",
+    default=os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "alembic.ini"),
+)
+
+

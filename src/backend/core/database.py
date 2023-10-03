@@ -1,11 +1,12 @@
 from typing import Annotated
 import re
 
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.orm import object_session, sessionmaker, Session
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from fastapi import Depends
 from fastapi.requests import Request
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from loguru import logger
 
 from .config import DATABASE_URI, DATABASE_ENGINE_POOL_SIZE, DATABASE_ENGINE_MAX_OVERFLOW
 
