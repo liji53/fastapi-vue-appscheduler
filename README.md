@@ -16,9 +16,8 @@ app 管理 + app 调度
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+##### 非docker
+前端打包：参考<https://yiming_chang.gitee.io/pure-admin-doc/pages/request/#%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95>
 
 #### 参与贡献
 

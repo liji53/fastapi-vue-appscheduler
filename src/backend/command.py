@@ -32,7 +32,7 @@ def init_database():
     db_session = SessionLocal()
     user = get_user_by_name(username="admin", db_session=db_session)
     if not user:
-        create_user(user_in=UserRegister(username="admin", password="123456"), db_session=db_session)
+        create_user(user_in=UserRegister(username="admin", password="admin123"), db_session=db_session)
 
 
 def get_alembic_config():

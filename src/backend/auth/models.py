@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from jose import jwt
+from loguru import logger
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
@@ -19,8 +20,8 @@ class User(Base, DateTimeMixin):
     # 当前用户所有已安装的应用
     # applications = relationship("application", backref="user")
 
-    def check_password(self, password):
-        return bcrypt.checkpw(password.encode("utf-8"), bytes(self.password))
+    def check_password(self, password: str):
+        return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
 
     @property
     def token(self):
@@ -32,3 +33,8 @@ class User(Base, DateTimeMixin):
         }
         return jwt.encode(data, JWT_SECRET, algorithm=JWT_ALG)
 
+    @property
+    def expired(self):
+        now = datetime.utcnow()
+        exp = (now + timedelta(seconds=JWT_EXP)).strftime("%Y/%m/%d %H:%M:%S")
+        return exp

@@ -79,6 +79,7 @@ Base = declarative_base(cls=CustomBase)
 
 
 def get_db(request: Request):
+    # 在middleware中创建
     return request.state.db
 
 

@@ -33,7 +33,7 @@ export const useUserStore = defineStore({
         getLogin(data)
           .then(data => {
             if (data) {
-              setToken(data.data);
+              setToken(data);
               resolve(data);
             }
           })
@@ -57,7 +57,7 @@ export const useUserStore = defineStore({
         refreshTokenApi(data)
           .then(data => {
             if (data) {
-              setToken(data.data);
+              setToken(data);
               resolve(data);
             }
           })

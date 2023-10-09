@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import { baseUrlApi } from "@/api/utils";
 
 type Result = {
   success: boolean;
@@ -14,21 +15,20 @@ type AppConfigResult = {
 
 // 获取已安装app的列表
 export const getMyApps = () => {
-  return http.request<Result>("get", "/apps/list/me");
+  return http.request<Result>("get", baseUrlApi("apps/me"));
 };
 
 // 获取指定应用的默认配置
-export const getAppDefaultConfig = (params?: object) => {
-  return http.request<AppConfigResult>("get", "/apps/config/default", {
-    params
-  });
+export const getAppDefaultConfig = (app_id: number) => {
+  return http.request<AppConfigResult>(
+    "get",
+    baseUrlApi("apps/" + app_id + "/config/default")
+  );
 };
 
 // 根据任务名称获取应用的配置
-export const getAppConfigByTask = (params?: object) => {
-  return http.request<AppConfigResult>("get", "/apps/config", {
-    params
-  });
+export const getAppConfigByTask = (app_id: number) => {
+  return http.request<AppConfigResult>("get", "apps/" + app_id + "config");
 };
 
 /** 应用商城-app列表 */

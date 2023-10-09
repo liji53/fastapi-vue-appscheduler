@@ -11,8 +11,9 @@ import {
 } from "./types.d";
 import { stringify } from "qs";
 import NProgress from "../progress";
-import { getToken, formatToken } from "@/utils/auth";
+import { getToken, formatToken, removeToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import { ElMessage } from "element-plus";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -88,7 +89,7 @@ class PureHttp {
                     useUserStoreHook()
                       .handRefreshToken({ refreshToken: data.refreshToken })
                       .then(res => {
-                        const token = res.data.accessToken;
+                        const token = res.accessToken;
                         config.headers["Authorization"] = formatToken(token);
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
@@ -167,7 +168,28 @@ class PureHttp {
           resolve(response);
         })
         .catch(error => {
-          reject(error);
+          if (error.response && error.response.status) {
+            if (error.response.status === 401) {
+              ElMessage.error(error.response.data.detail);
+              removeToken();
+              window.location.reload();
+              // router.push({ name: "Login" })
+            } else if (error.response.status === 403) {
+              ElMessage.error(error.response.data.detail);
+              // router.push("/error/403");
+            } else if (error.response.status === 400) {
+              ElMessage.error(error.response.data.detail);
+              // router.push("/error/403");
+            } else if (error.response.status === 422) {
+              ElMessage.error(error.response.data.detail);
+            } else if (error.response.status === 500) {
+              ElMessage.error("服务器内部异常.");
+            }
+            reject(error.response.data);
+          } else {
+            ElMessage.error(error.message);
+            reject(error);
+          }
         });
     });
   }

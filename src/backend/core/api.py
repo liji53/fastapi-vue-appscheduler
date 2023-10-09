@@ -1,19 +1,12 @@
-from typing import Optional, List
-
-from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from ..auth.views import auth_router
-
-
-# 定义错误的model
-class ErrorMsg(BaseModel):
-    msg: str
+from ..route.views import route_router
 
 
 class ErrorResponse(BaseModel):
-    detail: Optional[List[ErrorMsg]]
+    detail: str
 
 
 api_router = APIRouter(
@@ -27,3 +20,4 @@ api_router = APIRouter(
 )
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(route_router, prefix="/routes", tags=["route"])

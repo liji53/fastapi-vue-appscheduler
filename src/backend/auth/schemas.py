@@ -1,11 +1,11 @@
-from typing import Optional, List, Annotated
+from typing import Optional, Annotated
 
-from pydantic import Field, field_validator
+from pydantic import Field
 from pydantic.networks import EmailStr
 from pydantic.functional_validators import BeforeValidator
 import bcrypt
 
-from ..core.schemas import AppBaseModel, PrimaryKey
+from ..core.schemas import MyBaseModel, PrimaryKey
 
 
 def hash_password(password: str):
@@ -14,7 +14,7 @@ def hash_password(password: str):
     return bcrypt.hashpw(pw, salt)
 
 
-class UserBase(AppBaseModel):
+class UserBase(MyBaseModel):
     username: str
     email: Optional[EmailStr] = None
 
@@ -28,8 +28,12 @@ class UserRegister(UserBase):
     password: Annotated[str, BeforeValidator(hash_password)]
 
 
-class UserLoginResponse(AppBaseModel):
+class UserLoginResponse(MyBaseModel):
+    username: str
+    roles: list[str]
     accessToken: str
+    refreshToken: str
+    expires: str
 
 
 class UserRead(UserBase):

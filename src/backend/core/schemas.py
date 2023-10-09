@@ -5,7 +5,7 @@ from datetime import datetime
 PrimaryKey = conint(gt=0)
 
 
-class AppBaseModel(BaseModel):
+class MyBaseModel(BaseModel):
     class Config:
         from_attributes = True  # orm_mode = True
         validate_assignment = True
