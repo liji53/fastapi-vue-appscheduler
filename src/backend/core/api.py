@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from ..auth.views import auth_router
-from ..permission.views import route_router
+from ..permission.views import permission_router
 
 
 class ErrorResponse(BaseModel):
@@ -20,4 +20,4 @@ api_router = APIRouter(
 )
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
-api_router.include_router(route_router, prefix="/routes", tags=["permission"])
+api_router.include_router(permission_router, prefix="/permission", tags=["permission"])

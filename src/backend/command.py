@@ -19,6 +19,8 @@ def init_database():
     from .core.database import engine, Base, SessionLocal
     from .auth.schemas import UserRegister
     from .auth.service import get_user_by_name, create_user
+    from .permission.schemas import RoleRegister
+    from .permission.service import get_role_by_name, create_role
 
     """初始化数据库"""
     if not database_exists(DATABASE_URI):
@@ -28,11 +30,15 @@ def init_database():
     tables = [table for _, table in Base.metadata.tables.items()]
     Base.metadata.create_all(engine, tables=tables)
 
-    # 初始化admin用户
+    # 初始化admin角色、用户
     db_session = SessionLocal()
+    role = get_role_by_name(name="admin", db_session=db_session)
+    if not role:
+        role = create_role(db_session=db_session, role_in=RoleRegister(name="admin"))
+
     user = get_user_by_name(username="admin", db_session=db_session)
     if not user:
-        create_user(user_in=UserRegister(username="admin", password="admin123"), db_session=db_session)
+        create_user(user_in=UserRegister(username="admin", password="admin123", roles=[role]), db_session=db_session)
 
 
 def get_alembic_config():

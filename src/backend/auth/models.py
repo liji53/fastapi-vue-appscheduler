@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 from ..core.config import JWT_EXP, JWT_SECRET, JWT_ALG
 from ..core.database import Base
 from ..core.models import DateTimeMixin
+from ..permission.models import users_roles
 
 
 class User(Base, DateTimeMixin):
@@ -17,6 +18,7 @@ class User(Base, DateTimeMixin):
     email = Column(String(128), unique=True)
     password = Column(String(128), nullable=False)
 
+    roles = relationship("Role", secondary=users_roles, back_populates="users")
     # 当前用户所有已安装的应用
     # applications = relationship("application", backref="user")
 

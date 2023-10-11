@@ -1,4 +1,4 @@
-from typing import Optional, Annotated
+from typing import Optional, Annotated, Union
 
 from pydantic import Field
 from pydantic.networks import EmailStr
@@ -6,6 +6,7 @@ from pydantic.functional_validators import BeforeValidator
 import bcrypt
 
 from ..core.schemas import MyBaseModel, PrimaryKey
+from ..permission.models import Role
 
 
 def hash_password(password: str):
@@ -26,6 +27,7 @@ class UserLogin(UserBase):
 class UserRegister(UserBase):
     """需要对密码进行哈希"""
     password: Annotated[str, BeforeValidator(hash_password)]
+    roles: list[Union[int, Role]]
 
 
 class UserLoginResponse(MyBaseModel):

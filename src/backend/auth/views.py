@@ -12,7 +12,7 @@ auth_router = APIRouter()
 
 @auth_router.post("/login", response_model=UserLoginResponse)
 def login(user_in: UserLogin, db_session: DbSession):
-    logger.debug(f"登录：user in: {user_in.model_dump()}")
+    logger.debug(f"登录: {user_in.model_dump()}")
     user = get_user_by_name(db_session=db_session, username=user_in.username)
     if user and user.check_password(user_in.password):
         return {"accessToken": user.token, "username": user.username, "roles": ["admin"],

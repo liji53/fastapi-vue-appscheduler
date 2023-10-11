@@ -20,3 +20,8 @@ class MenuItem(MyBaseModel):
 
 class RouteResponse(MyBaseModel):
     data: list[MenuItem]
+
+
+class RoleRegister(MyBaseModel):
+    name: str
+    is_active: bool = True
