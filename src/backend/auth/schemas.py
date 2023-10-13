@@ -27,6 +27,9 @@ class UserLogin(UserBase):
 class UserRegister(UserBase):
     """需要对密码进行哈希"""
     password: Annotated[str, BeforeValidator(hash_password)]
+    phone: Optional[str] = None
+    is_active: bool = True
+    description: Optional[str] = None
     roles: list[Union[int, Role]]
 
 

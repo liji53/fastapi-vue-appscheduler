@@ -21,7 +21,6 @@ def get_user_by_name(*, db_session, username: str) -> Optional[User]:
 def create_user(*, db_session, user_in: UserRegister) -> User:
     """创建用户"""
     user = User(**user_in.model_dump())
-    # user.roles = []
 
     db_session.add(user)
     db_session.commit()

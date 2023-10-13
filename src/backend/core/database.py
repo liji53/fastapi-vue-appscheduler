@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 import re
 
 from fastapi import Depends
@@ -27,9 +27,9 @@ class CustomBase:
         names = re.split("(?=[A-Z])", self.__name__)
         return "_".join([x.lower() for x in names if x])
 
-    def dict(self):
-        """Returns a dict representation of a model."""
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    def dict(self, exclude: Optional[list[str]] = None):
+        """model 转 dic"""
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if not exclude or c.name not in exclude}
 
     @property
     def _id_str(self):
@@ -65,9 +65,9 @@ class CustomBase:
         return " ".join(values)
 
     def __repr__(self):
-        # get id like '#123'
+        # 拼接 id like '#123'
         id_str = ("#" + self._id_str) if self._id_str else ""
-        # join class name, id and repr_attrs
+        # 拼接 model名, id, repr_attrs
         return "<{} {}{}>".format(
             self.__class__.__name__,
             id_str,

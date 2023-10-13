@@ -18,9 +18,9 @@ def init_database():
     from .core.config import DATABASE_URI
     from .core.database import engine, Base, SessionLocal
     from .auth.schemas import UserRegister
-    from .auth.service import get_user_by_name, create_user
-    from .permission.schemas import RoleRegister
-    from .permission.service import get_role_by_name, create_role
+    from .auth import service as auth_service
+    from .permission.schemas import RoleRegister, MenuItem, MenuMeta
+    from .permission import service as permission_service
 
     """初始化数据库"""
     if not database_exists(DATABASE_URI):
@@ -30,15 +30,95 @@ def init_database():
     tables = [table for _, table in Base.metadata.tables.items()]
     Base.metadata.create_all(engine, tables=tables)
 
-    # 初始化admin角色、用户
     db_session = SessionLocal()
-    role = get_role_by_name(name="admin", db_session=db_session)
-    if not role:
-        role = create_role(db_session=db_session, role_in=RoleRegister(name="admin"))
 
-    user = get_user_by_name(username="admin", db_session=db_session)
+    # 初始化菜单
+    menus = permission_service.get_menus(db_session=db_session)
+    if not menus:
+        menus = []
+        default_menus = [
+            {
+                "path": "/task",
+                "meta": {"title": "任务中心", "icon": "listCheck", "rank": 2},
+                "children": [
+                    {
+                        "path": "/task/index",
+                        "name": "Task",
+                        "meta": {"title": "任务中心"}
+                    }
+                ]
+            },
+            {
+                "path": "/app",
+                "meta": {"title": "应用中心", "icon": "menu", "rank": 4},
+                "children": [
+                    {
+                        "path": "/app/manager",
+                        "name": "App",
+                        "meta": {"title": "应用管理"}
+                    },
+                    {
+                        "path": "/app/store",
+                        "name": "Store",
+                        "meta": {"title": "应用商城"}
+                    }
+                ]
+            },
+            {
+                "path": "/monitor",
+                "meta": {"title": "监控中心", "icon": "monitor", "rank": 8},
+                "children": [
+                    {
+                        "path": "/monitor/exception",
+                        "name": "Exception",
+                        "meta": {"title": "异常监控"}
+                    },
+                    {
+                        "path": "/monitor/statistics",
+                        "name": "Statistics",
+                        "meta": {"title": "统计管理"}
+                    },
+                    {
+                        "path": "/monitor/resource",
+                        "name": "Resource",
+                        "meta": {"title": "系统资源"}
+                    }
+                ]
+            },
+            {
+                "path": "/security",
+                "meta": {"title": "安全中心", "icon": "flUser", "rank": 10},
+                "children": [
+                    {
+                        "path": "/security/user",
+                        "name": "User",
+                        "meta": {"title": "用户管理"}
+                    },
+                    {
+                        "path": "/security/config",
+                        "name": "Config",
+                        "meta": {"title": "系统配置"}
+                    }
+                ]
+            }
+        ]
+        for default_menu in default_menus:
+            menus += permission_service.create_menus(
+                db_session=db_session,
+                menu_in=MenuItem(**default_menu)
+            )
+
+    # 初始化admin角色
+    role = permission_service.get_role_by_code(code="admin", db_session=db_session)
+    if not role:
+        role = permission_service.create_role(db_session=db_session,
+                                              role_in=RoleRegister(name="管理员", code="admin", menus=menus))
+
+    # 初始化admin用户
+    user = auth_service.get_user_by_name(username="admin", db_session=db_session)
     if not user:
-        create_user(user_in=UserRegister(username="admin", password="admin123", roles=[role]), db_session=db_session)
+        auth_service.create_user(user_in=UserRegister(username="admin", password="admin123",
+                                                      roles=[role]), db_session=db_session)
 
 
 def get_alembic_config():
@@ -130,10 +210,11 @@ def downgrade_database(revision):
 
 
 def entrypoint():
-    try:
-        app_scheduler_command()
-    except Exception as e:
-        click.secho(f"ERROR: {e}", bold=True, fg="red")
+    # try:
+    #     app_scheduler_command()
+    # except Exception as e:
+    #     click.secho(f"ERROR: {e}", bold=True, fg="red")
+    app_scheduler_command()
 
 
 if __name__ == "__main__":
