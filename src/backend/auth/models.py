@@ -6,8 +6,8 @@ from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
 from ..core.config import JWT_EXP, JWT_SECRET, JWT_ALG
-from ..core.database import Base
-from ..core.models import DateTimeMixin
+from ..core.database import Base, DateTimeMixin
+from ..application.models import UserApplication
 
 
 # 中间表
@@ -28,9 +28,10 @@ class User(Base, DateTimeMixin):
     is_active = Column(Boolean, default=True, comment="是否启用")
     description = Column(String(512), comment="备注")
 
+    # 当前用户的角色
     roles = relationship("Role", secondary=UserRole, back_populates="users")
     # 当前用户所有已安装的应用
-    # applications = relationship("application", backref="user")
+    installed_applications = relationship("Application", secondary=UserApplication, back_populates="users")
 
     def check_password(self, password: str):
         return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))

@@ -29,11 +29,11 @@ const formDialogVisible = ref(false);
 
 const getCardListData = async () => {
   try {
-    const { data } = await getMyAppList();
-    appList.value = data.list;
+    const response = await getMyAppList();
+    appList.value = response.data;
     pagination.value = {
       ...pagination.value,
-      total: data.list.length
+      total: response.total
     };
   } catch (e) {
     console.log(e);

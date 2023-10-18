@@ -2,8 +2,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Table
 from sqlalchemy.orm import relationship
 
 from ..auth.models import UserRole
-from ..core.database import Base
-from ..core.models import DateTimeMixin
+from ..core.database import Base, DateTimeMixin
 
 
 RoleMenu = Table(

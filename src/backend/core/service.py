@@ -1,10 +1,12 @@
 from typing import Annotated, Union
 
-from fastapi import Depends, Query
+from fastapi import Depends, Query, HTTPException
+from loguru import logger
+from sqlalchemy_filters import apply_pagination, apply_sort
 
-from .database import DbSession
+from .database import DbSession, get_class_by_table_name
 
-from ..auth.service import CurrentUser, CurrentRoles
+from ..auth.service import CurrentUser, CurrentRoles, User, Role
 
 
 # 通用查询参数
@@ -14,7 +16,6 @@ def common_parameters(
     roles: CurrentRoles,
     page: int = Query(1, gt=0, lt=2147483647),
     items_per_page: int = Query(20, alias="itemsPerPage", gt=-2, lt=2147483647),
-    query_str: str = Query(None, alias="q"),
     sort_by: list[str] = Query([], alias="sortBy[]"),
     descending: list[bool] = Query([], alias="descending[]"),
 ):
@@ -22,7 +23,6 @@ def common_parameters(
         "db_session": db_session,
         "page": page,
         "items_per_page": items_per_page,
-        "query_str": query_str,
         "sort_by": sort_by,
         "descending": descending,
         "current_user": current_user,
@@ -31,6 +31,57 @@ def common_parameters(
 
 
 CommonParameters = Annotated[
-    dict[str, Union[int, str, list[str], list[bool], CurrentUser, DbSession, CurrentRoles]],
+    dict[str, Union[int, list[str], list[bool], CurrentUser, DbSession, CurrentRoles]],
     Depends(common_parameters),
 ]
+
+
+def sort_paginate(
+    model,
+    db_session,
+    page: int = 1,
+    items_per_page: int = 20,
+    sort_by: list[str] = None,
+    descending: list[bool] = None,
+    current_user: User = None,
+    roles: list[Role] = None,
+):
+    """用于分页、排序 的通用函数"""
+    model_cls = get_class_by_table_name(model)
+    try:
+        query = db_session.query(model_cls)
+
+        if sort_by:
+            sort_spec = create_sort_spec(model, sort_by, descending)
+            logger.debug(f"排序内容: {sort_spec}")
+            query = apply_sort(query, sort_spec)
+    except Exception as e:
+        logger.debug(e)
+        raise HTTPException(status_code=500, detail="排序功能错误!")
+
+    if items_per_page == -1:
+        items_per_page = None
+
+    try:
+        query, pagination = apply_pagination(query, page_number=page, page_size=items_per_page)
+    except Exception as e:
+        logger.debug(e)
+        return HTTPException(status_code=500, detail="分页功能错误!")
+
+    return {
+        "data": query.all(),
+        "itemsPerPage": pagination.page_size,
+        "page": pagination.page_number,
+        "total": pagination.total_results,
+    }
+
+
+def create_sort_spec(model, sort_by: list[str], descending: list[bool]):
+    sort_spec = []
+    if sort_by and descending:
+        for field, direction in zip(sort_by, descending):
+            direction = "desc" if direction else "asc"
+
+            sort_spec.append({"model": model, "field": field, "direction": direction})
+
+    return sort_spec

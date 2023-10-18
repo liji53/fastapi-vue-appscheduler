@@ -1,12 +1,12 @@
 from typing import Annotated, Optional
 import re
+from datetime import datetime
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.requests import Request
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import create_engine, inspect, event, Column, DateTime
+from sqlalchemy.orm import sessionmaker, Session, registry
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from loguru import logger
 
 from .config import DATABASE_URI, DATABASE_ENGINE_POOL_SIZE, DATABASE_ENGINE_MAX_OVERFLOW
 
@@ -78,9 +78,44 @@ class CustomBase:
 Base = declarative_base(cls=CustomBase)
 
 
+class DateTimeMixin(object):
+    """Timestamping mixin"""
+    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at._creation_order = 9998
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    updated_at._creation_order = 9998
+
+    @staticmethod
+    def _updated_at(mapper, connection, target):
+        target.updated_at = datetime.utcnow()
+
+    @classmethod
+    def __declare_last__(cls):
+        event.listen(cls, "before_update", cls._updated_at)
+
+
 def get_db(request: Request):
     # 在middleware中创建
     return request.state.db
 
 
 DbSession = Annotated[Session, Depends(get_db)]
+
+
+def get_class_by_table_name(table_fullname: str) -> any:
+    """通过表名(需实际物理库中的表名)获取模型对象"""
+    def _find_class(name):
+        for c in Base.metadata.tables.values():
+            if c.name.lower() == name.lower():
+                return c
+        return None
+
+    mapped_class = _find_class(table_fullname)
+
+    if mapped_class is None:
+        raise HTTPException(
+            status_code=500,
+            detail="内部错误：获取表对象失败!",
+        )
+
+    return mapped_class

@@ -2,9 +2,10 @@ import { http } from "@/utils/http";
 import { baseUrlApi } from "@/api/utils";
 
 type Result = {
-  success: boolean;
+  itemsPerPage: number;
+  page: number;
+  total: number;
   data: Array<any>;
-  msg?: string;
 };
 
 type AppConfigResult = {
@@ -33,7 +34,7 @@ export const getAppConfigByTask = (app_id: number) => {
 
 /** 应用商城-app列表 */
 export const getAppList = (params?: object) => {
-  return http.request<Result>("get", "/getAppList", { params });
+  return http.request<Result>("get", baseUrlApi("apps"), { params });
 };
 
 /** 应用管理-已安装的app列表 */
