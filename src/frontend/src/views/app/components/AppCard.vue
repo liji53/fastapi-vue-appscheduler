@@ -1,77 +1,34 @@
 <script setup lang="ts">
-import { computed, PropType } from "vue";
-import shopIcon from "@/assets/svg/shop.svg?component";
-import laptopIcon from "@/assets/svg/laptop.svg?component";
-import serviceIcon from "@/assets/svg/service.svg?component";
-import calendarIcon from "@/assets/svg/calendar.svg?component";
-import userAvatarIcon from "@/assets/svg/user_avatar.svg?component";
+import { ref, computed } from "vue";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
 
-defineOptions({
-  name: "ReCard"
-});
-
-interface CardAppType {
-  type: number;
-  isInstall: boolean;
-  isOnline?: boolean;
-  description: string;
-  name: string;
-}
-
-const props = defineProps({
-  app: {
-    type: Object as PropType<CardAppType>
-  },
-  manager: {
-    type: Boolean,
-    default: false
-  }
-});
-
-const emit = defineEmits([
+const props = defineProps(["app"]);
+defineEmits([
   "install-app",
-  "change-version",
+  "revision-app",
   "edit-app",
-  "delete-app",
+  "uninstall-app",
   "info-app"
 ]);
 
-const handleClickInstall = (app: CardAppType) => {
-  emit("install-app", app);
-};
+const infoDialogVisible = ref(false);
 
-const handleClickChange = (app: CardAppType) => {
-  emit("change-version", app);
-};
+const isNotUse = computed(
+  () => props.app.status === "未安装" || props.app.status === "废弃"
+);
+const isNotInstall = computed(() => props.app.status === "未安装");
 
-const handleClickEdit = (app: CardAppType) => {
-  emit("edit-app", app);
-};
-
-const handleClickDelete = (app: CardAppType) => {
-  emit("delete-app", app);
-};
-
-const handleClickInfo = (app: CardAppType) => {
-  emit("info-app", app);
-};
-
+// 卡片的样式
 const cardClass = computed(() => [
   "list-card-item",
   {
-    "list-card-item__disabled": props.manager
-      ? !props.app.isOnline
-      : !props.app.isInstall
+    "list-card-item__disabled": isNotUse.value
   }
 ]);
-
 const cardLogoClass = computed(() => [
   "list-card-item_detail--logo",
   {
-    "list-card-item_detail--logo__disabled": props.manager
-      ? !props.app.isOnline
-      : !props.app.isInstall
+    "list-card-item_detail--logo__disabled": isNotUse.value
   }
 ]);
 </script>
@@ -79,58 +36,48 @@ const cardLogoClass = computed(() => [
 <template>
   <div :class="cardClass">
     <div class="list-card-item_detail bg-bg_color">
+      <!-- logo + 状态 + 操作 -->
       <el-row justify="space-between">
-        <div :class="cardLogoClass">
-          <shopIcon v-if="app.type === 1" />
-          <calendarIcon v-if="app.type === 2" />
-          <serviceIcon v-if="app.type === 3" />
-          <userAvatarIcon v-if="app.type === 4" />
-          <laptopIcon v-if="app.type === 5" />
-        </div>
+        <div
+          :class="cardLogoClass"
+          :style="`background-image: url(${app.banner})`"
+        />
         <div class="list-card-item_detail--operation">
           <el-tag
-            :color="
-              (manager ? app.isOnline : app.isInstall) ? '#00a870' : '#eee'
-            "
+            :color="!isNotUse ? '#00a870' : '#eee'"
             effect="dark"
             class="mx-1 list-card-item_detail--operation--tag"
           >
-            {{
-              manager
-                ? app.isOnline
-                  ? "已上线"
-                  : "未上线"
-                : app.isInstall
-                ? "已安装"
-                : "未安装"
-            }}
+            {{ app.status }}
           </el-tag>
           <el-dropdown trigger="click">
             <IconifyIconOffline :icon="More2Fill" class="text-[24px]" />
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
-                  v-if="!app.isInstall"
-                  @click="handleClickInstall(app)"
+                  v-if="isNotInstall"
+                  @click="$emit('install-app', app.id)"
                 >
                   安装
                 </el-dropdown-item>
-                <el-dropdown-item
-                  v-if="manager"
-                  @click="handleClickChange(app)"
-                >
+                <el-dropdown-item @click="$emit('revision-app', app.id)">
                   版本
                 </el-dropdown-item>
-                <el-dropdown-item v-if="manager" @click="handleClickEdit(app)">
+                <el-dropdown-item @click="$emit('edit-app', app.id)">
                   编辑
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="manager"
-                  @click="handleClickDelete(app)"
+                  v-if="!isNotUse"
+                  @click="$emit('uninstall-app', app.id)"
                 >
-                  删除
+                  卸载
                 </el-dropdown-item>
-                <el-dropdown-item @click="handleClickInfo(app)">
+                <el-dropdown-item
+                  @click="
+                    $emit('info-app', app.id);
+                    infoDialogVisible = true;
+                  "
+                >
                   详情
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -138,14 +85,22 @@ const cardLogoClass = computed(() => [
           </el-dropdown>
         </div>
       </el-row>
+
+      <!-- name -->
       <p class="list-card-item_detail--name text-text_color_primary">
         {{ app.name }}
       </p>
+
       <p class="list-card-item_detail--desc text-text_color_regular">
         {{ app.description }}
       </p>
     </div>
   </div>
+
+  <!-- dialog -->
+  <el-dialog v-model="infoDialogVisible" title="详情信息">
+    <span>未支持</span>
+  </el-dialog>
 </template>
 
 <style scoped lang="scss">
@@ -172,6 +127,8 @@ const cardLogoClass = computed(() => [
       color: #0052d9;
       background: #e0ebff;
       border-radius: 50%;
+      background-size: cover;
+      background-position: center;
 
       &__disabled {
         color: #a1c4ff;

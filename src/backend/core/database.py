@@ -102,15 +102,18 @@ def get_db(request: Request):
 DbSession = Annotated[Session, Depends(get_db)]
 
 
-def get_class_by_table_name(table_fullname: str) -> any:
-    """通过表名(需实际物理库中的表名)获取模型对象"""
-    def _find_class(name):
-        for c in Base.metadata.tables.values():
-            if c.name.lower() == name.lower():
-                return c
+def get_model_by_table_name(table_fullname: str) -> any:
+    from loguru import logger
+    """通过表名获取模型对象"""
+    def _find_model(name):
+        for mapper in Base.registry.mappers:
+            cls = mapper.class_
+            class_name = cls.__name__
+            if class_name.lower() == name.lower():
+                return cls
         return None
 
-    mapped_class = _find_class(table_fullname)
+    mapped_class = _find_model(table_fullname)
 
     if mapped_class is None:
         raise HTTPException(

@@ -34,15 +34,26 @@ const permissionRouter = {
     }
   ]
 };
+const appRouter = {
+  path: "/app",
+  meta: { title: "应用中心", icon: "menu", rank: 4 },
+  children: [
+    {
+      path: "/app/store",
+      name: "Store",
+      meta: { title: "应用商城" }
+    }
+  ]
+};
 
 export default [
   {
-    url: "/getAsyncRoutes",
+    url: "/permission/routes",
     method: "get",
     response: () => {
       return {
         success: true,
-        data: [permissionRouter]
+        data: [permissionRouter, appRouter]
       };
     }
   }

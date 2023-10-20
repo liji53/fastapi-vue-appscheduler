@@ -2,6 +2,172 @@ import { MockMethod } from "vite-plugin-mock";
 
 export default [
   {
+    url: "/apps",
+    method: "get",
+    response: () => {
+      return {
+        total: 188,
+        data: [
+          {
+            id: 1,
+            status: "废弃",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
+            name: "SSL证书",
+            description:
+              "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
+          },
+          {
+            id: 2,
+            status: "未安装",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+            name: "人脸识别",
+            description:
+              "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
+          },
+          {
+            id: 3,
+            status: "已上线",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
+            name: "CVM",
+            description:
+              "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
+          },
+          {
+            id: 4,
+            status: "废弃",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
+            name: "SSL证书",
+            description:
+              "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
+          },
+          {
+            id: 5,
+            status: "已安装",
+            category: "规范递交",
+            banner:
+              "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
+            name: "SSL证书",
+            description:
+              "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
+          },
+          {
+            id: 6,
+            status: "废弃",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
+            name: "T-Sec 云防火墙",
+            description:
+              "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
+          },
+          {
+            id: 7,
+            status: "已上线",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+            name: "CVM",
+            description:
+              "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
+          },
+          {
+            id: 8,
+            status: "废弃",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+            name: "SSL证书",
+            description:
+              "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
+          },
+          {
+            id: 9,
+            status: "已上线",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
+            name: "SSL证书",
+            description:
+              "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
+          },
+          {
+            id: 10,
+            status: "已上线",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
+            name: "CVM",
+            description:
+              "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
+          },
+          {
+            id: 11,
+            status: "已上线",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+            name: "云数据库",
+            description:
+              "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
+          },
+          {
+            id: 12,
+            status: "废弃",
+            category: "规范递交",
+            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+            name: "SSL证书",
+            description:
+              "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
+          }
+        ]
+      };
+    }
+  },
+  {
+    url: "/apps/category",
+    method: "get",
+    response: () => {
+      return {
+        data: [
+          {
+            id: 1,
+            name: "规范递交",
+            description: "检查程序规范化递交"
+          },
+          {
+            id: 2,
+            name: "数据比对",
+            description: "数据库的数据比对工具"
+          }
+        ]
+      };
+    }
+  },
+  {
+    url: "/apps/status",
+    method: "get",
+    response: () => {
+      return {
+        data: [
+          {
+            id: 1,
+            name: "未安装"
+          },
+          {
+            id: 2,
+            name: "未上线"
+          },
+          {
+            id: 3,
+            name: "已上线"
+          },
+          {
+            id: 4,
+            name: "废弃"
+          }
+        ]
+      };
+    }
+  },
+  {
     url: "/apps/config",
     method: "get",
     response: () => {
@@ -23,6 +189,7 @@ export default [
       };
     }
   },
+
   {
     url: "/apps/config/default",
     method: "get",
@@ -95,457 +262,6 @@ export default [
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
           }
         ]
-      };
-    }
-  },
-  {
-    url: "/getAppList",
-    method: "get",
-    response: () => {
-      return {
-        success: true,
-        data: {
-          list: [
-            {
-              index: 1,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "SSL证书",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 2,
-              isInstall: false,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "人脸识别",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 3,
-              isInstall: false,
-              type: 5,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "CVM",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 4,
-              isInstall: false,
-              type: 2,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "SSL证书",
-              description:
-                "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
-            },
-            {
-              index: 5,
-              isInstall: true,
-              type: 3,
-              banner:
-                "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
-              name: "SSL证书",
-              description:
-                "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
-            },
-            {
-              index: 6,
-              isInstall: true,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "T-Sec 云防火墙",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 7,
-              isInstall: false,
-              type: 1,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "CVM",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 8,
-              isInstall: true,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "SSL证书",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 9,
-              isInstall: false,
-              type: 1,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "SSL证书",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 10,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "CVM",
-              description:
-                "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
-            },
-            {
-              index: 11,
-              isInstall: true,
-              type: 5,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "云数据库",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 12,
-              isInstall: true,
-              type: 2,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "SSL证书",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 13,
-              isInstall: true,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-db.jpg",
-              name: "云数据库",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 14,
-              isInstall: false,
-              type: 5,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "SSL证书",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 15,
-              isInstall: true,
-              type: 2,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "云数据库",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 16,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "CVM",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 17,
-              isInstall: false,
-              type: 5,
-              banner:
-                "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
-              name: "云数据库",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 18,
-              isInstall: false,
-              type: 4,
-              banner:
-                "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
-              name: "云数据库",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 19,
-              isInstall: true,
-              type: 2,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "CVM",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 20,
-              isInstall: true,
-              type: 4,
-              banner:
-                "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
-              name: "SSL证书",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 21,
-              isInstall: false,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "云数据库",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 22,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-db.jpg",
-              name: "CVM",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 23,
-              isInstall: true,
-              type: 1,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "人脸识别",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 24,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "人脸识别",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 25,
-              isInstall: false,
-              type: 5,
-              banner:
-                "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
-              name: "CVM",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 26,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "SSL证书",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 27,
-              isInstall: true,
-              type: 5,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "CVM",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 28,
-              isInstall: false,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "云数据库",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 29,
-              isInstall: false,
-              type: 5,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-db.jpg",
-              name: "CVM",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 30,
-              isInstall: true,
-              type: 1,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "CVM",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 31,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "CVM",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 32,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "T-Sec 云防火墙",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 33,
-              isInstall: true,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "CVM",
-              description:
-                "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
-            },
-            {
-              index: 34,
-              isInstall: false,
-              type: 2,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "SSL证书",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 35,
-              isInstall: false,
-              type: 1,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "云数据库",
-              description:
-                "基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸"
-            },
-            {
-              index: 36,
-              isInstall: false,
-              type: 4,
-              banner:
-                "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
-              name: "SSL证书",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 37,
-              isInstall: true,
-              type: 5,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "CVM",
-              description:
-                "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
-            },
-            {
-              index: 38,
-              isInstall: false,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "云数据库",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 39,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "人脸识别",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 40,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "CVM",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 41,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "T-Sec 云防火墙",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 42,
-              isInstall: true,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "T-Sec 云防火墙",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 43,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-db.jpg",
-              name: "SSL证书",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 44,
-              isInstall: true,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-              name: "SSL证书",
-              description:
-                "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-            },
-            {
-              index: 45,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "T-Sec 云防火墙",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 46,
-              isInstall: true,
-              type: 2,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "SSL证书",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            },
-            {
-              index: 47,
-              isInstall: false,
-              type: 4,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-              name: "SSL证书",
-              description:
-                "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-            },
-            {
-              index: 48,
-              isInstall: false,
-              type: 3,
-              banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-              name: "T-Sec 云防火墙",
-              description:
-                "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-            }
-          ]
-        }
       };
     }
   },

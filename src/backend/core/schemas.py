@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from pydantic.types import conint, constr
 from datetime import datetime
 
-PrimaryKey = conint(gt=0)
+PrimaryKey = conint(gt=0, lt=2147483647)
 NameStr = constr(strip_whitespace=True, min_length=1)  # 不能是空白行
 
 
@@ -20,6 +20,4 @@ class MyBaseModel(BaseModel):
 
 
 class Pagination(MyBaseModel):
-    itemsPerPage: int
-    page: int
     total: int

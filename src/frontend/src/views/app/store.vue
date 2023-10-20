@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 import { getAppList } from "@/api/app";
-import { appCategory } from "./components/category";
-import Card from "./components/Card.vue";
-import Search from "@iconify-icons/ep/search";
+import { getAppCategory } from "@/api/app_category";
+import AppCard from "./components/AppCard.vue";
+import AppHeader from "./components/AppHeader.vue";
 
 defineOptions({
   name: "Store"
@@ -20,19 +20,25 @@ const svg = `
         " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
       `;
 
-const selected = ref(0);
+const apps = ref([]);
+const appCategories = ref([]);
+const appStatuses = ref(["废弃", "未安装", "已安装", "已上线"]);
 const pagination = ref({ current: 1, pageSize: 12, total: 0 });
-const appList = ref([]);
 const dataLoading = ref(true);
-const formData = ref({});
 
-const searchValue = ref("");
-const formDialogVisible = ref(false);
+const appQueryParams = ref({
+  page: 1,
+  itemsPerPage: pagination.value.pageSize,
+  q: null,
+  categoryId: -1,
+  statuses: []
+});
 
-const getCardListData = async () => {
+// api请求
+const getAppListData = async (params?: object) => {
   try {
-    const response = await getAppList();
-    appList.value = response.data;
+    const response = await getAppList(params);
+    apps.value = response.data;
     pagination.value = {
       ...pagination.value,
       total: response.total
@@ -45,127 +51,115 @@ const getCardListData = async () => {
     }, 500);
   }
 };
-onMounted(() => {
-  getCardListData();
+const getAppCategoryData = async () => {
+  try {
+    const response = await getAppCategory();
+    appCategories.value = response.data;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+watchEffect(async () => {
+  await getAppListData(appQueryParams.value);
 });
+
+onMounted(() => {
+  // getAppListData({ page: 1, items_per_page: pagination.value.pageSize });  # 在watchEffect中响应
+  getAppCategoryData();
+});
+
+// 用于响应AppHeader的事件
+const handleSelectAppCategory = async (category_id: number) => {
+  pagination.value.current = 1;
+  appQueryParams.value.page = 1;
+  appQueryParams.value.categoryId = category_id;
+};
+const handleSelectAppStatus = async (statuses: Array<String>) => {
+  pagination.value.current = 1;
+  appQueryParams.value.page = 1;
+  appQueryParams.value.statuses = statuses;
+};
+const handleSearchAppName = async (app_name: string) => {
+  pagination.value.current = 1;
+  appQueryParams.value.page = 1;
+  appQueryParams.value.q = app_name;
+};
+
+// 用于响应AppCard的事件
+const handleInstallApp = (app_id: number) => {
+  console.log(app_id);
+};
+const handleUninstallApp = (app_id: number) => {
+  console.log(app_id);
+};
+
+// 用于响应分页事件
 const onPageSizeChange = (size: number) => {
   pagination.value.pageSize = size;
   pagination.value.current = 1;
+  appQueryParams.value.itemsPerPage = size;
+  appQueryParams.value.page = 1;
 };
-const onCurrentChange = (current: number) => {
+const onCurrentPageChange = (current: number) => {
   pagination.value.current = current;
-};
-
-function tabClick({ index }) {
-  selected.value = index;
-}
-const handleInstallApp = app => {
-  console.log("download app" + app.name);
-};
-const handleInfoApp = app => {
-  formDialogVisible.value = true;
-  nextTick(() => {
-    formData.value = { ...app };
-  });
+  appQueryParams.value.page = current;
 };
 </script>
 
 <template>
   <el-card shadow="never">
-    <template #header>
-      <div class="card-header">
-        <div class="w-full flex justify-between mb-4">
-          <span class="font-medium">
-            应用商城会自动检测后台app，只要svn上传app之后，商城会自动上架该app，用户需要先安装再使用。
-          </span>
-          <el-input
-            style="width: 300px"
-            v-model="searchValue"
-            placeholder="请输入应用名称"
-            clearable
-          >
-            <template #suffix>
-              <el-icon class="el-input__icon">
-                <IconifyIconOffline
-                  v-show="searchValue.length === 0"
-                  :icon="Search"
-                />
-              </el-icon>
-            </template>
-          </el-input>
-        </div>
-      </div>
-    </template>
+    <!-- Header -->
+    <div class="w-full flex justify-between mb-4">
+      <AppHeader
+        :categories="appCategories"
+        :statuses="appStatuses"
+        @select-category="handleSelectAppCategory"
+        @select-status="handleSelectAppStatus"
+        @search-app="handleSearchAppName"
+      >
+        后台会自动检测已发布的app，用户需要先安装再使用。
+      </AppHeader>
+    </div>
 
-    <el-tabs @tab-click="tabClick">
-      <template v-for="item of appCategory" :key="item.key">
-        <el-tab-pane :lazy="true">
-          <template #label>
-            <el-tooltip :content="item.content" placement="top-end">
-              <span>{{ item.title }}</span>
-            </el-tooltip>
-          </template>
-          <div
-            v-loading="dataLoading"
-            :element-loading-svg="svg"
-            element-loading-svg-view-box="-10, -10, 50, 50"
+    <!-- Body -->
+    <div
+      v-loading="dataLoading"
+      :element-loading-svg="svg"
+      element-loading-svg-view-box="-10, -10, 50, 50"
+    >
+      <el-empty description="暂无数据" v-show="pagination.total === 0" />
+      <template v-if="pagination.total > 0">
+        <el-row :gutter="16">
+          <el-col
+            v-for="app of apps"
+            :key="app.id"
+            :xs="24"
+            :sm="12"
+            :md="8"
+            :lg="6"
+            :xl="4"
           >
-            <el-empty
-              description="暂无数据"
-              v-show="
-                appList
-                  .slice(
-                    pagination.pageSize * (pagination.current - 1),
-                    pagination.pageSize * pagination.current
-                  )
-                  .filter(v =>
-                    v.name.toLowerCase().includes(searchValue.toLowerCase())
-                  ).length === 0
-              "
+            <AppCard
+              :app="app"
+              @install-app="handleInstallApp"
+              @uninstall-app="handleUninstallApp"
             />
-            <template v-if="pagination.total > 0">
-              <el-row :gutter="16">
-                <el-col
-                  v-for="(app, index) in appList
-                    .slice(
-                      pagination.pageSize * (pagination.current - 1),
-                      pagination.pageSize * pagination.current
-                    )
-                    .filter(v =>
-                      v.name.toLowerCase().includes(searchValue.toLowerCase())
-                    )"
-                  :key="index"
-                  :xs="24"
-                  :sm="12"
-                  :md="8"
-                  :lg="6"
-                  :xl="4"
-                >
-                  <Card
-                    :app="app"
-                    @install-app="handleInstallApp"
-                    @info-app="handleInfoApp"
-                  />
-                </el-col>
-              </el-row>
-              <el-pagination
-                class="float-right"
-                v-model:currentPage="pagination.current"
-                :page-size="pagination.pageSize"
-                :total="pagination.total"
-                :page-sizes="[12, 24, 36]"
-                :background="true"
-                layout="total, sizes, prev, pager, next, jumper"
-                @size-change="onPageSizeChange"
-                @current-change="onCurrentChange"
-              />
-            </template>
-          </div>
-          <el-dialog v-model="formDialogVisible" title="详情信息">
-            <span>{{ formData["name"] }}</span>
-          </el-dialog>
-        </el-tab-pane>
+          </el-col>
+        </el-row>
+
+        <el-pagination
+          class="float-right"
+          v-model:currentPage="pagination.current"
+          :page-size="pagination.pageSize"
+          :total="pagination.total"
+          :page-sizes="[12, 24, 36]"
+          :background="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="onPageSizeChange"
+          @current-change="onCurrentPageChange"
+        />
       </template>
-    </el-tabs>
+    </div>
   </el-card>
 </template>

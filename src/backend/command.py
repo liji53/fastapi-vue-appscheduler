@@ -19,8 +19,10 @@ def init_database():
     from .core.database import engine, Base, SessionLocal
     from .auth.schemas import UserRegister
     from .auth import service as auth_service
-    from .permission.schemas import RoleRegister, MenuItem, MenuMeta
+    from .permission.schemas import RoleRegister, MenuItem
     from .permission import service as permission_service
+    from .application_category.schemas import ApplicationCategoryCreate
+    from .application_category import service as app_category_service
 
     """初始化数据库"""
     if not database_exists(DATABASE_URI):
@@ -120,6 +122,12 @@ def init_database():
         auth_service.create_user(user_in=UserRegister(username="admin", password="admin123",
                                                       roles=[role]), db_session=db_session)
 
+    # 初始化app category
+    app_categories = app_category_service.get_all(db_session=db_session)
+    if not app_categories:
+        app_category_service.create(db_session=db_session, app_category_in=ApplicationCategoryCreate(name="规范递交"))
+        app_category_service.create(db_session=db_session, app_category_in=ApplicationCategoryCreate(name="数据比对"))
+
 
 def get_alembic_config():
     from alembic.config import Config
@@ -128,6 +136,46 @@ def get_alembic_config():
     alembic_cfg = Config(ALEMBIC_INI_PATH)
     alembic_cfg.set_main_option("sqlalchemy.url", str(DATABASE_URI))
     return alembic_cfg
+
+
+@database_command.command("add")
+def database_add():
+    """用于测试"""
+    from .core.database import SessionLocal
+    from .application.schemas import ApplicationCreate
+    from .application_category.schemas import ApplicationCategoryCreate
+    from .application import service as app_service
+
+    db_session = SessionLocal()
+    test_apps = [
+        {"name": "test1", "description": "111", "banner": "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
+         "category": ApplicationCategoryCreate(name="规范递交"), "status": "已发布"},
+        {"name": "test2", "description": "222", "banner": "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+         "category": ApplicationCategoryCreate(name="规范递交"), "status": "已发布"},
+        {"name": "test3", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
+         "category": ApplicationCategoryCreate(name="数据比对"), "status": "已发布"},
+        {"name": "test4", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+        {"name": "test5", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+         "category": ApplicationCategoryCreate(name="数据比对"), "status": "废弃"},
+        {"name": "test6", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+        {"name": "test7", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+        {"name": "test8", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+        {"name": "test9", "description": None, "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
+         "category": ApplicationCategoryCreate(name="数据比对"), "status": "废弃"},
+        {"name": "test10", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "已发布"},
+        {"name": "test11", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "已发布"},
+        {"name": "test12", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "已发布"},
+        {"name": "test13", "description": "", "banner": None, "status": "废弃"},
+        {"name": "test14", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+        {"name": "test55", "description": "333", "status": "废弃"},
+        {"name": "test66", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "已发布"},
+        {"name": "test77", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+        {"name": "test88", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "已发布"},
+        {"name": "test99", "description": "333", "banner": "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg", "status": "废弃"},
+    ]
+    for app in test_apps:
+        app_service.create(db_session=db_session, application_in=ApplicationCreate(**app))
+    click.secho("Success.", fg="green")
 
 
 @database_command.command("init")

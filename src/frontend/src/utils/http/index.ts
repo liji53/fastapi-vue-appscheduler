@@ -1,8 +1,4 @@
-import Axios, {
-  AxiosInstance,
-  AxiosRequestConfig,
-  CustomParamsSerializer
-} from "axios";
+import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   PureHttpError,
   RequestMethods,
@@ -26,7 +22,9 @@ const defaultConfig: AxiosRequestConfig = {
   },
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
-    serialize: stringify as unknown as CustomParamsSerializer
+    //serialize: stringify as unknown as CustomParamsSerializer
+    // 数组参数 变成 xx=?&xx=?，否则为xx[0]=?&xx[1]=?
+    serialize: params => stringify(params, { arrayFormat: "repeat" })
   }
 };
 

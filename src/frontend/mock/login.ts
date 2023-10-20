@@ -3,7 +3,7 @@ import { MockMethod } from "vite-plugin-mock";
 
 export default [
   {
-    url: "/login",
+    url: "/auth/login",
     method: "post",
     response: ({ body }) => {
       if (body.username === "admin") {
