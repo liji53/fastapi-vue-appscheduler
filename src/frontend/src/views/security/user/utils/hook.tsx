@@ -17,7 +17,8 @@ import {
   updateUser,
   deleteUser,
   resetPasswd,
-  updateUserStatus
+  updateUserStatus,
+  batchUserDelete
 } from "@/api/user";
 import { getAllRoleList } from "@/api/role";
 import {
@@ -42,7 +43,9 @@ export function useUser(tableRef: Ref) {
   const form = reactive({
     username: null,
     phone: null,
-    status: null
+    status: null,
+    page: 1,
+    itemsPerPage: 10
   });
   const formRef = ref();
   const ruleFormRef = ref();
@@ -196,7 +199,7 @@ export function useUser(tableRef: Ref) {
         row.status === false ? (row.status = true) : (row.status = false);
       });
   }
-
+  // 操作下拉框
   function handleUpdate(row) {
     console.log(row);
   }
@@ -208,12 +211,15 @@ export function useUser(tableRef: Ref) {
     onSearch();
   }
 
-  function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+  async function handleSizeChange(val: number) {
+    form.page = 1;
+    form.itemsPerPage = val;
+    await onSearch();
   }
 
-  function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+  async function handleCurrentChange(val: number) {
+    form.page = val;
+    await onSearch();
   }
 
   /** 当CheckBox选择项发生变化时会触发该事件 */
@@ -234,11 +240,18 @@ export function useUser(tableRef: Ref) {
   function onbatchDel() {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
-    // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
-      type: "success"
-    });
-    tableRef.value.getTableRef().clearSelection();
+    batchUserDelete({
+      ids: getKeyList(curSelected, "id")
+    })
+      .then(async () => {
+        message(`批量删除了${curSelected.length}条数据`, {
+          type: "success"
+        });
+      })
+      .finally(async () => {
+        await onSearch();
+        tableRef.value.getTableRef().clearSelection();
+      });
   }
 
   async function onSearch() {

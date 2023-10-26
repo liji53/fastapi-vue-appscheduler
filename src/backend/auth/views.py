@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
 from .schemas import UserLogin, UserLoginResponse, UserRead, UserCreate, UserUpdate, UserPagination, \
-    UserPasswdReset, UserStatusUpdate
+    UserPasswdReset, UserStatusUpdate, UserBatchDelete
 from .service import get_by_name, create, get_by_id, update, delete
 
 from ..core.database import DbSession
@@ -77,7 +77,7 @@ def delete_user(user_id: PrimaryKey, db_session: DbSession, current_user: Curren
     """删除新用户"""
     # todo: 权限控制
     try:
-        delete(db_session=db_session, user_id=user_id)
+        delete(db_session=db_session, user_ids=[user_id])
     except Exception as e:
         logger.debug(f"删除用户{user_id}失败，原因: {e}")
         raise HTTPException(500, detail=[{"msg": f"用户{user_id}不能被删除，请确保该用户没有关联的应用"}])
@@ -103,3 +103,13 @@ def update_status(user_id: PrimaryKey, db_session: DbSession, status_in: UserSta
         raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
 
     update(db_session=db_session, user=user, user_in=status_in)
+
+
+@user_router.delete("", response_model=None, summary="删除用户")
+def batch_delete(db_session: DbSession, ids_in: UserBatchDelete, current_user: CurrentUser):
+    """批量删除用户"""
+    try:
+        delete(db_session=db_session, user_ids=ids_in.ids)
+    except Exception as e:
+        logger.debug(f"删除用户{ids_in.ids}失败，原因: {e}")
+        raise HTTPException(500, detail=[{"msg": f"用户{ids_in.ids}不能被删除，请确保该用户没有关联的应用"}])

@@ -59,6 +59,10 @@ class UserStatusUpdate(MyBaseModel):
     status: bool
 
 
+class UserBatchDelete(MyBaseModel):
+    ids: list[PrimaryKey]
+
+
 class UserRead(UserBase):
     id: PrimaryKey
     created_at: datetime

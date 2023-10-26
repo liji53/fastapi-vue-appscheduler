@@ -47,8 +47,8 @@ def update(*, db_session, user: User, user_in: Union[UserUpdate, UserPasswdReset
     return user
 
 
-def delete(*, db_session, user_id):
-    db_session.query(User).filter(User.id == user_id).delete()
+def delete(*, db_session, user_ids: list[int]):
+    db_session.query(User).filter(User.id.in_(user_ids)).delete()
     db_session.commit()
 
 
