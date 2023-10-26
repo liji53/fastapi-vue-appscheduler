@@ -168,20 +168,22 @@ class PureHttp {
         .catch(error => {
           if (error.response && error.response.status) {
             if (error.response.status === 401) {
-              ElMessage.error(error.response.data.detail);
+              for (const item of error.response.data.detail) {
+                ElMessage.error(item.msg);
+              }
               removeToken();
               window.location.reload();
               // router.push({ name: "Login" })
-            } else if (error.response.status === 403) {
-              ElMessage.error(error.response.data.detail);
+            } else if (
+              error.response.status === 403 ||
+              error.response.status === 400 ||
+              error.response.status === 422 ||
+              error.response.status === 500
+            ) {
+              for (const item of error.response.data.detail) {
+                ElMessage.error(item.msg);
+              }
               // router.push("/error/403");
-            } else if (error.response.status === 400) {
-              ElMessage.error(error.response.data.detail);
-              // router.push("/error/403");
-            } else if (error.response.status === 422) {
-              ElMessage.error(error.response.data.detail);
-            } else if (error.response.status === 500) {
-              ElMessage.error("服务器内部异常.");
             }
             reject(error.response.data);
           } else {
@@ -199,6 +201,24 @@ class PureHttp {
     config?: PureHttpRequestConfig
   ): Promise<P> {
     return this.request<P>("post", url, params, config);
+  }
+
+  /** 单独抽离的put工具函数 */
+  public put<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<T>,
+    config?: PureHttpRequestConfig
+  ): Promise<P> {
+    return this.request<P>("put", url, params, config);
+  }
+
+  /** 单独抽离的delete工具函数 */
+  public delete<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<T>,
+    config?: PureHttpRequestConfig
+  ): Promise<P> {
+    return this.request<P>("delete", url, params, config);
   }
 
   /** 单独抽离的get工具函数 */

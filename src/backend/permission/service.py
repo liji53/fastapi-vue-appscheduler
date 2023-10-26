@@ -3,7 +3,7 @@ from typing import Optional
 from loguru import logger
 
 from .models import Role, Menu, MenuMeta
-from .schemas import RoleRegister, MenuItem
+from .schemas import RoleCreate, MenuItem
 
 
 def get_role_by_code(*, db_session, code: str) -> Optional[Role]:
@@ -14,7 +14,7 @@ def get_roles(*, db_session, role_ids: list[int]) -> Optional[list[Role]]:
     return db_session.query(Role).filter(Role.id.in_(role_ids)).all()
 
 
-def create_role(*, db_session, role_in: RoleRegister) -> Role:
+def create_role(*, db_session, role_in: RoleCreate) -> Role:
     role = Role(**role_in.model_dump())
 
     db_session.add(role)

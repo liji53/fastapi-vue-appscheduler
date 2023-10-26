@@ -69,7 +69,7 @@ def sort_paginate(
 
     except Exception as e:
         logger.debug(e)
-        raise HTTPException(status_code=500, detail="排序功能错误!")
+        raise HTTPException(status_code=500, detail=[{"msg": "排序功能错误!"}])
 
     if items_per_page == -1:
         items_per_page = None
@@ -78,7 +78,7 @@ def sort_paginate(
         query, pagination = apply_pagination(query, page_number=page, page_size=items_per_page)
     except Exception as e:
         logger.debug(e)
-        raise HTTPException(status_code=500, detail="分页功能错误!")
+        raise HTTPException(status_code=500, detail=[{"msg": "分页功能错误!"}])
 
     return {
         "data": query.all(),

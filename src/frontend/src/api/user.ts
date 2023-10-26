@@ -23,11 +23,30 @@ export type RefreshTokenResult = {
   expires: Date;
 };
 
+type User = {
+  id: number;
+  username: string;
+  avatar: string;
+  phone: string;
+  email: string;
+  status: boolean;
+  remark: string;
+  created_at: number;
+};
+
+export type UserList = {
+  total: number;
+  data: Array<User>;
+};
+
+type RoleIds = {
+  data: Array<number>;
+};
+
 /** 登录 */
 export const getLogin = (data?: object) => {
   return http.request<UserResult>("post", baseUrlApi("auth/login"), { data });
 };
-
 /** 刷新token */
 export const refreshTokenApi = (data?: object) => {
   return http.request<RefreshTokenResult>(
@@ -37,4 +56,30 @@ export const refreshTokenApi = (data?: object) => {
       data
     }
   );
+};
+
+// 用户列表;
+export const getUserList = (params?: object) => {
+  return http.request<UserList>("get", baseUrlApi("users"), { params });
+};
+// 新建用户
+export const createUser = (data?: object) => {
+  return http.post(baseUrlApi("users"), { data });
+};
+// 更新用户
+export const updateUser = (user_id: number, data?: object) => {
+  return http.put(baseUrlApi(`users/${user_id}`), { data });
+};
+// 删除用户
+export const deleteUser = (user_id: number) => {
+  return http.delete(baseUrlApi(`users/${user_id}`));
+};
+// 重置密码
+export const resetPasswd = (user_id: number, data?: object) => {
+  return http.put(baseUrlApi(`users/${user_id}/passwd`), { data });
+};
+
+/** 用户管理-根据userId，获取对应角色id列表（userId：用户id） */
+export const getRoleIds = (user_id: number) => {
+  return http.request<RoleIds>("get", baseUrlApi(`users/${user_id}/roles`));
 };

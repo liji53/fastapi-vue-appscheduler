@@ -17,9 +17,9 @@ def init_database():
     from sqlalchemy_utils import create_database, database_exists
     from .core.config import DATABASE_URI
     from .core.database import engine, Base, SessionLocal
-    from .auth.schemas import UserRegister
-    from .auth import service as auth_service
-    from .permission.schemas import RoleRegister, MenuItem
+    from .auth.schemas import UserCreate
+    from .auth import service as user_service
+    from .permission.schemas import RoleCreate, MenuItem
     from .permission import service as permission_service
     from .application_category.schemas import ApplicationCategoryCreate
     from .application_category import service as app_category_service
@@ -92,7 +92,7 @@ def init_database():
                 "meta": {"title": "安全中心", "icon": "flUser", "rank": 10},
                 "children": [
                     {
-                        "path": "/security/user",
+                        "path": "/security/user/index",
                         "name": "User",
                         "meta": {"title": "用户管理"}
                     },
@@ -114,13 +114,13 @@ def init_database():
     role = permission_service.get_role_by_code(code="admin", db_session=db_session)
     if not role:
         role = permission_service.create_role(db_session=db_session,
-                                              role_in=RoleRegister(name="管理员", code="admin", menus=menus))
+                                              role_in=RoleCreate(name="管理员", code="admin", menus=menus))
 
     # 初始化admin用户
-    user = auth_service.get_user_by_name(username="admin", db_session=db_session)
+    user = user_service.get_by_name(username="admin", db_session=db_session)
     if not user:
-        auth_service.create_user(user_in=UserRegister(username="admin", password="admin123",
-                                                      roles=[role]), db_session=db_session)
+        user_service.create(user_in=UserCreate(username="admin", password="admin123", roles=[role]),
+                            db_session=db_session)
 
     # 初始化app category
     app_categories = app_category_service.get_all(db_session=db_session)

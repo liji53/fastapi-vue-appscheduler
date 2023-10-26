@@ -1,21 +1,81 @@
 from fastapi import APIRouter, status, HTTPException
-from fastapi.responses import JSONResponse
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 
-from .schemas import UserRead, UserLogin, UserLoginResponse
-from .service import get_user_by_name
+from .schemas import UserLogin, UserLoginResponse, UserRead, UserCreate, UserUpdate, UserPagination, UserPasswdReset
+from .service import get_by_name, create, get_by_id, update, delete
 
 from ..core.database import DbSession
+from ..core.service import CurrentUser, CommonParameters, sort_paginate
+from ..core.schemas import PrimaryKey
 
 auth_router = APIRouter()
+user_router = APIRouter()
 
 
 @auth_router.post("/login", response_model=UserLoginResponse, summary="登录")
 def login(user_in: UserLogin, db_session: DbSession):
     logger.debug(f"登录: {user_in.model_dump()}")
-    user = get_user_by_name(db_session=db_session, username=user_in.username)
+    user = get_by_name(db_session=db_session, username=user_in.username)
     if user and user.check_password(user_in.password):
         return {"accessToken": user.token, "username": user.username, "roles": ["admin"],
                 "refreshToken": "?", "expires": user.expired}
 
-    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="登录失败!")
+    raise HTTPException(status_code=422, detail=[{"msg": "登录失败!"}])
+
+
+@user_router.get("", response_model=UserPagination, summary="获取用户列表")
+def get_users(common: CommonParameters):
+    """获取用户列表"""
+    # todo: 权限控制
+    pagination = sort_paginate(model="User", **common)
+    return pagination
+
+
+@user_router.post("", response_model=UserRead, summary="新建用户")
+def create_user(user_in: UserCreate, db_session: DbSession, current_user: CurrentUser):
+    """创建新用户"""
+    # todo: 权限控制
+    user = get_by_name(db_session=db_session, username=user_in.username)
+    if user:
+        logger.warning(f"创建用户失败，原因：用户{user.username}已经存在")
+        raise HTTPException(422, detail=[{"msg": "该用户已经存在!"}])
+    try:
+        user = create(db_session=db_session, user_in=user_in)
+    except IntegrityError:
+        raise HTTPException(422, detail=[{"msg": "用户名/手机号/邮箱 已经存在了"}])
+    return user
+
+
+@user_router.put("/{user_id}", response_model=UserRead, summary="更新用户信息")
+def update_user(user_id: PrimaryKey, user_in: UserUpdate, db_session: DbSession, current_user: CurrentUser):
+    """更新用户"""
+    # todo: 权限控制
+    user = get_by_id(db_session=db_session, user_id=user_id)
+    if not user:
+        raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
+
+    user = update(db_session=db_session, user=user, user_in=user_in)
+    return user
+
+
+@user_router.delete("/{user_id}", response_model=None, summary="删除用户")
+def delete_user(user_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
+    """删除新用户"""
+    # todo: 权限控制
+    try:
+        delete(db_session=db_session, user_id=user_id)
+    except Exception as e:
+        logger.debug(f"删除用户{user_id}失败，原因: {e}")
+        raise HTTPException(500, detail=[{"msg": f"用户{user_id}不能被删除，请确保该用户没有关联的应用"}])
+
+
+@user_router.put("/{user_id}/passwd", response_model=None, summary="重置密码")
+def reset_passwd(user_id: PrimaryKey, db_session: DbSession, passwd_in: UserPasswdReset, current_user: CurrentUser):
+    """重置密码"""
+    # todo
+    user = get_by_id(db_session=db_session, user_id=user_id)
+    if not user:
+        raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
+
+    update(db_session=db_session, user=user, user_in=passwd_in)

@@ -1,12 +1,13 @@
 from fastapi import APIRouter
 from loguru import logger
 
-from .schemas import RouteResponse, MenuItem
+from .schemas import RouteResponse, MenuItem, RolePagination
 
 from ..core.database import DbSession
-from ..core.service import CommonParameters
+from ..core.service import CommonParameters, sort_paginate
 
 permission_router = APIRouter()
+role_router = APIRouter()
 
 
 def recursion_menu(menu, result: list) -> dict:
@@ -41,3 +42,8 @@ def routes(common: CommonParameters, db_session: DbSession):
             recursion_menu(menu, menus)
 
     return {"data": menus}
+
+
+@role_router.get("", response_model=RolePagination, summary="获取角色列表")
+def get_roles(common:  CommonParameters):
+    return sort_paginate("Role", **common)

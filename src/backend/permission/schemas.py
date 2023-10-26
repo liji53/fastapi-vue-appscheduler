@@ -1,8 +1,9 @@
 from typing import Optional, Union
+from datetime import datetime
 
 from .models import Menu
 
-from ..core.schemas import MyBaseModel
+from ..core.schemas import MyBaseModel, Pagination, PrimaryKey, NameStr
 
 
 class MenuMeta(MyBaseModel):
@@ -24,15 +25,22 @@ class RouteResponse(MyBaseModel):
     data: list[MenuItem]
 
 
-class RoleRegister(MyBaseModel):
-    name: str
-    code: str
-    is_active: bool = True
-    description: Optional[str] = None
-    menus: list[Union[Menu, int]] = []
+class RoleBase(MyBaseModel):
+    name: NameStr
+    code: NameStr
+    status: bool = True
+    remark: Optional[str] = None
 
 
+class RoleCreate(RoleBase):
+    menus: Optional[list[Union[PrimaryKey, Menu]]] = None
 
 
+class RoleRead(RoleBase):
+    id: PrimaryKey
+    created_at: datetime
+    updated_at: datetime
 
 
+class RolePagination(Pagination):
+    data: list[RoleRead]

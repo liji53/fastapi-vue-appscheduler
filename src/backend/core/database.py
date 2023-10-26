@@ -116,9 +116,6 @@ def get_model_by_table_name(table_fullname: str) -> any:
     mapped_class = _find_model(table_fullname)
 
     if mapped_class is None:
-        raise HTTPException(
-            status_code=500,
-            detail="内部错误：获取表对象失败!",
-        )
+        raise HTTPException(status_code=500, detail=[{"msg": "获取表对象失败!"}])
 
     return mapped_class

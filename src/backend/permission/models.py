@@ -17,8 +17,8 @@ class Role(Base, DateTimeMixin):
     id = Column(Integer, primary_key=True)
     name = Column(String(128), nullable=False, comment="角色名称")
     code = Column(String(128), unique=True, nullable=False, comment="角色标识")
-    is_active = Column(Boolean, default=True, comment="是否启用")
-    description = Column(String(512), comment="备注")
+    status = Column(Boolean, default=True, comment="是否启用")
+    remark = Column(String(512), comment="备注")
 
     users = relationship("User", secondary=UserRole, back_populates="roles")
     menus = relationship("Menu", secondary=RoleMenu, back_populates="roles")  # 只关联叶子节点

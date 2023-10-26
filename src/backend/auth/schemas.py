@@ -1,11 +1,11 @@
 from typing import Optional, Annotated, Union
+from datetime import datetime
 
-from pydantic import Field
-from pydantic.networks import EmailStr
+from pydantic.networks import EmailStr, HttpUrl
 from pydantic.functional_validators import BeforeValidator
 import bcrypt
 
-from ..core.schemas import MyBaseModel, PrimaryKey
+from ..core.schemas import MyBaseModel, PrimaryKey, Pagination, NameStr
 from ..permission.models import Role
 
 
@@ -15,32 +15,50 @@ def hash_password(password: str):
     return bcrypt.hashpw(pw, salt)
 
 
-class UserBase(MyBaseModel):
-    username: str
-    email: Optional[EmailStr] = None
+class UserLoginBase(MyBaseModel):
+    username: NameStr
 
 
-class UserLogin(UserBase):
+class UserLogin(UserLoginBase):
     password: str
 
 
-class UserRegister(UserBase):
-    """需要对密码进行哈希"""
-    password: Annotated[str, BeforeValidator(hash_password)]
-    phone: Optional[str] = None
-    is_active: bool = True
-    description: Optional[str] = None
-    roles: list[Union[int, Role]]
-
-
-class UserLoginResponse(MyBaseModel):
-    username: str
+class UserLoginResponse(UserLoginBase):
     roles: list[str]
     accessToken: str
     refreshToken: str
     expires: str
 
 
+class UserBase(MyBaseModel):
+    username: NameStr
+    avatar: Optional[HttpUrl] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    status: bool = True
+    remark: Optional[str] = None
+
+
+class UserCreate(UserBase):
+    password: Annotated[str, BeforeValidator(hash_password)]  # 会自动对密码hash
+    roles: Optional[list[Union[PrimaryKey, Role]]] = None
+
+
+class UserUpdate(MyBaseModel):
+    username: NameStr
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    remark: Optional[str] = None
+
+
+class UserPasswdReset(MyBaseModel):
+    password: Annotated[str, BeforeValidator(hash_password)]  # 会自动对密码hash
+
+
 class UserRead(UserBase):
     id: PrimaryKey
-    role: Optional[str] = Field(None, nullable=True)
+    created_at: datetime
+
+
+class UserPagination(Pagination):
+    data: list[UserRead]
