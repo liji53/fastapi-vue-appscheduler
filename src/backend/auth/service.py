@@ -6,7 +6,7 @@ from loguru import logger
 from jose import jwt
 
 from .models import User
-from .schemas import UserCreate, UserUpdate, UserPasswdReset
+from .schemas import UserCreate, UserUpdate, UserPasswdReset, UserStatusUpdate
 
 from ..core.config import JWT_SECRET, JWT_ALG
 from ..permission.models import Role
@@ -34,7 +34,7 @@ def create(*, db_session, user_in: UserCreate) -> User:
     return user
 
 
-def update(*, db_session, user: User, user_in: Union[UserUpdate, UserPasswdReset]):
+def update(*, db_session, user: User, user_in: Union[UserUpdate, UserPasswdReset, UserStatusUpdate]):
     """更新用户信息"""
     user_data = user.dict()
     update_data = user_in.model_dump()

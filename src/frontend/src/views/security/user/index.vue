@@ -18,7 +18,6 @@ defineOptions({
   name: "User"
 });
 
-const treeRef = ref();
 const formRef = ref();
 const tableRef = ref();
 
@@ -43,7 +42,7 @@ const {
   onSelectionCancel,
   handleCurrentChange,
   handleSelectionChange
-} = useUser(tableRef, treeRef);
+} = useUser(tableRef);
 </script>
 
 <template>
@@ -79,8 +78,8 @@ const {
             clearable
             class="!w-[160px]"
           >
-            <el-option label="已开启" value="1" />
-            <el-option label="已关闭" value="0" />
+            <el-option label="已开启" value="true" />
+            <el-option label="已关闭" value="false" />
           </el-select>
         </el-form-item>
         <el-form-item>

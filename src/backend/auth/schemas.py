@@ -55,6 +55,10 @@ class UserPasswdReset(MyBaseModel):
     password: Annotated[str, BeforeValidator(hash_password)]  # 会自动对密码hash
 
 
+class UserStatusUpdate(MyBaseModel):
+    status: bool
+
+
 class UserRead(UserBase):
     id: PrimaryKey
     created_at: datetime

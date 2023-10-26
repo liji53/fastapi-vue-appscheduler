@@ -6,7 +6,7 @@ interface FormItemProps {
   password: string;
   phone: string | number;
   email: string;
-  status: number;
+  status: boolean;
   remark: string;
 }
 interface FormProps {

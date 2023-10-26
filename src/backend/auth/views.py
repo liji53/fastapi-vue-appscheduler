@@ -1,8 +1,11 @@
-from fastapi import APIRouter, status, HTTPException
+from typing import Union
+
+from fastapi import APIRouter, HTTPException, Query
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
-from .schemas import UserLogin, UserLoginResponse, UserRead, UserCreate, UserUpdate, UserPagination, UserPasswdReset
+from .schemas import UserLogin, UserLoginResponse, UserRead, UserCreate, UserUpdate, UserPagination, \
+    UserPasswdReset, UserStatusUpdate
 from .service import get_by_name, create, get_by_id, update, delete
 
 from ..core.database import DbSession
@@ -25,10 +28,20 @@ def login(user_in: UserLogin, db_session: DbSession):
 
 
 @user_router.get("", response_model=UserPagination, summary="获取用户列表")
-def get_users(common: CommonParameters):
+def get_users(common: CommonParameters, username: str = "", phone: str = "",
+              active: str = Query(default="", alias="status")):
     """获取用户列表"""
     # todo: 权限控制
-    pagination = sort_paginate(model="User", **common)
+    filter_spec = []
+    if username:
+        filter_spec.append({"field": "username", 'op': 'like', 'value': f"%{username}%"})
+    if phone:
+        filter_spec.append({"field": "phone", 'op': '==', 'value': phone})
+    if active:
+        filter_spec.append({"field": "status", 'op': '==', 'value': True if active == "true" else False})
+    logger.debug(filter_spec)
+
+    pagination = sort_paginate(model="User", filter_spec=filter_spec, **common)
     return pagination
 
 
@@ -79,3 +92,14 @@ def reset_passwd(user_id: PrimaryKey, db_session: DbSession, passwd_in: UserPass
         raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
 
     update(db_session=db_session, user=user, user_in=passwd_in)
+
+
+@user_router.put("/{user_id}/status", response_model=None, summary="更新用户是否使能")
+def update_status(user_id: PrimaryKey, db_session: DbSession, status_in: UserStatusUpdate, current_user: CurrentUser):
+    """重置密码"""
+    # todo
+    user = get_by_id(db_session=db_session, user_id=user_id)
+    if not user:
+        raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
+
+    update(db_session=db_session, user=user, user_in=status_in)

@@ -78,6 +78,10 @@ export const deleteUser = (user_id: number) => {
 export const resetPasswd = (user_id: number, data?: object) => {
   return http.put(baseUrlApi(`users/${user_id}/passwd`), { data });
 };
+// 更新用户状态
+export const updateUserStatus = (user_id: number, data?: object) => {
+  return http.put(baseUrlApi(`users/${user_id}/status`), { data });
+};
 
 /** 用户管理-根据userId，获取对应角色id列表（userId：用户id） */
 export const getRoleIds = (user_id: number) => {

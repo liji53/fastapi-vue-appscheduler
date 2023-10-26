@@ -16,7 +16,8 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  resetPasswd
+  resetPasswd,
+  updateUserStatus
 } from "@/api/user";
 import { getAllRoleList } from "@/api/role";
 import {
@@ -37,11 +38,11 @@ import {
   onMounted
 } from "vue";
 
-export function useUser(tableRef: Ref, treeRef: Ref) {
+export function useUser(tableRef: Ref) {
   const form = reactive({
-    username: "",
-    phone: "",
-    status: ""
+    username: null,
+    phone: null,
+    status: null
   });
   const formRef = ref();
   const ruleFormRef = ref();
@@ -153,10 +154,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const curScore = ref();
   const roleOptions = ref([]);
 
+  // 用户状态变更
   function onChange({ row, index }) {
     ElMessageBox.confirm(
       `确认要<strong>${
-        row.status === 0 ? "停用" : "启用"
+        row.status === false ? "停用" : "启用"
       }</strong><strong style='color:var(--el-color-primary)'>${
         row.username
       }</strong>用户吗?`,
@@ -177,7 +179,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             loading: true
           }
         );
-        setTimeout(() => {
+        updateUserStatus(row.id, { status: row.status }).then(() => {
           switchLoadMap.value[index] = Object.assign(
             {},
             switchLoadMap.value[index],
@@ -188,10 +190,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           message("已成功修改用户状态", {
             type: "success"
           });
-        }, 300);
+        });
       })
       .catch(() => {
-        row.status === 0 ? (row.status = 1) : (row.status = 0);
+        row.status === false ? (row.status = true) : (row.status = false);
       });
   }
 
@@ -253,7 +255,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    treeRef.value.onTreeReset();
     onSearch();
   };
 
@@ -268,7 +269,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           password: row?.password ?? "",
           phone: row?.phone ?? null,
           email: row?.email ?? null,
-          status: row?.status ?? 1,
+          status: row?.status ?? true,
           remark: row?.remark ?? null
         }
       },
