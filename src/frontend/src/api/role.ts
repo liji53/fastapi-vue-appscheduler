@@ -4,6 +4,10 @@ import { baseUrlApi } from "@/api/utils";
 type Role = {
   id: Number;
   name: string;
+  code: string;
+  status: boolean;
+  remark: string;
+  created_at: string;
 };
 
 type RoleList = {
@@ -12,6 +16,18 @@ type RoleList = {
 };
 
 /** 获取角色列表 */
-export const getAllRoleList = (params?: object) => {
+export const getRoleList = (params?: object) => {
   return http.request<RoleList>("get", baseUrlApi("roles"), { params });
+};
+// 新建角色
+export const createRole = (data: object) => {
+  return http.post(baseUrlApi("roles"), { data });
+};
+// 更新角色
+export const updateRole = (role_id: number, data: object) => {
+  return http.put(baseUrlApi(`roles/${role_id}`), { data });
+};
+// 删除角色
+export const deleteRole = (role_id: number) => {
+  return http.delete(baseUrlApi(`roles/${role_id}`));
 };

@@ -31,7 +31,7 @@ type User = {
   email: string;
   status: boolean;
   remark: string;
-  created_at: number;
+  created_at: string;
 };
 
 export type UserList = {
@@ -73,14 +73,6 @@ export const updateUser = (user_id: number, data?: object) => {
 // 删除用户
 export const deleteUser = (user_id: number) => {
   return http.delete(baseUrlApi(`users/${user_id}`));
-};
-// 重置密码
-export const resetPasswd = (user_id: number, data?: object) => {
-  return http.put(baseUrlApi(`users/${user_id}/passwd`), { data });
-};
-// 更新用户状态
-export const updateUserStatus = (user_id: number, data?: object) => {
-  return http.put(baseUrlApi(`users/${user_id}/status`), { data });
 };
 // 批量删除用户
 export const batchUserDelete = (data?: object) => {

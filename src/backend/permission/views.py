@@ -1,10 +1,15 @@
-from fastapi import APIRouter
-from loguru import logger
+from typing import Union
 
-from .schemas import RouteResponse, MenuItem, RolePagination
+from fastapi import APIRouter, Query, HTTPException
+from loguru import logger
+from sqlalchemy.exc import IntegrityError
+
+from .schemas import RouteResponse, RolePagination, RoleRead, RoleCreate, RoleUpdate, RoleStatusUpdate
+from .service import get_by_code, get_by_id, create, update, delete
 
 from ..core.database import DbSession
 from ..core.service import CommonParameters, sort_paginate
+from ..core.schemas import PrimaryKey
 
 permission_router = APIRouter()
 role_router = APIRouter()
@@ -33,7 +38,7 @@ def recursion_menu(menu, result: list) -> dict:
 
 
 @permission_router.get("/routes", response_model=RouteResponse, response_model_exclude_none=True, summary="获取动态路由")
-def routes(common: CommonParameters, db_session: DbSession):
+def routes(common: CommonParameters):
     """前端动态路由"""
     logger.debug(f"获取web路由, 当前角色为: {common['roles']}")
     menus = []
@@ -45,5 +50,55 @@ def routes(common: CommonParameters, db_session: DbSession):
 
 
 @role_router.get("", response_model=RolePagination, summary="获取角色列表")
-def get_roles(common:  CommonParameters):
-    return sort_paginate("Role", **common)
+def get_roles(common:  CommonParameters, code: str = "", active: str = Query(default="", alias="status")):
+    """获取角色列表"""
+    filter_spec = []
+    if code:
+        filter_spec.append({"field": "code", 'op': '==', 'value': code})
+    if active:
+        filter_spec.append({"field": "status", 'op': '==', 'value': True if active == "true" else False})
+
+    return sort_paginate("Role", filter_spec=filter_spec, **common)
+
+
+@role_router.post("", response_model=RoleRead, summary="创建角色列表")
+def create_role(role_in: RoleCreate, db_session: DbSession):
+    """创建角色"""
+    # todo: 权限控制
+    role = get_by_code(db_session=db_session, code=role_in.code)
+    if role:
+        logger.info(f"创建角色失败，原因：角色{role.code}已经存在")
+        raise HTTPException(422, detail=[{"msg": "创建角色失败，该角色已经存在!"}])
+    try:
+        role = create(db_session=db_session, role_in=role_in)
+    except IntegrityError:
+        logger.warning(f"创建角色失败，原因：{IntegrityError}")
+        raise HTTPException(500, detail=[{"msg": "创建角色失败，该角色已经存在了"}])
+    return role
+
+
+@role_router.put("/{role_id}", response_model=RoleRead, summary="更新角色信息, 更新角色状态")
+def update_role(role_id: PrimaryKey, role_in: Union[RoleUpdate, RoleStatusUpdate], db_session: DbSession):
+    """更新角色"""
+    # todo: 权限控制
+    role = get_by_id(db_session=db_session, role_id=role_id)
+    if not role:
+        logger.info(f"更新角色失败，原因：角色{role.code}不存在")
+        raise HTTPException(404, detail=[{"msg": "更新角色失败，该角色不存在！"}])
+    try:
+        role = update(db_session=db_session, role=role, role_in=role_in)
+    except IntegrityError:
+        logger.warning(f"更新角色失败，原因：{IntegrityError}")
+        raise HTTPException(500, detail=[{"msg": "更新角色失败, 角色code已经存在！"}])
+    return role
+
+
+@role_router.delete("/{role_id}", response_model=None, summary="删除角色")
+def delete_role(role_id: PrimaryKey, db_session: DbSession):
+    """删除角色"""
+    # todo: 权限控制
+    try:
+        delete(db_session=db_session, role_id=role_id)
+    except IntegrityError:
+        logger.debug(f"删除角色{role_id}失败，原因: {IntegrityError}")
+        raise HTTPException(500, detail=[{"msg": f"角色{role_id}不能被删除，请确保该角色没有关联的对象"}])

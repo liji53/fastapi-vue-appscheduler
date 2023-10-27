@@ -39,10 +39,8 @@ def get_users(common: CommonParameters, username: str = "", phone: str = "",
         filter_spec.append({"field": "phone", 'op': '==', 'value': phone})
     if active:
         filter_spec.append({"field": "status", 'op': '==', 'value': True if active == "true" else False})
-    logger.debug(filter_spec)
 
-    pagination = sort_paginate(model="User", filter_spec=filter_spec, **common)
-    return pagination
+    return sort_paginate(model="User", filter_spec=filter_spec, **common)
 
 
 @user_router.post("", response_model=UserRead, summary="新建用户")
@@ -60,8 +58,9 @@ def create_user(user_in: UserCreate, db_session: DbSession, current_user: Curren
     return user
 
 
-@user_router.put("/{user_id}", response_model=UserRead, summary="更新用户信息")
-def update_user(user_id: PrimaryKey, user_in: UserUpdate, db_session: DbSession, current_user: CurrentUser):
+@user_router.put("/{user_id}", response_model=UserRead, summary="更新用户信息, 更新用户状态, 重置密码")
+def update_user(user_id: PrimaryKey, user_in: Union[UserUpdate, UserStatusUpdate, UserPasswdReset],
+                db_session: DbSession, current_user: CurrentUser):
     """更新用户"""
     # todo: 权限控制
     user = get_by_id(db_session=db_session, user_id=user_id)
@@ -81,28 +80,6 @@ def delete_user(user_id: PrimaryKey, db_session: DbSession, current_user: Curren
     except Exception as e:
         logger.debug(f"删除用户{user_id}失败，原因: {e}")
         raise HTTPException(500, detail=[{"msg": f"用户{user_id}不能被删除，请确保该用户没有关联的应用"}])
-
-
-@user_router.put("/{user_id}/passwd", response_model=None, summary="重置密码")
-def reset_passwd(user_id: PrimaryKey, db_session: DbSession, passwd_in: UserPasswdReset, current_user: CurrentUser):
-    """重置密码"""
-    # todo
-    user = get_by_id(db_session=db_session, user_id=user_id)
-    if not user:
-        raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
-
-    update(db_session=db_session, user=user, user_in=passwd_in)
-
-
-@user_router.put("/{user_id}/status", response_model=None, summary="更新用户是否使能")
-def update_status(user_id: PrimaryKey, db_session: DbSession, status_in: UserStatusUpdate, current_user: CurrentUser):
-    """重置密码"""
-    # todo
-    user = get_by_id(db_session=db_session, user_id=user_id)
-    if not user:
-        raise HTTPException(404, detail=[{"msg": "该用户不存在！"}])
-
-    update(db_session=db_session, user=user, user_in=status_in)
 
 
 @user_router.delete("", response_model=None, summary="删除用户")

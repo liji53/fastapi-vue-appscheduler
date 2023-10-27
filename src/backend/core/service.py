@@ -16,7 +16,7 @@ def common_parameters(
     roles: CurrentRoles,
     page: int = Query(1, gt=0, lt=2147483647),
     items_per_page: int = Query(None, alias="itemsPerPage", gt=-2, lt=2147483647),
-    query_str: str = Query(None, alias="q"),
+    query_name: str = Query(None, alias="name"),
     sort_by: list[str] = Query([], alias="sortBy[]"),
     descending: list[bool] = Query([], alias="descending[]"),
 ):
@@ -24,7 +24,7 @@ def common_parameters(
         "db_session": db_session,
         "page": page,
         "items_per_page": items_per_page,
-        "query_str": query_str,
+        "query_name": query_name,
         "sort_by": sort_by,
         "descending": descending,
         "current_user": current_user,
@@ -44,7 +44,7 @@ def sort_paginate(
     filter_spec: list[dict] = None,
     page: int = 1,
     items_per_page: int = None,
-    query_str: str = None,
+    query_name: str = None,
     sort_by: list[str] = None,
     descending: list[bool] = None,
     current_user: User = None,
@@ -54,9 +54,9 @@ def sort_paginate(
     model_cls = get_model_by_table_name(model)
     try:
         query = db_session.query(model_cls)
-        if query_str:
+        if query_name:
             # query = search(query_str=query_str, query=query, model=model, sort=sort)
-            name_filter = [{"field": "name", 'op': 'like', 'value': f"%{query_str}%"}]
+            name_filter = [{"field": "name", 'op': 'like', 'value': f"%{query_name}%"}]
             query = apply_filters(query, filter_spec=name_filter)
 
         if filter_spec:

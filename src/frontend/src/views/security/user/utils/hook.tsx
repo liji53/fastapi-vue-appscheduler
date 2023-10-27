@@ -16,11 +16,9 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  resetPasswd,
-  updateUserStatus,
   batchUserDelete
 } from "@/api/user";
-import { getAllRoleList } from "@/api/role";
+import { getRoleList } from "@/api/role";
 import {
   ElForm,
   ElInput,
@@ -41,8 +39,8 @@ import {
 
 export function useUser(tableRef: Ref) {
   const form = reactive({
-    username: null,
-    phone: null,
+    username: "",
+    phone: "",
     status: null,
     page: 1,
     itemsPerPage: 10
@@ -115,7 +113,7 @@ export function useUser(tableRef: Ref) {
           inactive-text="已停用"
           inline-prompt
           style={switchStyle.value}
-          onChange={() => onChange(scope as any)}
+          onChange={() => onChangeStatus(scope as any)}
         />
       )
     },
@@ -158,7 +156,7 @@ export function useUser(tableRef: Ref) {
   const roleOptions = ref([]);
 
   // 用户状态变更
-  function onChange({ row, index }) {
+  function onChangeStatus({ row, index }) {
     ElMessageBox.confirm(
       `确认要<strong>${
         row.status === false ? "停用" : "启用"
@@ -174,7 +172,7 @@ export function useUser(tableRef: Ref) {
         draggable: true
       }
     )
-      .then(() => {
+      .then(async () => {
         switchLoadMap.value[index] = Object.assign(
           {},
           switchLoadMap.value[index],
@@ -182,18 +180,26 @@ export function useUser(tableRef: Ref) {
             loading: true
           }
         );
-        updateUserStatus(row.id, { status: row.status }).then(() => {
-          switchLoadMap.value[index] = Object.assign(
-            {},
-            switchLoadMap.value[index],
-            {
-              loading: false
-            }
-          );
-          message("已成功修改用户状态", {
-            type: "success"
+        await updateUser(row.id, { status: row.status })
+          .then(() => {
+            message(
+              `已${row.status === false ? "停用" : "启用"}${row.username}`,
+              {
+                type: "success"
+              }
+            );
+          })
+          .catch(() => {
+            row.status === false ? (row.status = true) : (row.status = false);
           });
-        });
+
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: false
+          }
+        );
       })
       .catch(() => {
         row.status === false ? (row.status = true) : (row.status = false);
@@ -211,15 +217,15 @@ export function useUser(tableRef: Ref) {
     onSearch();
   }
 
-  async function handleSizeChange(val: number) {
+  function handleSizeChange(val: number) {
     form.page = 1;
     form.itemsPerPage = val;
-    await onSearch();
+    onSearch();
   }
 
-  async function handleCurrentChange(val: number) {
+  function handleCurrentChange(val: number) {
     form.page = val;
-    await onSearch();
+    onSearch();
   }
 
   /** 当CheckBox选择项发生变化时会触发该事件 */
@@ -242,27 +248,21 @@ export function useUser(tableRef: Ref) {
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
     batchUserDelete({
       ids: getKeyList(curSelected, "id")
-    })
-      .then(async () => {
-        message(`批量删除了${curSelected.length}条数据`, {
-          type: "success"
-        });
-      })
-      .finally(async () => {
-        await onSearch();
-        tableRef.value.getTableRef().clearSelection();
+    }).then(() => {
+      message(`批量删除了${curSelected.length}条数据`, {
+        type: "success"
       });
+      tableRef.value.getTableRef().clearSelection();
+    });
   }
 
   async function onSearch() {
     loading.value = true;
-    const response = await getUserList(toRaw(form));
-    dataList.value = response.data;
-    pagination.total = response.total;
-
-    setTimeout(() => {
-      loading.value = false;
-    }, 500);
+    await getUserList(toRaw(form)).then(response => {
+      dataList.value = response.data;
+      pagination.total = response.total;
+    });
+    loading.value = false;
   }
 
   const resetForm = formEl => {
@@ -407,7 +407,7 @@ export function useUser(tableRef: Ref) {
         ruleFormRef.value.validate(async valid => {
           if (valid) {
             // 表单规则校验通过
-            await resetPasswd(row.id, { password: pwdForm.newPwd }).then(() => {
+            await updateUser(row.id, { password: pwdForm.newPwd }).then(() => {
               message(`已成功重置 ${row.username} 用户的密码`, {
                 type: "success"
               });
@@ -453,7 +453,7 @@ export function useUser(tableRef: Ref) {
     onSearch();
 
     // 角色列表
-    roleOptions.value = (await getAllRoleList()).data;
+    roleOptions.value = (await getRoleList()).data;
   });
 
   return {

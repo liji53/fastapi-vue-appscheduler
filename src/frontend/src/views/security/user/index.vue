@@ -47,7 +47,7 @@ const {
 
 <template>
   <div class="flex justify-between">
-    <div class="w-[calc(100%-50px)]">
+    <div class="w-[calc(100%-1px)]">
       <!-- 用户搜索header -->
       <el-form
         ref="formRef"

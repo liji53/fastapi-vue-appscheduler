@@ -36,10 +36,19 @@ class RoleCreate(RoleBase):
     menus: Optional[list[Union[PrimaryKey, Menu]]] = None
 
 
+class RoleUpdate(MyBaseModel):
+    name: NameStr
+    code: NameStr
+    remark: Optional[str] = None
+
+
+class RoleStatusUpdate(MyBaseModel):
+    status: bool
+
+
 class RoleRead(RoleBase):
     id: PrimaryKey
     created_at: datetime
-    updated_at: datetime
 
 
 class RolePagination(Pagination):

@@ -29,7 +29,7 @@ const dataLoading = ref(true);
 const appQueryParams = ref({
   page: 1,
   itemsPerPage: pagination.value.pageSize,
-  q: null,
+  name: null,
   categoryId: -1,
   statuses: []
 });
@@ -83,7 +83,7 @@ const handleSelectAppStatus = async (statuses: Array<String>) => {
 const handleSearchAppName = async (app_name: string) => {
   pagination.value.current = 1;
   appQueryParams.value.page = 1;
-  appQueryParams.value.q = app_name;
+  appQueryParams.value.name = app_name;
 };
 
 // 用于响应AppCard的事件

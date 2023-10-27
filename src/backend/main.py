@@ -2,7 +2,7 @@ import sys
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
@@ -14,11 +14,27 @@ from .core.middleware import DBSessionMiddleware
 logger.remove()
 logger.add(sys.stderr, level=LOG_LEVEL)
 
+
 # app-scheduler应用
 app = FastAPI(openapi_url="")
 
+
+# api的异常处理
+async def not_found(request, exc):
+    return JSONResponse(
+        status_code=404, content={"detail": [{"msg": "API不支持."}]}
+    )
+
+
+async def internal_error(request, exc):
+    return JSONResponse(
+        status_code=500, content={"detail": [{"msg": "API服务内部错误."}]}
+    )
+exception_handlers = {404: not_found, 500: internal_error}   # 404异常的处理
+
 # 后端api
 api = FastAPI(
+    exception_handlers=exception_handlers,
     title="App Scheduler",
     description="App Scheduler's API documentation.",
     root_path="/api/v1",

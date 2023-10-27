@@ -97,6 +97,11 @@ def init_database():
                         "meta": {"title": "用户管理"}
                     },
                     {
+                        "path": "/security/role/index",
+                        "name": "Role",
+                        "meta": {"title": "角色管理"}
+                    },
+                    {
                         "path": "/security/config",
                         "name": "Config",
                         "meta": {"title": "系统配置"}
@@ -111,10 +116,10 @@ def init_database():
             )
 
     # 初始化admin角色
-    role = permission_service.get_role_by_code(code="admin", db_session=db_session)
+    role = permission_service.get_by_code(code="admin", db_session=db_session)
     if not role:
-        role = permission_service.create_role(db_session=db_session,
-                                              role_in=RoleCreate(name="管理员", code="admin", menus=menus))
+        role = permission_service.create(db_session=db_session,
+                                         role_in=RoleCreate(name="管理员", code="admin", menus=menus))
 
     # 初始化admin用户
     user = user_service.get_by_name(username="admin", db_session=db_session)
