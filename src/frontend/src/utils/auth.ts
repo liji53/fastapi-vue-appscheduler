@@ -58,7 +58,8 @@ export function setToken(data: DataInfo<Date>) {
       refreshToken,
       expires,
       username,
-      roles
+      roles,
+      avatar
     });
   }
 
