@@ -15,6 +15,9 @@ export const useUserStore = defineStore({
     // 用户名
     username:
       storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "",
+    // 头像
+    avatar:
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.avatar ?? "",
     // 页面级别权限
     roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? []
   }),
@@ -22,6 +25,10 @@ export const useUserStore = defineStore({
     /** 存储用户名 */
     SET_USERNAME(username: string) {
       this.username = username;
+    },
+    /** 存储用户头像 */
+    SET_AVATAR(avatar: string) {
+      this.avatar = avatar;
     },
     /** 存储角色 */
     SET_ROLES(roles: Array<string>) {
@@ -46,6 +53,7 @@ export const useUserStore = defineStore({
     logOut() {
       this.username = "";
       this.roles = [];
+      this.avatar = "";
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();

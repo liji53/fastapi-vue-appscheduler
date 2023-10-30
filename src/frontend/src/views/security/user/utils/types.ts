@@ -14,6 +14,7 @@ interface FormProps {
 }
 
 interface RoleFormItemProps {
+  user_id: number;
   username: string;
   /** 角色列表 */
   roleOptions: any[];

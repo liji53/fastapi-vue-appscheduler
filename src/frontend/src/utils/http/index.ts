@@ -230,6 +230,20 @@ class PureHttp {
   ): Promise<P> {
     return this.request<P>("get", url, params, config);
   }
+
+  /** 单独抽离的upload工具函数 */
+  public upload<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<T>,
+    config?: PureHttpRequestConfig
+  ): Promise<P> {
+    return this.request<P>("post", url, params, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      ...config
+    });
+  }
 }
 
 export const http = new PureHttp();

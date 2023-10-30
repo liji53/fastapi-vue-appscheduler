@@ -4,6 +4,8 @@ import { baseUrlApi } from "@/api/utils";
 export type UserResult = {
   /** 用户名 */
   username: string;
+  /*头像 */
+  avatar: string;
   /** 当前登陆用户的角色 */
   roles: Array<string>;
   /** `token` */
@@ -82,4 +84,9 @@ export const batchUserDelete = (data?: object) => {
 /** 用户管理-根据userId，获取对应角色id列表（userId：用户id） */
 export const getRoleIds = (user_id: number) => {
   return http.request<RoleIds>("get", baseUrlApi(`users/${user_id}/roles`));
+};
+
+// 上传用户头像
+export const uploadUserAvatar = (user_id: number, data?: object) => {
+  return http.upload(baseUrlApi(`users/${user_id}/avatar`), { data });
 };

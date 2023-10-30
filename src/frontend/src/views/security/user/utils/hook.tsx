@@ -16,7 +16,8 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  batchUserDelete
+  batchUserDelete,
+  uploadUserAvatar
 } from "@/api/user";
 import { getRoleList } from "@/api/role";
 import {
@@ -329,12 +330,13 @@ export function useUser(tableRef: Ref) {
       closeOnClickModal: false,
       contentRenderer: () =>
         h(croppingUpload, {
-          imgSrc: row.avatar,
+          imgSrc: row.avatar ?? "/default_avatar.jpeg", // 默认头像
           onCropper: info => (avatarInfo.value = info)
         }),
-      beforeSure: done => {
+      beforeSure: async done => {
         console.log("裁剪后的图片信息：", avatarInfo.value);
         // 根据实际业务使用avatarInfo.value和row里的某些字段去调用上传头像接口即可
+        await uploadUserAvatar(row.id, avatarInfo.value);
         done(); // 关闭弹框
         onSearch(); // 刷新表格数据
       }
@@ -430,6 +432,7 @@ export function useUser(tableRef: Ref) {
       title: `分配 ${row.username} 用户的角色`,
       props: {
         formInline: {
+          user_id: row?.id ?? "",
           username: row?.username ?? "",
           roleOptions: roleOptions.value ?? [],
           ids
@@ -440,10 +443,11 @@ export function useUser(tableRef: Ref) {
       fullscreenIcon: true,
       closeOnClickModal: false,
       contentRenderer: () => h(roleForm),
-      beforeSure: (done, { options }) => {
+      beforeSure: async (done, { options }) => {
         const curData = options.props.formInline as RoleFormItemProps;
         console.log("curIds", curData.ids);
         // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
+        await updateUser(curData.user_id, { roles: curData.ids });
         done(); // 关闭弹框
       }
     });

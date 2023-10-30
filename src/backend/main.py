@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
-from .core.config import LOG_LEVEL, STATIC_DIR
+from .core.config import LOG_LEVEL, STATIC_DIR, FILES_DIR, FILES_DIR_NAME
 from .core.api import api_router
 from .core.middleware import DBSessionMiddleware
 
@@ -59,6 +59,15 @@ async def default_page(request, call_next):
 if STATIC_DIR and os.path.isdir(STATIC_DIR):
     frontend.mount("/", StaticFiles(directory=STATIC_DIR), name="app")
 
-# 挂载前端和后端api
+# 上传图片的路由
+files = FastAPI(openapi_url="")
+if FILES_DIR:
+    if not os.path.exists(FILES_DIR):
+        os.makedirs(FILES_DIR)
+    files.mount(f"", StaticFiles(directory=FILES_DIR), name="file")
+
+# 挂载前端、后端api、存储系统
 app.mount("/api/v1", app=api)
+app.mount(f"/{FILES_DIR_NAME}", app=files)
 app.mount("/", app=frontend)
+

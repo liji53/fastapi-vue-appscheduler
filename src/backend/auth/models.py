@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from jose import jwt
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Table
+from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Table, LargeBinary
 from sqlalchemy.orm import relationship
 
 from ..core.config import JWT_EXP, JWT_SECRET, JWT_ALG

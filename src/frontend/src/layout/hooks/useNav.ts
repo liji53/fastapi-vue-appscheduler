@@ -2,7 +2,6 @@ import { storeToRefs } from "pinia";
 import { getConfig } from "@/config";
 import { emitter } from "@/utils/mitt";
 import { routeMetaType } from "../types";
-import userAvatar from "@/assets/user.jpg";
 import { getTopMenu } from "@/router/utils";
 import { useGlobal } from "@pureadmin/utils";
 import { useRouter, useRoute } from "vue-router";
@@ -35,6 +34,11 @@ export function useNav() {
   /** 用户名 */
   const username = computed(() => {
     return useUserStoreHook()?.username;
+  });
+
+  // 用户头像
+  const userAvatar = computed(() => {
+    return useUserStoreHook()?.avatar ? useUserStoreHook()?.avatar : "";
   });
 
   const avatarsStyle = computed(() => {

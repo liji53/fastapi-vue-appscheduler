@@ -1,7 +1,7 @@
 from typing import Optional, Annotated, Union
 from datetime import datetime
 
-from pydantic.networks import EmailStr, HttpUrl
+from pydantic.networks import EmailStr
 from pydantic.functional_validators import BeforeValidator
 import bcrypt
 
@@ -24,6 +24,7 @@ class UserLogin(UserLoginBase):
 
 
 class UserLoginResponse(UserLoginBase):
+    avatar: Optional[str] = None
     roles: list[str]
     accessToken: str
     refreshToken: str
@@ -32,7 +33,7 @@ class UserLoginResponse(UserLoginBase):
 
 class UserBase(MyBaseModel):
     username: NameStr
-    avatar: Optional[HttpUrl] = None
+    avatar: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     status: bool = True
@@ -61,6 +62,16 @@ class UserStatusUpdate(MyBaseModel):
 
 class UserBatchDelete(MyBaseModel):
     ids: list[PrimaryKey]
+
+
+# 获取某用户的角色列表
+class UserRolesRead(MyBaseModel):
+    data: list[PrimaryKey]
+
+
+# 更新用户的角色
+class UserRolesUpdate(MyBaseModel):
+    roles: list[PrimaryKey]
 
 
 class UserRead(UserBase):

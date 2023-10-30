@@ -14,6 +14,15 @@ DEFAULT_STATIC_DIR = os.path.join(
 STATIC_DIR = config("STATIC_DIR", default=DEFAULT_STATIC_DIR)
 logger.debug(f"默认web路径：{STATIC_DIR}")
 
+# 本地存储文件路径 - 上传的图片
+DEFAULT_FILES_DIR_NAME = "files"
+FILES_DIR_NAME = config("FILES_DIR_NAME", default=DEFAULT_FILES_DIR_NAME)
+DEFAULT_FILES_DIR = os.path.join(
+    os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), FILES_DIR_NAME
+)
+FILES_DIR = config("FILES_DIR", default=DEFAULT_FILES_DIR)
+logger.debug(f"默认file路径：{FILES_DIR_NAME} , {FILES_DIR}")
+
 # 认证
 JWT_SECRET = config("JWT_SECRET", default="develop")
 JWT_ALG = config("JWT_ALG", default="HS256")

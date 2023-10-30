@@ -6,10 +6,11 @@ from loguru import logger
 from jose import jwt
 
 from .models import User
-from .schemas import UserCreate, UserUpdate, UserPasswdReset, UserStatusUpdate
+from .schemas import UserCreate, UserUpdate, UserPasswdReset, UserStatusUpdate, UserRolesUpdate
 
 from ..core.config import JWT_SECRET, JWT_ALG
 from ..permission.models import Role
+from ..permission import service as role_service
 
 UNAUTHORIZED_EXCEPTION = HTTPException(status_code=401, detail=[{"msg": "未认证."}])
 
@@ -34,14 +35,25 @@ def create(*, db_session, user_in: UserCreate) -> User:
     return user
 
 
-def update(*, db_session, user: User, user_in: Union[UserUpdate, UserPasswdReset, UserStatusUpdate]):
+def update(*, db_session, user: User, user_in: Union[UserUpdate, UserPasswdReset,
+                                                     UserStatusUpdate, UserRolesUpdate, dict[str, str]]):
     """更新用户信息"""
     user_data = user.dict()
-    update_data = user_in.model_dump()
+    if isinstance(user_in, dict):
+        update_data = user_in
+    else:
+        update_data = user_in.model_dump()
 
     for field in user_data:
         if field in update_data:
             setattr(user, field, update_data[field])
+
+    if update_data.__contains__("roles"):
+        logger.debug(f"{user.roles}")
+        roles = [
+            role_service.get_by_id(db_session=db_session, role_id=role_id) for role_id in update_data["roles"]
+        ]
+        user.roles = roles
 
     db_session.commit()
     return user
