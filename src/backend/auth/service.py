@@ -1,16 +1,15 @@
 from typing import Optional, Annotated, Union
 
 from fastapi import Depends, Request, HTTPException
-from fastapi.security.utils import get_authorization_scheme_param
 from loguru import logger
 from jose import jwt
 
 from .models import User
 from .schemas import UserCreate, UserUpdate, UserPasswdReset, UserStatusUpdate, UserRolesUpdate
 
-from ..core.config import JWT_SECRET, JWT_ALG
 from ..permission.models import Role
 from ..permission import service as role_service
+from ..utils import jwt
 
 UNAUTHORIZED_EXCEPTION = HTTPException(status_code=401, detail=[{"msg": "未认证."}])
 
@@ -71,17 +70,8 @@ def get_current_user(request: Request) -> User:
         logger.error("authorization不存在")
         raise UNAUTHORIZED_EXCEPTION
 
-    scheme, param = get_authorization_scheme_param(authorization)
-    if scheme.lower() != "bearer":
-        logger.error("authorization非法")
-        raise UNAUTHORIZED_EXCEPTION
-
-    token = authorization.split()[1]
-
-    try:
-        data = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALG)
-    except:
-        logger.error("jwt 解码失败.")
+    data = jwt.decode_token(authorization)
+    if not data:
         raise UNAUTHORIZED_EXCEPTION
 
     if not data.__contains__("username") or not data["username"]:

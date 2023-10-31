@@ -31,6 +31,16 @@ class UserLoginResponse(UserLoginBase):
     expires: str
 
 
+class UserToken(MyBaseModel):
+    refreshToken: str
+
+
+class RefreshTokenResponse(MyBaseModel):
+    accessToken: str
+    refreshToken: str
+    expires: str
+
+
 class UserBase(MyBaseModel):
     username: NameStr
     avatar: Optional[str] = None

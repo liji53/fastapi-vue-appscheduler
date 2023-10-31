@@ -21,12 +21,13 @@ DEFAULT_FILES_DIR = os.path.join(
     os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), FILES_DIR_NAME
 )
 FILES_DIR = config("FILES_DIR", default=DEFAULT_FILES_DIR)
-logger.debug(f"默认file路径：{FILES_DIR_NAME} , {FILES_DIR}")
+logger.debug(f"默认file路径: {FILES_DIR}")
 
 # 认证
 JWT_SECRET = config("JWT_SECRET", default="develop")
 JWT_ALG = config("JWT_ALG", default="HS256")
-JWT_EXP = config("JWT_EXP", cast=int, default=24*60*60)   # Seconds
+JWT_EXP = config("JWT_EXP", cast=int, default=2*60*60)   # 2小时过期
+JWT_REFRESH_TOKEN_EXP = config("JWT_REFRESH_TOKEN_EXP", cast=int, default=7*24*60*60)  # 7天过期
 
 # 数据库
 DATABASE_HOSTNAME = config("DATABASE_HOSTNAME")
@@ -44,5 +45,3 @@ ALEMBIC_INI_PATH = config(
     "ALEMBIC_INI_PATH",
     default=os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "alembic.ini"),
 )
-
-

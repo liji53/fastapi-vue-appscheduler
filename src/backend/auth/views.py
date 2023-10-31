@@ -4,17 +4,20 @@ import uuid
 import os
 
 from fastapi import APIRouter, HTTPException, Query, File
+
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
-from .schemas import UserLogin, UserLoginResponse, UserRead, UserCreate, UserUpdate, UserPagination, \
+from .schemas import UserLogin, UserLoginResponse, UserToken, RefreshTokenResponse, \
+    UserRead, UserCreate, UserUpdate, UserPagination, \
     UserPasswdReset, UserStatusUpdate, UserBatchDelete, UserRolesRead, UserRolesUpdate
-from .service import get_by_name, create, get_by_id, update, delete
+from .service import get_by_name, create, get_by_id, update, delete, UNAUTHORIZED_EXCEPTION
 
 from ..core.database import DbSession
 from ..core.service import CurrentUser, CommonParameters, sort_paginate
 from ..core.schemas import PrimaryKey
 from ..core.config import FILES_DIR, FILES_DIR_NAME
+from ..utils import jwt
 
 auth_router = APIRouter()
 user_router = APIRouter()
@@ -27,10 +30,29 @@ def login(user_in: UserLogin, db_session: DbSession):
     logger.debug(f"登录: {user_in.model_dump()}")
     user = get_by_name(db_session=db_session, username=user_in.username)
     if user and user.check_password(user_in.password):
-        return {"username": user.username, "avatar": user.avatar, "roles": ["admin"],
-                "accessToken": user.token, "refreshToken": "?", "expires": user.expired}
+        return {
+            "username": user.username,
+            "avatar": user.avatar,
+            "expires": jwt.expired(),  # 前端使用
+            "accessToken": jwt.get_token(user.username),
+            "refreshToken": jwt.get_token(user.username, True),
+            "roles": [role.code for role in user.roles]
+        }
 
     raise HTTPException(status_code=422, detail=[{"msg": "登录失败!"}])
+
+
+@auth_router.post("/refresh_token", response_model=RefreshTokenResponse, summary="刷新token")
+def refresh_token(token_in: UserToken, db_session: DbSession):
+    data = jwt.decode_token(f"bearer {token_in.refreshToken}")
+    if not data:
+        raise UNAUTHORIZED_EXCEPTION
+
+    return {
+        "accessToken": jwt.get_token(data["username"]),
+        "refreshToken": token_in.refreshToken,
+        "expires": jwt.expired()  # 前端使用，accessToken的过期时间
+    }
 
 
 @user_router.get("", response_model=UserPagination, summary="获取用户列表")

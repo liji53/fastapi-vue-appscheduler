@@ -1,11 +1,7 @@
-from datetime import datetime, timedelta
-
 import bcrypt
-from jose import jwt
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Table, LargeBinary
+from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
-from ..core.config import JWT_EXP, JWT_SECRET, JWT_ALG
 from ..core.database import Base, DateTimeMixin
 from ..application.models import UserApplication
 
@@ -36,19 +32,3 @@ class User(Base, DateTimeMixin):
 
     def check_password(self, password: str):
         return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
-
-    @property
-    def token(self):
-        now = datetime.utcnow()
-        exp = (now + timedelta(seconds=JWT_EXP)).timestamp()
-        data = {
-            "exp": exp,
-            "username": self.username,
-        }
-        return jwt.encode(data, JWT_SECRET, algorithm=JWT_ALG)
-
-    @property
-    def expired(self):
-        now = datetime.utcnow()
-        exp = (now + timedelta(seconds=JWT_EXP)).strftime("%Y/%m/%d %H:%M:%S")
-        return exp
