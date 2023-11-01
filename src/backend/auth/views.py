@@ -29,7 +29,7 @@ NOT_FOUND_EXCEPTION = HTTPException(404, detail=[{"msg": "该用户不存在！"
 def login(user_in: UserLogin, db_session: DbSession):
     logger.debug(f"登录: {user_in.model_dump()}")
     user = get_by_name(db_session=db_session, username=user_in.username)
-    if user and user.check_password(user_in.password):
+    if user and user.status and user.check_password(user_in.password):
         return {
             "username": user.username,
             "avatar": user.avatar,
@@ -47,12 +47,14 @@ def refresh_token(token_in: UserToken, db_session: DbSession):
     data = jwt.decode_token(f"bearer {token_in.refreshToken}")
     if not data:
         raise UNAUTHORIZED_EXCEPTION
-
-    return {
-        "accessToken": jwt.get_token(data["username"]),
-        "refreshToken": token_in.refreshToken,
-        "expires": jwt.expired()  # 前端使用，accessToken的过期时间
-    }
+    user = get_by_name(db_session=db_session, username=data["username"])
+    if user and user.status:
+        return {
+            "accessToken": jwt.get_token(data["username"]),
+            "refreshToken": token_in.refreshToken,
+            "expires": jwt.expired()  # 前端使用，accessToken的过期时间
+        }
+    raise HTTPException(status_code=401, detail=[{"msg": "请重新登录!"}])
 
 
 @user_router.get("", response_model=UserPagination, summary="获取用户列表")

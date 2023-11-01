@@ -77,11 +77,16 @@ def get_current_user(request: Request) -> User:
         logger.error("token 中不存在username信息")
         raise UNAUTHORIZED_EXCEPTION
 
-    return get_by_name(db_session=request.state.db, username=data["username"])
+    user = get_by_name(db_session=request.state.db, username=data["username"])
+    if user and user.status:
+        return user
+    logger.error(f"未认证：user信息{user}")
+    raise UNAUTHORIZED_EXCEPTION
 
 
 def get_current_roles(current_user: User = Depends(get_current_user)) -> list[Role]:
-    return current_user.roles
+    """返回当前使能状态的role"""
+    return [role for role in current_user.roles if role.status]
 
 
 # 当前登录的用户
