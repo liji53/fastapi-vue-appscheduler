@@ -150,4 +150,6 @@ def upload_file(user_id: PrimaryKey, file: Annotated[bytes, File(alias="blob")],
 @user_router.get("/{user_id}/roles", response_model=UserRolesRead, summary="获取用户的角色")
 def get_user_roles(user_id: PrimaryKey, db_session: DbSession):
     user = get_by_id(db_session=db_session, user_id=user_id)
+    if not user:
+        raise NOT_FOUND_EXCEPTION
     return {"data": [role.id for role in user.roles]}

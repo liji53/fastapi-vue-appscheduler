@@ -3,6 +3,8 @@ import { ref } from "vue";
 import { useRole } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import { updateRole, getRoleMenus } from "@/api/role";
+import type { ElTreeV2 } from "element-plus";
 
 // import Database from "@iconify-icons/ri/database-2-line";
 // import More from "@iconify-icons/ep/more-filled";
@@ -28,13 +30,40 @@ const {
   onSearch,
   resetForm,
   openDialog,
-  handleMenu,
+  // handleMenu,
   handleDelete,
   // handleDatabase,
   handleSizeChange,
   handleCurrentChange,
   handleSelectionChange
 } = useRole();
+
+const dataProps = ref({
+  value: "id",
+  label: "title",
+  children: "children"
+});
+const dialogFormVisible = ref(false);
+const currentRoleId = ref(0);
+const menusData = ref([]);
+const activedMenus = ref([]);
+const treeRef = ref<InstanceType<typeof ElTreeV2>>();
+
+const handleMenu = (role_id: number) => {
+  dialogFormVisible.value = true;
+  currentRoleId.value = role_id;
+  getRoleMenus(role_id).then(response => {
+    menusData.value = response.menus;
+    activedMenus.value = response.activedMenus;
+    treeRef.value.setCheckedKeys(activedMenus.value);
+  });
+};
+const onConfirmMenus = () => {
+  dialogFormVisible.value = false;
+  updateRole(currentRoleId.value, {
+    menus: treeRef.value.getCheckedKeys(true)
+  });
+};
 </script>
 
 <template>
@@ -134,7 +163,7 @@ const {
               type="primary"
               :size="size"
               :icon="useRenderIcon(Menu)"
-              @click="handleMenu"
+              @click="handleMenu(row.id)"
             >
               菜单权限
             </el-button>
@@ -195,6 +224,27 @@ const {
         </pure-table>
       </template>
     </PureTableBar>
+
+    <el-dialog v-model="dialogFormVisible" title="菜单权限">
+      <el-card>
+        <el-tree
+          ref="treeRef"
+          :data="menusData"
+          :props="dataProps"
+          show-checkbox
+          node-key="id"
+          :height="500"
+          :default-checked-keys="activedMenus"
+          default-expand-all
+        />
+      </el-card>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取消</el-button>
+          <el-button type="primary" @click="onConfirmMenus"> 确定 </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 

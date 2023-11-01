@@ -48,7 +48,6 @@ def update(*, db_session, user: User, user_in: Union[UserUpdate, UserPasswdReset
             setattr(user, field, update_data[field])
 
     if update_data.__contains__("roles"):
-        logger.debug(f"{user.roles}")
         roles = [
             role_service.get_by_id(db_session=db_session, role_id=role_id) for role_id in update_data["roles"]
         ]

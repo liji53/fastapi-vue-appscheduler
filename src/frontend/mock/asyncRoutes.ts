@@ -45,6 +45,37 @@ const appRouter = {
     }
   ]
 };
+const securityRouter = {
+  path: "/security",
+  meta: {
+    title: "安全中心",
+    icon: "flUser",
+    rank: 10
+  },
+  children: [
+    {
+      path: "/security/role/index",
+      name: "Role",
+      meta: {
+        title: "角色管理"
+      }
+    },
+    {
+      path: "/security/user/index",
+      name: "User",
+      meta: {
+        title: "用户管理"
+      }
+    },
+    {
+      path: "/security/config",
+      name: "Config",
+      meta: {
+        title: "系统配置"
+      }
+    }
+  ]
+};
 
 export default [
   {
@@ -53,7 +84,7 @@ export default [
     response: () => {
       return {
         success: true,
-        data: [permissionRouter, appRouter]
+        data: [permissionRouter, appRouter, securityRouter]
       };
     }
   }

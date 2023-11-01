@@ -15,6 +15,19 @@ type RoleList = {
   data: Array<Role>;
 };
 
+type Menu = {
+  id: Number;
+  title: string;
+  children: Array<Menu>;
+};
+
+type MenuList = {
+  // 所有的菜单
+  menus: Array<Menu>;
+  // 当前角色已经拥有的菜单
+  activedMenus: Array<number>;
+};
+
 /** 获取角色列表 */
 export const getRoleList = (params?: object) => {
   return http.request<RoleList>("get", baseUrlApi("roles"), { params });
@@ -30,4 +43,9 @@ export const updateRole = (role_id: number, data: object) => {
 // 删除角色
 export const deleteRole = (role_id: number) => {
   return http.delete(baseUrlApi(`roles/${role_id}`));
+};
+
+// 获取指定角色的Menus
+export const getRoleMenus = (role_id: number) => {
+  return http.request<MenuList>("get", baseUrlApi(`roles/${role_id}/menus`));
 };

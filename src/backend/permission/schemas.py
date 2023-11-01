@@ -46,6 +46,21 @@ class RoleStatusUpdate(MyBaseModel):
     status: bool
 
 
+class RoleMenuItem(MyBaseModel):
+    id: PrimaryKey
+    title: str
+    children: Optional[list['RoleMenuItem']] = None
+
+
+class RoleMenuUpdate(MyBaseModel):
+    menus: list[PrimaryKey]  # 叶子节点的id
+
+
+class RoleMenuRead(MyBaseModel):
+    menus: list[RoleMenuItem]
+    activedMenus: list[PrimaryKey]
+
+
 class RoleRead(RoleBase):
     id: PrimaryKey
     created_at: datetime
