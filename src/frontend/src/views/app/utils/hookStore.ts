@@ -1,7 +1,13 @@
 import { reactive, ref, onMounted, h } from "vue";
 import { getAppCategory } from "@/api/app_category";
 import type { FormRules } from "element-plus";
-import { getAppList, createApp, updateApp, uploadPic } from "@/api/app";
+import {
+  getAppList,
+  createApp,
+  updateApp,
+  deleteApp,
+  uploadPic
+} from "@/api/app";
 import { installApp } from "@/api/installed_app";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
@@ -134,6 +140,14 @@ export function useApp() {
     await updateApp(app_id, { status: false });
     onSearch();
   };
+  const handleEnableApp = async (app_id: number) => {
+    await updateApp(app_id, { status: true });
+    onSearch();
+  };
+  const handleDeleteApp = async (app_id: number) => {
+    await deleteApp(app_id);
+    onSearch();
+  };
   const handleUploadPicApp = app => {
     addDialog({
       title: "裁剪、上传应用图片",
@@ -194,6 +208,8 @@ export function useApp() {
     handleRevisionApp,
     handleEditApp,
     handleDisableApp,
+    handleEnableApp,
+    handleDeleteApp,
     handleUploadPicApp,
     getCategoryName
   };

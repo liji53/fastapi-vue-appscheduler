@@ -8,6 +8,8 @@ defineEmits([
   "revision-app",
   "edit-app",
   "disable-app",
+  "enable-app",
+  "delete-app",
   "uninstall-app",
   "upload-pic"
 ]);
@@ -97,8 +99,20 @@ const cardLogoClass = computed(() => [
                   下架
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="pagename === 'store' && !app.status"
+                  @click="$emit('enable-app', app.id)"
+                >
+                  上架
+                </el-dropdown-item>
+                <el-dropdown-item
+                  v-if="pagename === 'store'"
+                  @click="$emit('delete-app', app.id)"
+                >
+                  删除
+                </el-dropdown-item>
+                <el-dropdown-item
                   v-if="pagename === 'myApp'"
-                  @click="$emit('uninstall-app-app', app.id)"
+                  @click="$emit('uninstall-app', app.id)"
                 >
                   卸载
                 </el-dropdown-item>

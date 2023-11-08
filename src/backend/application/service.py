@@ -31,9 +31,15 @@ def create(*, db_session, app_in: ApplicationCreate) -> Application:
     return app
 
 
-def update(*, db_session, app: Application, app_in: Union[ApplicationUpdate, AppStatusUpdate]) -> Application:
+def update(*, db_session,
+           app: Application,
+           app_in: Union[ApplicationUpdate, AppStatusUpdate, dict]) -> Application:
+
     app_data = app.dict()
-    update_data = app_in.model_dump()
+    if isinstance(app_in, dict):
+        update_data = app_in
+    else:
+        update_data = app_in.model_dump()
 
     logger.debug(app_data)
     logger.debug(update_data)
@@ -44,3 +50,8 @@ def update(*, db_session, app: Application, app_in: Union[ApplicationUpdate, App
 
     db_session.commit()
     return app
+
+
+def delete(*, db_session, pk: int):
+    db_session.query(Application).filter(Application.id == pk).delete()
+    db_session.commit()

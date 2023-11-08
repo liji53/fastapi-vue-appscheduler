@@ -1,7 +1,4 @@
 from typing import Union, Annotated, Optional
-import time
-import uuid
-import os
 
 from fastapi import APIRouter, HTTPException, Query, File
 
@@ -16,8 +13,7 @@ from .service import get_by_name, create, get_by_id, update, delete, UNAUTHORIZE
 from ..core.database import DbSession
 from ..core.service import CurrentUser, CommonParameters, sort_paginate
 from ..core.schemas import PrimaryKey
-from ..core.config import FILES_DIR, FILES_DIR_NAME
-from ..utils import jwt
+from ..utils import jwt, storage
 
 auth_router = APIRouter()
 user_router = APIRouter()
@@ -108,6 +104,12 @@ def update_user(user_id: PrimaryKey,
 def delete_user(user_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
     """删除新用户"""
     # todo: 权限控制
+    user = get_by_id(db_session=db_session, user_id=user_id)
+    if user:
+        storage.remove_old_file(user.avatar)  # 清理该用户的图片
+    else:
+        return
+
     try:
         delete(db_session=db_session, user_ids=[user_id])
     except Exception as e:
@@ -126,8 +128,10 @@ def batch_delete(db_session: DbSession, ids_in: UserBatchDelete, current_user: C
 
 
 @user_router.post("/{user_id}/avatar", response_model=None, summary="上传用户头像")
-def upload_file(user_id: PrimaryKey, file: Annotated[bytes, File(alias="blob")],
-                db_session: DbSession, current_user: CurrentUser):
+def upload_file(user_id: PrimaryKey,
+                file: Annotated[bytes, File(alias="blob")],
+                db_session: DbSession,
+                current_user: CurrentUser):
     """上传文件，前端数据通过blob字段传递，而不是file
     采用本地存储临时方案
     todo: 限制上传的文件大小
@@ -135,22 +139,11 @@ def upload_file(user_id: PrimaryKey, file: Annotated[bytes, File(alias="blob")],
     user = get_by_id(db_session=db_session, user_id=user_id)
     if not user:
         raise NOT_FOUND_EXCEPTION
-    old_file_path = os.path.join(FILES_DIR, user.avatar.replace(FILES_DIR_NAME, "")[1:])
-    logger.debug(f"删除旧头像文件路径：{old_file_path}")
-    if os.path.exists(old_file_path):
-        os.remove(old_file_path)
 
-    file_name = f"{str(uuid.uuid4())}.png"
-    url_dir = time.strftime(f"avatar/{user_id}/%Y-%m-%d/")
-    save_dir = os.path.join(FILES_DIR, url_dir)
+    storage.remove_old_file(url_path=user.avatar)
+    new_file_path = storage.create_new_file(file=file, pk=user.id, root_dir="users")
 
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-
-    with open(os.path.join(save_dir, file_name), 'wb') as fd:
-        fd.write(file)
-
-    update(db_session=db_session, user=user, user_in={"avatar": os.path.join(FILES_DIR_NAME, url_dir, file_name)})
+    update(db_session=db_session, user=user, user_in={"avatar": new_file_path})
 
 
 @user_router.get("/{user_id}/roles", response_model=UserRolesRead, summary="获取用户的角色")

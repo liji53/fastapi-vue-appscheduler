@@ -10,7 +10,7 @@ class ApplicationBase(MyBaseModel):
     url: HttpUrl
     status: bool = True
     category_id: Optional[PrimaryKey] = None
-    banner: Optional[HttpUrl] = None
+    banner: Optional[str] = None
     description: Optional[str] = None
 
 

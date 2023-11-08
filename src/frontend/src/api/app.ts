@@ -29,6 +29,10 @@ export const updateApp = (app_id: number, data: object) => {
   return http.put(baseUrlApi(`apps/${app_id}`), { data });
 };
 
+export const deleteApp = (app_id: number) => {
+  return http.delete(baseUrlApi(`apps/${app_id}`));
+};
+
 // 上传应用的图片
 export const uploadPic = (app_id: number, data: object) => {
   return http.upload(baseUrlApi(`apps/${app_id}/banner`), { data });

@@ -33,6 +33,8 @@ const {
   handleRevisionApp,
   handleEditApp,
   handleDisableApp,
+  handleEnableApp,
+  handleDeleteApp,
   handleUploadPicApp,
   getCategoryName
 } = useApp();
@@ -133,6 +135,8 @@ const {
               @revision-app="handleRevisionApp"
               @edit-app="handleEditApp"
               @disable-app="handleDisableApp"
+              @enable-app="handleEnableApp"
+              @delete-app="handleDeleteApp"
               @upload-pic="handleUploadPicApp"
             />
           </el-col>
