@@ -79,18 +79,20 @@ def routes(common: CommonParameters):
 
 
 @role_router.get("", response_model=RolePagination, summary="获取角色列表")
-def get_roles(common:  CommonParameters, code: str = "", active: str = Query(default="", alias="status")):
+def get_roles(common:  CommonParameters,
+              code: str = None,
+              active: Optional[bool] = Query(default=None, alias="status")):
     """获取角色列表"""
     filter_spec = []
     if code:
         filter_spec.append({"field": "code", 'op': '==', 'value': code})
-    if active:
-        filter_spec.append({"field": "status", 'op': '==', 'value': True if active == "true" else False})
+    if active is not None:
+        filter_spec.append({"field": "status", 'op': '==', 'value': active})
 
     return sort_paginate("Role", filter_spec=filter_spec, **common)
 
 
-@role_router.post("", response_model=RoleRead, summary="创建角色列表")
+@role_router.post("", response_model=RoleRead, summary="创建角色")
 def create_role(role_in: RoleCreate, db_session: DbSession):
     """创建角色"""
     # todo: 权限控制

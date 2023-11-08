@@ -23,7 +23,7 @@ export function useApp() {
   // 搜索表单
   const form = reactive({
     name: "",
-    categroy: null,
+    category_id: null,
     is_online: null,
     page: 1,
     itemsPerPage: 8

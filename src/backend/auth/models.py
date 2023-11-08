@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
 from ..core.database import Base, DateTimeMixin
-from ..application.models import UserApplication
+# from ..application.models import UserInstalledApp
 
 
 # 中间表
@@ -28,7 +28,7 @@ class User(Base, DateTimeMixin):
     # 当前用户的角色
     roles = relationship("Role", secondary=UserRole, back_populates="users")
     # 当前用户所有已安装的应用
-    installed_applications = relationship("Application", secondary=UserApplication, back_populates="users")
+    # installed_applications = relationship("Application", secondary=UserApplication, back_populates="users")
 
     def check_password(self, password: str):
         return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))

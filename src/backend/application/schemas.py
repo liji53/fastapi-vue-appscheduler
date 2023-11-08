@@ -3,23 +3,32 @@ from typing import Optional
 from pydantic.networks import HttpUrl
 
 from ..core.schemas import Pagination, MyBaseModel, NameStr, PrimaryKey
-from ..application_category.schemas import ApplicationCategoryCreate, ApplicationCategoryRead
 
 
 class ApplicationBase(MyBaseModel):
     name: NameStr
-    status: str
+    url: HttpUrl
+    status: bool = True
+    category_id: Optional[PrimaryKey] = None
     banner: Optional[HttpUrl] = None
     description: Optional[str] = None
 
 
 class ApplicationCreate(ApplicationBase):
-    category: Optional[ApplicationCategoryCreate] = None
+    pass
+
+
+class ApplicationUpdate(ApplicationBase):
+    pass
+
+
+class AppStatusUpdate(MyBaseModel):
+    status: bool
 
 
 class ApplicationRead(ApplicationBase):
     id: PrimaryKey
-    category: Optional[ApplicationCategoryRead] = None
+    is_installed: bool = False
 
 
 class ApplicationPagination(Pagination):

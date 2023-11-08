@@ -56,9 +56,9 @@ const {
               class="!w-[200px]"
             />
           </el-form-item>
-          <el-form-item label="应用分类：" prop="categroy">
+          <el-form-item label="应用分类：" prop="category_id">
             <el-select
-              v-model="form.categroy"
+              v-model="form.category_id"
               placeholder="请选择应用分类"
               clearable
               class="!w-[180px]"

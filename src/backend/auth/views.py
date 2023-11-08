@@ -1,4 +1,4 @@
-from typing import Union, Annotated
+from typing import Union, Annotated, Optional
 import time
 import uuid
 import os
@@ -58,8 +58,10 @@ def refresh_token(token_in: UserToken, db_session: DbSession):
 
 
 @user_router.get("", response_model=UserPagination, summary="获取用户列表")
-def get_users(common: CommonParameters, username: str = "", phone: str = "",
-              active: str = Query(default="", alias="status")):
+def get_users(common: CommonParameters,
+              username: Optional[str] = None,
+              phone: Optional[str] = None,
+              active: Optional[bool] = Query(default=None, alias="status")):
     """获取用户列表"""
     # todo: 权限控制
     filter_spec = []
@@ -67,8 +69,8 @@ def get_users(common: CommonParameters, username: str = "", phone: str = "",
         filter_spec.append({"field": "username", 'op': 'like', 'value': f"%{username}%"})
     if phone:
         filter_spec.append({"field": "phone", 'op': '==', 'value': phone})
-    if active:
-        filter_spec.append({"field": "status", 'op': '==', 'value': True if active == "true" else False})
+    if active is not None:
+        filter_spec.append({"field": "status", 'op': '==', 'value': active})
 
     return sort_paginate(model="User", filter_spec=filter_spec, **common)
 
@@ -89,7 +91,8 @@ def create_user(user_in: UserCreate, db_session: DbSession, current_user: Curren
 
 
 @user_router.put("/{user_id}", response_model=UserRead, summary="更新用户信息, 更新用户状态, 重置密码")
-def update_user(user_id: PrimaryKey, user_in: Union[UserUpdate, UserStatusUpdate, UserPasswdReset, UserRolesUpdate],
+def update_user(user_id: PrimaryKey,
+                user_in: Union[UserUpdate, UserStatusUpdate, UserPasswdReset, UserRolesUpdate],
                 db_session: DbSession, current_user: CurrentUser):
     """更新用户"""
     # todo: 权限控制

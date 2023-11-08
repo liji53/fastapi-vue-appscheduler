@@ -132,11 +132,11 @@ export function useRole() {
       });
   }
 
-  async function handleDelete(row) {
-    await deleteRole(row.id).then(() => {
+  function handleDelete(row) {
+    deleteRole(row.id).then(() => {
       message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
+      onSearch();
     });
-    onSearch();
   }
 
   function handleSizeChange(val: number) {
@@ -154,13 +154,16 @@ export function useRole() {
     console.log("handleSelectionChange", val);
   }
 
-  async function onSearch() {
+  function onSearch() {
     loading.value = true;
-    await getRoleList(toRaw(form)).then(data => {
-      dataList.value = data.data;
-      pagination.total = data.total;
-    });
-    loading.value = false;
+    getRoleList(toRaw(form))
+      .then(data => {
+        dataList.value = data.data;
+        pagination.total = data.total;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
   }
 
   const resetForm = formEl => {
@@ -189,7 +192,7 @@ export function useRole() {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
         function chores() {
-          message(`您${title}了角色名称为${curData.name}的这条数据`, {
+          message(`您${title}了角色${curData.name}`, {
             type: "success"
           });
           done(); // 关闭弹框

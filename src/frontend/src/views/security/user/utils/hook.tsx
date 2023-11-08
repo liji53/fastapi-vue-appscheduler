@@ -211,11 +211,11 @@ export function useUser(tableRef: Ref) {
     console.log(row);
   }
 
-  async function handleDelete(row) {
-    await deleteUser(row.id).then(() => {
-      message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
+  function handleDelete(row) {
+    deleteUser(row.id).then(() => {
+      message(`您删除了用户${row.name}`, { type: "success" });
+      onSearch();
     });
-    onSearch();
   }
 
   function handleSizeChange(val: number) {
@@ -250,20 +250,23 @@ export function useUser(tableRef: Ref) {
     batchUserDelete({
       ids: getKeyList(curSelected, "id")
     }).then(() => {
-      message(`批量删除了${curSelected.length}条数据`, {
+      message(`批量删除了${curSelected.length}个用户`, {
         type: "success"
       });
       tableRef.value.getTableRef().clearSelection();
     });
   }
 
-  async function onSearch() {
+  function onSearch() {
     loading.value = true;
-    await getUserList(toRaw(form)).then(response => {
-      dataList.value = response.data;
-      pagination.total = response.total;
-    });
-    loading.value = false;
+    getUserList(toRaw(form))
+      .then(response => {
+        dataList.value = response.data;
+        pagination.total = response.total;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
   }
 
   const resetForm = formEl => {
@@ -295,24 +298,23 @@ export function useUser(tableRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        async function chores() {
-          message(`您${title}了用户名称为${curData.username}的这条数据`, {
+        function chores() {
+          message(`您${title}了用户${curData.username}`, {
             type: "success"
           });
           done(); // 关闭弹框
-          await onSearch(); // 刷新表格数据
+          onSearch(); // 刷新表格数据
         }
         FormRef.validate(valid => {
           if (valid) {
-            console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
-              createUser(curData).then(async () => {
-                await chores();
+              createUser(curData).then(() => {
+                chores();
               });
             } else {
-              updateUser(curData.id, curData).then(async () => {
-                await chores();
+              updateUser(curData.id, curData).then(() => {
+                chores();
               });
             }
           }
@@ -333,12 +335,14 @@ export function useUser(tableRef: Ref) {
           imgSrc: row.avatar ?? "/default_avatar.jpeg", // 默认头像
           onCropper: info => (avatarInfo.value = info)
         }),
-      beforeSure: async done => {
-        console.log("裁剪后的图片信息：", avatarInfo.value);
-        // 根据实际业务使用avatarInfo.value和row里的某些字段去调用上传头像接口即可
-        await uploadUserAvatar(row.id, avatarInfo.value);
-        done(); // 关闭弹框
-        onSearch(); // 刷新表格数据
+      beforeSure: done => {
+        uploadUserAvatar(row.id, avatarInfo.value).then(() => {
+          message(`您上传了${row.name}的头像`, {
+            type: "success"
+          });
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        });
       }
     });
   }
@@ -406,18 +410,16 @@ export function useUser(tableRef: Ref) {
       ),
       closeCallBack: () => (pwdForm.newPwd = ""),
       beforeSure: done => {
-        ruleFormRef.value.validate(async valid => {
+        ruleFormRef.value.validate(valid => {
           if (valid) {
             // 表单规则校验通过
-            await updateUser(row.id, { password: pwdForm.newPwd }).then(() => {
-              message(`已成功重置 ${row.username} 用户的密码`, {
+            updateUser(row.id, { password: pwdForm.newPwd }).then(() => {
+              message(`已成功重置了 ${row.username} 的密码`, {
                 type: "success"
               });
+              done(); // 关闭弹框
+              onSearch(); // 刷新表格数据
             });
-
-            // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
-            done(); // 关闭弹框
-            onSearch(); // 刷新表格数据
           }
         });
       }
@@ -447,8 +449,12 @@ export function useUser(tableRef: Ref) {
         const curData = options.props.formInline as RoleFormItemProps;
         console.log("curIds", curData.ids);
         // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
-        await updateUser(curData.user_id, { roles: curData.ids });
-        done(); // 关闭弹框
+        await updateUser(curData.user_id, { roles: curData.ids }).then(() => {
+          message(`已成功分配 ${row.username} 的角色`, {
+            type: "success"
+          });
+          done(); // 关闭弹框
+        });
       }
     });
   }

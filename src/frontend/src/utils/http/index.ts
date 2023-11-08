@@ -1,4 +1,5 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import lodash from "lodash";
 import {
   PureHttpError,
   RequestMethods,
@@ -23,8 +24,13 @@ const defaultConfig: AxiosRequestConfig = {
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
     //serialize: stringify as unknown as CustomParamsSerializer
-    // 数组参数 变成 xx=?&xx=?，否则为xx[0]=?&xx[1]=?
-    serialize: params => stringify(params, { arrayFormat: "repeat" })
+
+    serialize: params => {
+      // 如果查询参数的属性值为"", 则去掉该字段
+      params = lodash.pickBy(params, item => item);
+      // 数组参数 变成 xx=?&xx=?，否则为xx[0]=?&xx[1]=?
+      return stringify(params, { arrayFormat: "repeat" });
+    }
   }
 };
 
@@ -167,12 +173,10 @@ class PureHttp {
         })
         .catch(error => {
           if (error.response && error.response.status) {
-            // 后端返回格式：{"detail": [{"msg": ""}]}
+            // 后端错误时，返回格式：{"detail": [{"msg": ""}]}
             if (error.response.status === 401) {
-              if (error.response.data.hasOwnProperty.call("detail")) {
-                for (const item of error.response.data.detail) {
-                  ElMessage.error(item.msg);
-                }
+              for (const item of error.response.data.detail) {
+                ElMessage.error(item.msg);
               }
               removeToken();
               window.location.reload();
@@ -184,10 +188,8 @@ class PureHttp {
               error.response.status === 422 ||
               error.response.status === 500
             ) {
-              if (error.response.data.hasOwnProperty.call("detail")) {
-                for (const item of error.response.data.detail) {
-                  ElMessage.error(item.msg);
-                }
+              for (const item of error.response.data.detail) {
+                ElMessage.error(item.msg);
               }
             }
             reject(error.response.data);

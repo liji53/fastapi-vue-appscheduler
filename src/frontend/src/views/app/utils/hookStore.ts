@@ -19,7 +19,7 @@ export function useApp() {
   // 搜索表单
   const form = reactive({
     name: "",
-    categroy: null,
+    category_id: null,
     status: null,
     page: 1,
     itemsPerPage: 8
@@ -37,7 +37,7 @@ export function useApp() {
     name: "",
     status: true,
     url: "",
-    categroy_id: null,
+    category_id: null,
     description: ""
   };
   // 表单

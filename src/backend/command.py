@@ -55,9 +55,9 @@ def init_database():
                 "meta": {"title": "应用中心", "icon": "menu", "rank": 4},
                 "children": [
                     {
-                        "path": "/app/manager",
-                        "name": "App",
-                        "meta": {"title": "应用管理"}
+                        "path": "/app/myApp",
+                        "name": "MyApp",
+                        "meta": {"title": "我的应用"}
                     },
                     {
                         "path": "/app/store",

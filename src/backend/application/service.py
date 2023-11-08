@@ -1,15 +1,28 @@
+from typing import Optional, Union
+
+from loguru import logger
+
 from .models import Application
-from .schemas import ApplicationCreate
+from .schemas import ApplicationCreate, ApplicationUpdate, AppStatusUpdate
+
 from ..application_category import service as app_category_service
 
 
-def create(*, db_session, application_in: ApplicationCreate) -> Application:
+def get_by_name(*, db_session, name: str) -> Optional[Application]:
+    return db_session.query(Application).filter(Application.name == name).one_or_none()
+
+
+def get_by_id(*, db_session, pk: int) -> Optional[Application]:
+    return db_session.query(Application).filter(Application.id == pk).one_or_none()
+
+
+def create(*, db_session, app_in: ApplicationCreate) -> Application:
     """创建app"""
     category = None
-    if application_in.category:
-        category = app_category_service.get_by_name(db_session=db_session, category_name=application_in.category.name)
+    if app_in.category_id:
+        category = app_category_service.get_by_id(db_session=db_session, pk=app_in.category_id)
 
-    app = Application(**application_in.model_dump(exclude=["category"]))
+    app = Application(**app_in.model_dump(exclude=["category_id"]))
     if category:
         app.category = category
 
@@ -18,5 +31,16 @@ def create(*, db_session, application_in: ApplicationCreate) -> Application:
     return app
 
 
-def get_all(*, db_session) -> list[Application]:
-    return db_session.query(Application).all()
+def update(*, db_session, app: Application, app_in: Union[ApplicationUpdate, AppStatusUpdate]) -> Application:
+    app_data = app.dict()
+    update_data = app_in.model_dump()
+
+    logger.debug(app_data)
+    logger.debug(update_data)
+
+    for field in app_data:
+        if field in update_data:
+            setattr(app, field, update_data[field])
+
+    db_session.commit()
+    return app
