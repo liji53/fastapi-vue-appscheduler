@@ -167,9 +167,12 @@ class PureHttp {
         })
         .catch(error => {
           if (error.response && error.response.status) {
+            // 后端返回格式：{"detail": [{"msg": ""}]}
             if (error.response.status === 401) {
-              for (const item of error.response.data.detail) {
-                ElMessage.error(item.msg);
+              if (error.response.data.hasOwnProperty.call("detail")) {
+                for (const item of error.response.data.detail) {
+                  ElMessage.error(item.msg);
+                }
               }
               removeToken();
               window.location.reload();
@@ -181,10 +184,11 @@ class PureHttp {
               error.response.status === 422 ||
               error.response.status === 500
             ) {
-              for (const item of error.response.data.detail) {
-                ElMessage.error(item.msg);
+              if (error.response.data.hasOwnProperty.call("detail")) {
+                for (const item of error.response.data.detail) {
+                  ElMessage.error(item.msg);
+                }
               }
-              // router.push("/error/403");
             }
             reject(error.response.data);
           } else {

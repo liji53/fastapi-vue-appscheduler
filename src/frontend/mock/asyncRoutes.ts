@@ -42,6 +42,11 @@ const appRouter = {
       path: "/app/store",
       name: "Store",
       meta: { title: "应用商城" }
+    },
+    {
+      path: "/app/myApp",
+      name: "MyApp",
+      meta: { title: "我的应用" }
     }
   ]
 };

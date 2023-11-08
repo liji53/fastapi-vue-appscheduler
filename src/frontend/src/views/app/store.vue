@@ -1,134 +1,119 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from "vue";
-import { getAppList } from "@/api/app";
-import { getAppCategory } from "@/api/app_category";
+import { ref } from "vue";
+import { useApp } from "./utils/hookStore";
 import AppCard from "./components/AppCard.vue";
-import AppHeader from "./components/AppHeader.vue";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import Search from "@iconify-icons/ep/search";
+import Refresh from "@iconify-icons/ep/refresh";
+import AddFill from "@iconify-icons/ri/add-circle-line";
 
 defineOptions({
   name: "Store"
 });
 
-const svg = `
-        <path class="path" d="
-          M 30 15
-          L 28 17
-          M 25.61 25.61
-          A 15 15, 0, 0, 1, 15 30
-          A 15 15, 0, 1, 1, 27.99 7.5
-          L 15 15
-        " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
-      `;
-
-const apps = ref([]);
-const appCategories = ref([]);
-const appStatuses = ref(["废弃", "未安装", "已安装", "已上线"]);
-const pagination = ref({ current: 1, pageSize: 12, total: 0 });
-const dataLoading = ref(true);
-
-const appQueryParams = ref({
-  page: 1,
-  itemsPerPage: pagination.value.pageSize,
-  name: null,
-  categoryId: -1,
-  statuses: []
-});
-
-// api请求
-const getAppListData = async (params?: object) => {
-  try {
-    const response = await getAppList(params);
-    apps.value = response.data;
-    pagination.value = {
-      ...pagination.value,
-      total: response.total
-    };
-  } catch (e) {
-    console.log(e);
-  } finally {
-    setTimeout(() => {
-      dataLoading.value = false;
-    }, 500);
-  }
-};
-const getAppCategoryData = async () => {
-  try {
-    const response = await getAppCategory();
-    appCategories.value = response.data;
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-watchEffect(async () => {
-  await getAppListData(appQueryParams.value);
-});
-
-onMounted(() => {
-  // getAppListData({ page: 1, items_per_page: pagination.value.pageSize });  # 在watchEffect中响应
-  getAppCategoryData();
-});
-
-// 用于响应AppHeader的事件
-const handleSelectAppCategory = async (category_id: number) => {
-  pagination.value.current = 1;
-  appQueryParams.value.page = 1;
-  appQueryParams.value.categoryId = category_id;
-};
-const handleSelectAppStatus = async (statuses: Array<String>) => {
-  pagination.value.current = 1;
-  appQueryParams.value.page = 1;
-  appQueryParams.value.statuses = statuses;
-};
-const handleSearchAppName = async (app_name: string) => {
-  pagination.value.current = 1;
-  appQueryParams.value.page = 1;
-  appQueryParams.value.name = app_name;
-};
-
-// 用于响应AppCard的事件
-const handleInstallApp = (app_id: number) => {
-  console.log(app_id);
-};
-const handleUninstallApp = (app_id: number) => {
-  console.log(app_id);
-};
-
-// 用于响应分页事件
-const onPageSizeChange = (size: number) => {
-  pagination.value.pageSize = size;
-  pagination.value.current = 1;
-  appQueryParams.value.itemsPerPage = size;
-  appQueryParams.value.page = 1;
-};
-const onCurrentPageChange = (current: number) => {
-  pagination.value.current = current;
-  appQueryParams.value.page = current;
-};
+const formRef = ref();
+const appFromRef = ref();
+const {
+  form,
+  loading,
+  pagination,
+  categories,
+  apps,
+  dialogVisable,
+  dialogTitle,
+  appForm,
+  appFormRules,
+  onSearch,
+  resetForm,
+  onPageSizeChange,
+  onCurrentPageChange,
+  onAddApp,
+  onConfirmApp,
+  handleInstallApp,
+  handleRevisionApp,
+  handleEditApp,
+  handleDisableApp,
+  handleUploadPicApp,
+  getCategoryName
+} = useApp();
 </script>
 
 <template>
-  <el-card shadow="never">
-    <!-- Header -->
-    <div class="w-full flex justify-between mb-4">
-      <AppHeader
-        :categories="appCategories"
-        :statuses="appStatuses"
-        @select-category="handleSelectAppCategory"
-        @select-status="handleSelectAppStatus"
-        @search-app="handleSearchAppName"
-      >
-        后台会自动检测已发布的app，用户需要先安装再使用。
-      </AppHeader>
-    </div>
+  <div class="main">
+    <el-row :gutter="12">
+      <el-col :span="22">
+        <el-form
+          ref="formRef"
+          :inline="true"
+          :model="form"
+          class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
+        >
+          <el-form-item label="应用名称：" prop="name">
+            <el-input
+              v-model="form.name"
+              placeholder="请输入应用名称"
+              clearable
+              class="!w-[200px]"
+            />
+          </el-form-item>
+          <el-form-item label="应用分类：" prop="categroy">
+            <el-select
+              v-model="form.categroy"
+              placeholder="请选择应用分类"
+              clearable
+              class="!w-[180px]"
+            >
+              <el-option
+                v-for="(item, index) in categories"
+                :key="index"
+                :value="item.id"
+                :label="item.name"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="状态：" prop="status">
+            <el-select
+              v-model="form.status"
+              placeholder="请选择状态"
+              clearable
+              class="!w-[180px]"
+            >
+              <el-option label="已上架" :value="true" />
+              <el-option label="已下架" :value="false" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              :icon="useRenderIcon(Search)"
+              :loading="loading"
+              @click="onSearch"
+            >
+              搜索
+            </el-button>
+            <el-button
+              :icon="useRenderIcon(Refresh)"
+              @click="resetForm(formRef)"
+            >
+              重置
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+      <el-col :span="2" :min-width="200">
+        <el-button
+          class="custom-button"
+          type="primary"
+          :icon="useRenderIcon(AddFill)"
+          @click="onAddApp"
+        >
+          新增
+        </el-button>
+      </el-col>
+    </el-row>
 
-    <!-- Body -->
-    <div
-      v-loading="dataLoading"
-      :element-loading-svg="svg"
-      element-loading-svg-view-box="-10, -10, 50, 50"
-    >
-      <el-empty description="暂无数据" v-show="pagination.total === 0" />
+    <div v-loading="loading" style="margin-top: 12px">
+      <el-empty description="暂无应用" v-show="pagination.total === 0" />
       <template v-if="pagination.total > 0">
         <el-row :gutter="16">
           <el-col
@@ -142,24 +127,100 @@ const onCurrentPageChange = (current: number) => {
           >
             <AppCard
               :app="app"
+              :category="getCategoryName(app.category_id)"
+              pagename="store"
               @install-app="handleInstallApp"
-              @uninstall-app="handleUninstallApp"
+              @revision-app="handleRevisionApp"
+              @edit-app="handleEditApp"
+              @disable-app="handleDisableApp"
+              @upload-pic="handleUploadPicApp"
             />
           </el-col>
         </el-row>
 
         <el-pagination
           class="float-right"
-          v-model:currentPage="pagination.current"
+          v-model:currentPage="pagination.currentPage"
           :page-size="pagination.pageSize"
           :total="pagination.total"
           :page-sizes="[12, 24, 36]"
-          :background="true"
+          background
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="onPageSizeChange"
           @current-change="onCurrentPageChange"
         />
       </template>
     </div>
-  </el-card>
+
+    <el-dialog v-model="dialogVisable" :title="`${dialogTitle}应用`">
+      <el-form
+        ref="appFromRef"
+        :model="appForm"
+        :rules="appFormRules"
+        label-width="82px"
+      >
+        <el-form-item label="应用名称" prop="name">
+          <el-input
+            v-model="appForm.name"
+            clearable
+            placeholder="请输入应用名称"
+          />
+        </el-form-item>
+        <el-form-item label="仓库地址" prop="url">
+          <el-input
+            v-model="appForm.url"
+            clearable
+            placeholder="请输入svn/git仓库地址"
+          />
+        </el-form-item>
+        <el-form-item label="分类" prop="category_id">
+          <el-select
+            v-model="appForm.category_id"
+            placeholder="请选择应用分类"
+            clearable
+            class="!w-[180px]"
+          >
+            <el-option
+              v-for="(item, index) in categories"
+              :key="index"
+              :value="item.id"
+              :label="item.name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否发布" prop="status">
+          <el-select v-model="appForm.status" placeholder="请选择状态">
+            <el-option label="上架" :value="true" />
+            <el-option label="下架" :value="false" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input
+            v-model="appForm.description"
+            placeholder="请输入描述信息"
+            type="textarea"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="dialogVisable = false"> 取消 </el-button>
+          <el-button type="primary" @click="onConfirmApp(appFromRef)">
+            确定
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.search-form {
+  :deep(.el-form-item) {
+    margin-bottom: 12px;
+  }
+}
+
+.custom-button {
+  margin-top: 12px;
+}
+</style>
+./utils/hookStore

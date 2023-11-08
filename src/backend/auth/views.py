@@ -123,7 +123,8 @@ def batch_delete(db_session: DbSession, ids_in: UserBatchDelete, current_user: C
 
 
 @user_router.post("/{user_id}/avatar", response_model=None, summary="上传用户头像")
-def upload_file(user_id: PrimaryKey, file: Annotated[bytes, File(alias="blob")], db_session: DbSession):
+def upload_file(user_id: PrimaryKey, file: Annotated[bytes, File(alias="blob")],
+                db_session: DbSession, current_user: CurrentUser):
     """上传文件，前端数据通过blob字段传递，而不是file
     采用本地存储临时方案
     todo: 限制上传的文件大小
@@ -150,7 +151,7 @@ def upload_file(user_id: PrimaryKey, file: Annotated[bytes, File(alias="blob")],
 
 
 @user_router.get("/{user_id}/roles", response_model=UserRolesRead, summary="获取用户的角色")
-def get_user_roles(user_id: PrimaryKey, db_session: DbSession):
+def get_user_roles(user_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
     user = get_by_id(db_session=db_session, user_id=user_id)
     if not user:
         raise NOT_FOUND_EXCEPTION

@@ -6,12 +6,14 @@ export default [
     method: "get",
     response: () => {
       return {
-        total: 188,
+        total: 4,
         data: [
           {
             id: 1,
-            status: "废弃",
-            category: "规范递交",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: true,
+            is_installed: true,
+            category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
             name: "SSL证书",
             description:
@@ -19,8 +21,10 @@ export default [
           },
           {
             id: 2,
-            status: "未安装",
-            category: "规范递交",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: false,
+            is_installed: false,
+            category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
             name: "人脸识别",
             description:
@@ -28,8 +32,10 @@ export default [
           },
           {
             id: 3,
-            status: "已上线",
-            category: "规范递交",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: false,
+            is_installed: false,
+            category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
             name: "CVM",
             description:
@@ -37,8 +43,10 @@ export default [
           },
           {
             id: 4,
-            status: "废弃",
-            category: "规范递交",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: true,
+            is_installed: false,
+            category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
             name: "SSL证书",
             description:
@@ -46,83 +54,43 @@ export default [
           },
           {
             id: 5,
-            status: "已安装",
-            category: "规范递交",
-            banner:
-              "https://tdesign.gtimg.com/tdesign-pro/face-recognition.jpg",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: true,
+            is_installed: true,
+            category_id: 1,
+            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
             name: "SSL证书",
             description:
               "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
           },
           {
             id: 6,
-            status: "废弃",
-            category: "规范递交",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: true,
+            is_installed: true,
+            category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-            name: "T-Sec 云防火墙",
-            description:
-              "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-          },
-          {
-            id: 7,
-            status: "已上线",
-            category: "规范递交",
-            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-            name: "CVM",
-            description:
-              "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-          },
-          {
-            id: 8,
-            status: "废弃",
-            category: "规范递交",
-            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
             name: "SSL证书",
-            description:
-              "云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗"
-          },
-          {
-            id: 9,
-            status: "已上线",
-            category: "规范递交",
-            banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
-            name: "SSL证书",
-            description:
-              "腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客"
-          },
-          {
-            id: 10,
-            status: "已上线",
-            category: "规范递交",
-            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
-            name: "CVM",
             description:
               "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
           },
           {
-            id: 11,
-            status: "已上线",
-            category: "规范递交",
-            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
-            name: "云数据库",
-            description:
-              "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
-          },
-          {
-            id: 12,
-            status: "废弃",
-            category: "规范递交",
-            banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
+            id: 7,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
+            status: false,
+            is_installed: true,
+            category_id: 1,
+            banner: "https://tdesign.gtimg.com/tdesign-pro/ssl.jpg",
             name: "SSL证书",
             description:
-              "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
+              "云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。"
           }
         ]
       };
     }
   },
   {
-    url: "/apps/category",
+    url: "/app_categories",
     method: "get",
     response: () => {
       return {

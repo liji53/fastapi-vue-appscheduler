@@ -2,33 +2,54 @@
 import { ref, computed } from "vue";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
 
-const props = defineProps(["app"]);
+const props = defineProps(["app", "category", "pagename"]);
 defineEmits([
   "install-app",
   "revision-app",
   "edit-app",
+  "disable-app",
   "uninstall-app",
-  "info-app"
+  "upload-pic"
 ]);
 
 const infoDialogVisible = ref(false);
 
-const isNotUse = computed(
-  () => props.app.status === "未安装" || props.app.status === "废弃"
-);
-const isNotInstall = computed(() => props.app.status === "未安装");
+const tag_name = computed(() => {
+  if (props.pagename === "store") {
+    return !props.app.status
+      ? "未上架"
+      : props.app.is_installed
+      ? "已安装"
+      : "未安装";
+  } else {
+    return props.app.is_online ? "已上线" : "未上线";
+  }
+});
+const tag_color = computed(() => {
+  if (props.pagename === "store") {
+    return !props.app.status
+      ? "#D3D3D3"
+      : props.app.is_installed
+      ? "#90EE90"
+      : "#00BFFF";
+  } else {
+    return props.app.is_online ? "#90EE90" : "#D3D3D3";
+  }
+});
 
 // 卡片的样式
 const cardClass = computed(() => [
   "list-card-item",
   {
-    "list-card-item__disabled": isNotUse.value
+    "list-card-item__disabled":
+      props.pagename === "store" ? !props.app.status : !props.app.is_online
   }
 ]);
 const cardLogoClass = computed(() => [
   "list-card-item_detail--logo",
   {
-    "list-card-item_detail--logo__disabled": isNotUse.value
+    "list-card-item_detail--logo__disabled":
+      props.pagename === "store" ? !props.app.status : !props.app.is_online
   }
 ]);
 </script>
@@ -44,18 +65,18 @@ const cardLogoClass = computed(() => [
         />
         <div class="list-card-item_detail--operation">
           <el-tag
-            :color="!isNotUse ? '#00a870' : '#eee'"
+            :color="tag_color"
             effect="dark"
             class="mx-1 list-card-item_detail--operation--tag"
           >
-            {{ app.status }}
+            {{ tag_name }}
           </el-tag>
           <el-dropdown trigger="click">
             <IconifyIconOffline :icon="More2Fill" class="text-[24px]" />
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
-                  v-if="isNotInstall"
+                  v-if="pagename === 'store' && !app.is_installed && app.status"
                   @click="$emit('install-app', app.id)"
                 >
                   安装
@@ -63,21 +84,25 @@ const cardLogoClass = computed(() => [
                 <el-dropdown-item @click="$emit('revision-app', app.id)">
                   版本
                 </el-dropdown-item>
-                <el-dropdown-item @click="$emit('edit-app', app.id)">
+                <el-dropdown-item @click="$emit('edit-app', app)">
                   编辑
                 </el-dropdown-item>
+                <el-dropdown-item @click="$emit('upload-pic', app)">
+                  图标
+                </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="!isNotUse"
-                  @click="$emit('uninstall-app', app.id)"
+                  v-if="pagename === 'store' && app.status"
+                  @click="$emit('disable-app', app.id)"
+                >
+                  下架
+                </el-dropdown-item>
+                <el-dropdown-item
+                  v-if="pagename === 'myApp'"
+                  @click="$emit('uninstall-app-app', app.id)"
                 >
                   卸载
                 </el-dropdown-item>
-                <el-dropdown-item
-                  @click="
-                    $emit('info-app', app.id);
-                    infoDialogVisible = true;
-                  "
-                >
+                <el-dropdown-item @click="infoDialogVisible = true">
                   详情
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -87,9 +112,18 @@ const cardLogoClass = computed(() => [
       </el-row>
 
       <!-- name -->
-      <p class="list-card-item_detail--name text-text_color_primary">
-        {{ app.name }}
-      </p>
+      <el-row>
+        <p class="list-card-item_detail--name text-text_color_primary">
+          {{ app.name }}
+        </p>
+        <el-tag
+          type="info"
+          class="mx-1 list-card-item_detail--operation--tag"
+          style="margin-top: 20px; float: right; margin-left: 20px"
+        >
+          {{ category }}
+        </el-tag>
+      </el-row>
 
       <p class="list-card-item_detail--desc text-text_color_regular">
         {{ app.description }}
@@ -99,7 +133,7 @@ const cardLogoClass = computed(() => [
 
   <!-- dialog -->
   <el-dialog v-model="infoDialogVisible" title="详情信息">
-    <span>未支持</span>
+    <span>{{ app.description }}</span>
   </el-dialog>
 </template>
 
