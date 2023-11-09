@@ -9,9 +9,10 @@ from .schemas import ApplicationPagination, ApplicationRead, ApplicationCreate, 
 
 from ..core.service import CommonParameters, sort_paginate, DbSession
 from ..core.schemas import PrimaryKey
-from ..utils.storage import remove_old_file, create_new_file
+from ..utils.storage import remove_old_file, create_new_file, remove_dir
 
 application_router = APIRouter()
+STORAGE_APP_DIR = "apps"
 
 
 @application_router.get("", response_model=ApplicationPagination, summary="获取所有的应用列表")
@@ -72,17 +73,13 @@ def update_application(app_id: PrimaryKey,
 
 @application_router.delete("/{app_id}", response_model=None, summary="删除应用")
 def delete_application(app_id: PrimaryKey, db_session: DbSession):
-    app = get_by_id(db_session=db_session, pk=app_id)
-    if app:
-        remove_old_file(app.banner)  # 清理该应用的图片
-    else:
-        return
-
     try:
         delete(db_session=db_session, pk=app_id)
     except IntegrityError:
         logger.debug(f"删除应用失败，原因: {IntegrityError}")
         raise HTTPException(500, detail=[{"msg": f"应用删除失败！存在用户已经安装了该应用"}])
+
+    remove_dir(pk=app_id, root_dir=STORAGE_APP_DIR)
 
 
 @application_router.post("/{app_id}/banner", response_model=None, summary="上传应用logo")
@@ -98,6 +95,6 @@ def upload_file(app_id: PrimaryKey,
         raise HTTPException(404, detail=[{"msg": "上传应用logo失败，该应用不存在！"}])
 
     remove_old_file(app.banner)
-    new_file_path = create_new_file(file=file, pk=app.id, root_dir="apps")
+    new_file_path = create_new_file(file=file, pk=app.id, root_dir=STORAGE_APP_DIR)
 
     update(db_session=db_session, app=app, app_in={"banner": new_file_path})

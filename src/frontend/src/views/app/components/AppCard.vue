@@ -131,6 +131,7 @@ const cardLogoClass = computed(() => [
           {{ app.name }}
         </p>
         <el-tag
+          v-if="category !== undefined"
           type="info"
           class="mx-1 list-card-item_detail--operation--tag"
           style="margin-top: 20px; float: right; margin-left: 20px"

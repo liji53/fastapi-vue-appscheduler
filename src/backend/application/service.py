@@ -41,9 +41,6 @@ def update(*, db_session,
     else:
         update_data = app_in.model_dump()
 
-    logger.debug(app_data)
-    logger.debug(update_data)
-
     for field in app_data:
         if field in update_data:
             setattr(app, field, update_data[field])

@@ -24,7 +24,7 @@ export default [
             url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S5_任务跟踪类/Track/IntegratedNoMergedTrack",
             status: false,
             is_installed: false,
-            category_id: 2,
+            category_id: null,
             banner: "https://tdesign.gtimg.com/tdesign-pro/t-sec.jpg",
             name: "人脸识别",
             description:
