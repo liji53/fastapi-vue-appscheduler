@@ -2,12 +2,11 @@ from typing import Optional, Union, Annotated
 
 from fastapi import APIRouter, HTTPException, File
 from loguru import logger
-from sqlalchemy.exc import IntegrityError
 
 from .service import get_by_name, get_by_id, create, update, delete
 from .schemas import ApplicationPagination, ApplicationRead, ApplicationCreate, ApplicationUpdate, AppStatusUpdate
 
-from ..core.service import CommonParameters, sort_paginate, DbSession
+from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
 from ..utils.storage import remove_old_file, create_new_file, remove_dir
 
@@ -18,8 +17,9 @@ STORAGE_APP_DIR = "apps"
 @application_router.get("", response_model=ApplicationPagination, summary="获取所有的应用列表")
 def get_applications(
         common: CommonParameters,
+        current_user: CurrentUser,
         category_id: Optional[int] = None,
-        status: Optional[bool] = None
+        status: Optional[bool] = None,
 ):
     filter_spec = []
     if category_id:
@@ -29,11 +29,12 @@ def get_applications(
 
     pagination = sort_paginate(model="Application", filter_spec=filter_spec, **common)
     # 获取当前用户的已安装app，并修改is_installed的状态
-    # todo
     res = []
+    app_ids = [i.application_id for i in current_user.installed_applications]  # 已经安装app的id
     for app in pagination["data"]:
         app_data = app.dict()
-        app_data['is_installed'] = True
+        if app.id in app_ids:
+            app_data['is_installed'] = True
         res.append(app_data)
 
     return {
@@ -50,8 +51,8 @@ def create_application(app_in: ApplicationCreate, db_session: DbSession):
 
     try:
         app = create(db_session=db_session, app_in=app_in)
-    except IntegrityError:
-        logger.warning(f"创建应用失败，原因：{IntegrityError}")
+    except Exception as e:
+        logger.warning(f"创建应用失败，原因：{e}")
         raise HTTPException(500, detail=[{"msg": "上架应用失败！"}])
     return app
 
@@ -65,8 +66,8 @@ def update_application(app_id: PrimaryKey,
         raise HTTPException(404, detail=[{"msg": "更新应用失败，该应用不存在！"}])
     try:
         app = update(db_session=db_session, app=app, app_in=app_in)
-    except IntegrityError:
-        logger.warning(f"更新应用失败，原因：{IntegrityError}")
+    except Exception as e:
+        logger.warning(f"更新应用失败，原因：{e}")
         raise HTTPException(500, detail=[{"msg": "更新应用失败！"}])
     return app
 
@@ -75,8 +76,8 @@ def update_application(app_id: PrimaryKey,
 def delete_application(app_id: PrimaryKey, db_session: DbSession):
     try:
         delete(db_session=db_session, pk=app_id)
-    except IntegrityError:
-        logger.debug(f"删除应用失败，原因: {IntegrityError}")
+    except Exception as e:
+        logger.warning(f"删除应用失败，原因: {e}")
         raise HTTPException(500, detail=[{"msg": f"应用删除失败！存在用户已经安装了该应用"}])
 
     remove_dir(pk=app_id, root_dir=STORAGE_APP_DIR)

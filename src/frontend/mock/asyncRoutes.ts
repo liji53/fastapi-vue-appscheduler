@@ -41,7 +41,10 @@ const appRouter = {
     {
       path: "/app/store",
       name: "Store",
-      meta: { title: "应用商城" }
+      meta: {
+        title: "应用商城",
+        auths: ["btn_add", "btn_update", "btn_delete"]
+      }
     },
     {
       path: "/app/myApp",

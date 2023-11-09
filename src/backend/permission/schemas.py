@@ -11,7 +11,7 @@ class MenuMeta(MyBaseModel):
     icon: Optional[str] = None
     rank: Optional[int] = None
     roles: Optional[list[str]] = None
-    auths: Optional[list[str]] = None
+    auths: list[str] = []
 
 
 class MenuItem(MyBaseModel):

@@ -3,7 +3,6 @@ from typing import Union, Annotated, Optional
 from fastapi import APIRouter, HTTPException, Query, File
 
 from loguru import logger
-from sqlalchemy.exc import IntegrityError
 
 from .schemas import UserLogin, UserLoginResponse, UserToken, RefreshTokenResponse, \
     UserRead, UserCreate, UserUpdate, UserPagination, \
@@ -78,12 +77,12 @@ def create_user(user_in: UserCreate, db_session: DbSession, current_user: Curren
     # todo: 权限控制
     user = get_by_name(db_session=db_session, username=user_in.username)
     if user:
-        logger.warning(f"创建用户失败，原因：用户{user.username}已经存在")
         raise HTTPException(422, detail=[{"msg": "该用户已经存在!"}])
     try:
         user = create(db_session=db_session, user_in=user_in)
-    except IntegrityError:
-        raise HTTPException(422, detail=[{"msg": "用户名/手机号/邮箱 已经存在了"}])
+    except Exception as e:
+        logger.warning(f"创建用户失败，原因: {e}")
+        raise HTTPException(500, detail=[{"msg": "创建用户失败，请确保用户名、手机、邮箱唯一"}])
     return user
 
 

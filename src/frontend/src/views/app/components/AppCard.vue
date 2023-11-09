@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
+import { hasAuth } from "@/router/utils";
 
 const props = defineProps(["app", "category", "pagename"]);
 defineEmits([
@@ -86,26 +87,36 @@ const cardLogoClass = computed(() => [
                 <el-dropdown-item @click="$emit('revision-app', app.id)">
                   版本
                 </el-dropdown-item>
-                <el-dropdown-item @click="$emit('edit-app', app)">
+                <el-dropdown-item
+                  @click="$emit('edit-app', app)"
+                  v-if="hasAuth('btn_update')"
+                >
                   编辑
                 </el-dropdown-item>
-                <el-dropdown-item @click="$emit('upload-pic', app)">
+                <el-dropdown-item
+                  @click="$emit('upload-pic', app)"
+                  v-if="hasAuth('btn_update')"
+                >
                   图标
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="pagename === 'store' && app.status"
+                  v-if="
+                    pagename === 'store' && app.status && hasAuth('btn_update')
+                  "
                   @click="$emit('disable-app', app.id)"
                 >
                   下架
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="pagename === 'store' && !app.status"
+                  v-if="
+                    pagename === 'store' && !app.status && hasAuth('btn_update')
+                  "
                   @click="$emit('enable-app', app.id)"
                 >
                   上架
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="pagename === 'store'"
+                  v-if="pagename === 'store' && hasAuth('btn_delete')"
                   @click="$emit('delete-app', app.id)"
                 >
                   删除

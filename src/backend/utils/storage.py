@@ -35,4 +35,6 @@ def create_new_file(*, file: bytes, pk: int, root_dir: str):
 
 
 def remove_dir(pk: int, root_dir: str):
-    shutil.rmtree(os.path.join(FILES_DIR, root_dir, str(pk)))
+    target_path = os.path.join(FILES_DIR, root_dir, str(pk))
+    if os.path.exists(target_path):
+        shutil.rmtree(target_path)
