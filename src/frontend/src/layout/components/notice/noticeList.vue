@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType } from "vue";
-import { ListItem } from "./data";
+import { ListItem } from "@/api/notice";
 import NoticeItem from "./noticeItem.vue";
 
 const props = defineProps({
