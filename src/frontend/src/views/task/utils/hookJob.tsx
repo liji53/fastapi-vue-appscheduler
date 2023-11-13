@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import editForm from "../components/jobForm.vue";
 import { message } from "@/utils/message";
 import { getJobList, createJob, updateJob, deleteJob } from "@/api/job";
-import { getMyInstallApps } from "@/api/installed_app";
+import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
@@ -239,7 +239,7 @@ export function useJob() {
     getProjectList().then(response => {
       projects.value = response.data;
     });
-    getMyInstallApps().then(response => {
+    getMyAppTree().then(response => {
       apps.value = response.data;
     });
   });

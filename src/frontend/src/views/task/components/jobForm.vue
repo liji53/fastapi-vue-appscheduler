@@ -20,6 +20,24 @@ const newFormInline = ref(props.formInline);
 function getRef() {
   return ruleFormRef.value;
 }
+const onSelectChnage = (value: any) => {
+  console.log(value);
+  for (const app of newFormInline.value.apps) {
+    if ("children" in app) {
+      for (const child of app["children"]) {
+        if (child.value == value) {
+          newFormInline.value.name = child.label;
+          console.log(newFormInline.value.name);
+        }
+      }
+    } else {
+      if (app.value == value) {
+        newFormInline.value.name = app.label;
+        console.log(newFormInline.value.name);
+      }
+    }
+  }
+};
 
 defineExpose({ getRef });
 </script>
@@ -32,18 +50,14 @@ defineExpose({ getRef });
     label-width="82px"
   >
     <el-form-item label="应用" prop="app_id">
-      <el-select
+      <el-tree-select
         v-model="newFormInline.app_id"
+        :data="newFormInline.apps"
+        :render-after-expand="false"
         placeholder="请选择应用"
         clearable
-      >
-        <el-option
-          v-for="(item, index) in newFormInline.apps"
-          :key="index"
-          :value="item.id"
-          :label="item.name"
-        />
-      </el-select>
+        @change="onSelectChnage"
+      />
     </el-form-item>
     <el-form-item label="任务名称" prop="name">
       <el-input

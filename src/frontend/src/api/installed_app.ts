@@ -14,6 +14,14 @@ type AppResult = {
   data: Array<InstalledApp>;
 };
 
+// 安装应用的tree形式
+type AppTree = {
+  value: string;
+  label: string;
+  children?: Array<AppTree>;
+};
+type AppTreeResult = { data: Array<AppTree> };
+
 // 我的应用列表
 export const getMyInstallApps = (params?: object) => {
   return http.request<AppResult>("get", baseUrlApi("installed_apps"), {
@@ -39,4 +47,9 @@ export const updateApp = (app_id: number, data: object) => {
 // 上传应用的图片
 export const uploadPic = (app_id: number, data: object) => {
   return http.upload(baseUrlApi(`installed_apps/${app_id}/banner`), { data });
+};
+
+// 任务管理-获取已安装应用的app Tree列表
+export const getMyAppTree = () => {
+  return http.request<AppTreeResult>("get", baseUrlApi("installed_apps/tree"));
 };
