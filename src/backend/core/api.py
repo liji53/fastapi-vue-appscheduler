@@ -6,6 +6,8 @@ from ..permission.views import permission_router, role_router
 from ..application.views import application_router
 from ..application_category.views import app_category_router
 from ..application_installed.views import installed_app_router
+from ..project.views import project_router
+from ..task.views import task_router
 
 
 class ErrorResponse(BaseModel):
@@ -30,3 +32,5 @@ api_router.include_router(role_router, prefix="/roles", tags=["role"])
 api_router.include_router(application_router, prefix="/apps", tags=["app"])
 api_router.include_router(app_category_router, prefix="/app_categories", tags=["app_category"])
 api_router.include_router(installed_app_router, prefix="/installed_apps", tags=["my_app"])
+api_router.include_router(project_router, prefix="/projects", tags=["project"])
+api_router.include_router(task_router, prefix="/tasks", tags=["task"])

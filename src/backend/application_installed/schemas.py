@@ -26,3 +26,13 @@ class InstalledAppRead(InstalledApp):
 
 class InstalledAppPagination(Pagination):
     data: list[InstalledAppRead]
+
+
+class InstalledAppTreeNode(MyBaseModel):
+    id: int
+    name: NameStr
+    children: list['InstalledAppTreeNode']
+
+
+class InstalledAppTree(MyBaseModel):
+    data: list[InstalledAppTreeNode]

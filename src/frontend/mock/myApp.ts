@@ -91,34 +91,34 @@ export default [
       return {
         data: [
           {
-            value: "1",
-            label: "规范递交",
+            id: 1,
+            name: "规范递交",
             children: [
               {
-                value: "12",
-                label: "SSL证书"
+                id: 12,
+                name: "SSL证书"
               },
               {
-                value: "13",
-                label: "SSL证书2"
+                id: 13,
+                name: "SSL证书2"
               },
               {
-                value: "14",
-                label: "SSL证书4"
+                id: 14,
+                name: "SSL证书4"
               }
             ]
           },
           {
-            value: "2",
-            label: "数据比对",
+            id: 2,
+            name: "数据比对",
             children: [
               {
-                value: "15",
-                label: "SSL证书4"
+                id: 15,
+                name: "SSL证书4"
               },
               {
-                value: "16",
-                label: "SSL证书6"
+                id: 16,
+                name: "SSL证书6"
               }
             ]
           }

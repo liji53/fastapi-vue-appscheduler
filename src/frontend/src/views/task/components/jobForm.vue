@@ -13,6 +13,11 @@ const props = withDefaults(defineProps<JobFormProps>(), {
     apps: []
   })
 });
+const TreeProps = ref({
+  value: "id",
+  label: "name",
+  children: "children"
+});
 
 const ruleFormRef = ref();
 const newFormInline = ref(props.formInline);
@@ -52,6 +57,7 @@ defineExpose({ getRef });
     <el-form-item label="应用" prop="app_id">
       <el-tree-select
         v-model="newFormInline.app_id"
+        :props="TreeProps"
         :data="newFormInline.apps"
         :render-after-expand="false"
         placeholder="请选择应用"

@@ -182,9 +182,10 @@ class PureHttp {
               window.location.reload();
               // router.push({ name: "Login" })
             } else if (
-              error.response.status === 403 ||
               error.response.status === 400 ||
+              error.response.status === 403 ||
               error.response.status === 404 ||
+              error.response.status === 405 ||
               error.response.status === 422 ||
               error.response.status === 500
             ) {

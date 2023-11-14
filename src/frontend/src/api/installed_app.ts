@@ -16,8 +16,8 @@ type AppResult = {
 
 // 安装应用的tree形式
 type AppTree = {
-  value: string;
-  label: string;
+  id: number;
+  name: string;
   children?: Array<AppTree>;
 };
 type AppTreeResult = { data: Array<AppTree> };

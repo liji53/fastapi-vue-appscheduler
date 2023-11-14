@@ -44,9 +44,14 @@ def init_database():
                 "meta": {"title": "任务中心", "icon": "listCheck", "rank": 2},
                 "children": [
                     {
-                        "path": "/task/index",
-                        "name": "Task",
-                        "meta": {"title": "任务中心"}
+                        "path": "/task/job",
+                        "name": "Job",
+                        "meta": {"title": "任务管理"}
+                    },
+                    {
+                        "path": "/task/project",
+                        "name": "Project",
+                        "meta": {"title": "项目管理"}
                     }
                 ]
             },
@@ -55,14 +60,14 @@ def init_database():
                 "meta": {"title": "应用中心", "icon": "menu", "rank": 4},
                 "children": [
                     {
-                        "path": "/app/myApp",
-                        "name": "MyApp",
-                        "meta": {"title": "我的应用"}
-                    },
-                    {
                         "path": "/app/store",
                         "name": "Store",
                         "meta": {"title": "应用商城"}
+                    },
+                    {
+                        "path": "/app/myApp",
+                        "name": "MyApp",
+                        "meta": {"title": "我的应用"}
                     }
                 ]
             },
@@ -92,14 +97,14 @@ def init_database():
                 "meta": {"title": "安全中心", "icon": "flUser", "rank": 10},
                 "children": [
                     {
-                        "path": "/security/user/index",
-                        "name": "User",
-                        "meta": {"title": "用户管理"}
-                    },
-                    {
                         "path": "/security/role/index",
                         "name": "Role",
                         "meta": {"title": "角色管理"}
+                    },
+                    {
+                        "path": "/security/user/index",
+                        "name": "User",
+                        "meta": {"title": "用户管理"}
                     },
                     {
                         "path": "/security/config",
