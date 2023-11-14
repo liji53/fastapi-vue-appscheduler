@@ -35,6 +35,13 @@ export function useJob() {
     pageSize: 10,
     currentPage: 1
   });
+  const crontabVisible = ref(false);
+  const isShowCronCore = ref(true);
+  const cronFormData = reactive({
+    id: null,
+    cron: "* * * * *"
+  });
+
   const columns: TableColumnList = [
     {
       label: "任务编号",
@@ -75,11 +82,11 @@ export function useJob() {
       minWidth: 150
     },
     {
-      label: "创建时间",
+      label: "更新时间",
       minWidth: 180,
-      prop: "created_at",
-      formatter: ({ created_at }) =>
-        dayjs(created_at).format("YYYY-MM-DD HH:mm:ss")
+      prop: "updated_at",
+      formatter: ({ updated_at }) =>
+        dayjs(updated_at).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
@@ -143,9 +150,23 @@ export function useJob() {
     console.log(row.id);
   }
 
+  // 定时任务相关逻辑
   function handleTimer(row) {
-    console.log(row.id);
+    cronFormData.id = row["id"];
+    cronFormData.cron = row["cron"];
+    crontabVisible.value = true;
   }
+  // const onChangeCron = val => {
+  //   if (typeof val !== "string") return false;
+  //   cronFormData.cron = val;
+  // };
+  const onCancelCron = () => {
+    crontabVisible.value = false;
+  };
+  const onConfirmCron = async () => {
+    await updateJob(cronFormData.id, { cron: cronFormData.cron });
+    onSearch();
+  };
 
   function handleConfig(row) {
     console.log(row.id);
@@ -259,6 +280,12 @@ export function useJob() {
     handleConfig,
     handleDelete,
     handleSizeChange,
-    handleCurrentChange
+    handleCurrentChange,
+    crontabVisible,
+    isShowCronCore,
+    cronFormData,
+    //onChangeCron,
+    onCancelCron,
+    onConfirmCron
   };
 }

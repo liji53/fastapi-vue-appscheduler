@@ -17,7 +17,8 @@ export default [
             remark:
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部",
             status: true,
-            created_at: "2023-01-11 20:10:01"
+            updated_at: "2023-01-11 20:10:01",
+            cron: "* * * * *"
           },
           {
             id: 2,
@@ -28,7 +29,8 @@ export default [
             remark:
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部",
             status: false,
-            created_at: "2023-01-11 20:10:01"
+            updated_at: "2023-01-11 20:10:01",
+            cron: "* * 2-10 * *"
           },
           {
             id: 3,
@@ -39,7 +41,8 @@ export default [
             remark:
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部",
             status: true,
-            created_at: "2023-01-11 20:10:01"
+            updated_at: "2023-01-11 20:10:01",
+            cron: "* 1,2 * * *"
           },
           {
             id: 4,
@@ -50,7 +53,8 @@ export default [
             remark:
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部",
             status: false,
-            created_at: "2023-01-11 20:10:01"
+            updated_at: "2023-01-11 20:10:01",
+            cron: "0/3 * * * ?"
           }
         ]
       };

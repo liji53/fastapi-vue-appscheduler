@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useJob } from "./utils/hookJob";
+import crontab from "./components/crontab.vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { ref } from "vue";
@@ -12,6 +13,7 @@ import Clock from "@iconify-icons/ep/clock";
 import Setting from "@iconify-icons/ep/setting";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
+import ArrowDown from "@iconify-icons/ep/arrow-down";
 
 defineOptions({
   name: "Job"
@@ -33,7 +35,13 @@ const {
   handleTimer,
   handleConfig,
   handleSizeChange,
-  handleCurrentChange
+  handleCurrentChange,
+  crontabVisible,
+  isShowCronCore,
+  cronFormData,
+  //onChangeCron,
+  onCancelCron,
+  onConfirmCron
 } = useJob();
 </script>
 
@@ -94,7 +102,7 @@ const {
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="项目列表" :columns="columns" @refresh="onSearch">
+    <PureTableBar title="任务列表" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
@@ -198,6 +206,51 @@ const {
       </template>
     </PureTableBar>
   </div>
+  <el-drawer
+    v-model="crontabVisible"
+    direction="rtl"
+    :destroy-on-close="true"
+    title="任务定时"
+    size="800px"
+  >
+    <div class="pr-20">
+      <el-form
+        class="edit-form"
+        :model="cronFormData"
+        ref="formRef"
+        label-width="100px"
+      >
+        <el-form-item label="cron表达式" prop="cron">
+          <el-input v-model="cronFormData.cron" placeholder="请输入cron表达式">
+            <template #append>
+              <el-tooltip content="配置cron表达式" placement="top">
+                <el-button
+                  :icon="useRenderIcon(ArrowDown)"
+                  @click="
+                    () => {
+                      isShowCronCore = !isShowCronCore;
+                    }
+                  "
+                />
+              </el-tooltip>
+            </template>
+          </el-input>
+        </el-form-item>
+        <div
+          style="width: 100%; padding-left: 10px; margin-top: -5px"
+          v-show="isShowCronCore"
+        >
+          <crontab v-model:value="cronFormData.cron" />
+        </div>
+      </el-form>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="onCancelCron">取 消</el-button>
+        <el-button type="primary" @click="onConfirmCron">确 定</el-button>
+      </span>
+    </template>
+  </el-drawer>
 </template>
 
 <style scoped lang="scss">
