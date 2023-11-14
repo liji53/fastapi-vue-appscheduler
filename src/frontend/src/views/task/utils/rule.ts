@@ -7,5 +7,7 @@ export const projectFormRules = reactive(<FormRules>{
 });
 
 export const jobFormRules = reactive(<FormRules>{
-  app_id: [{ required: true, message: "必须选择一个应用", trigger: "blur" }]
+  app_id: [{ required: true, message: "必须选择一个应用", trigger: "blur" }],
+  name: [{ required: true, message: "必须填写任务名称", trigger: "blur" }],
+  project_id: [{ required: true, message: "必须选择一个项目", trigger: "blur" }]
 });
