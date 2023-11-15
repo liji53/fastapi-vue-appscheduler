@@ -44,11 +44,6 @@ export function useJob() {
 
   const columns: TableColumnList = [
     {
-      label: "任务编号",
-      prop: "id",
-      minWidth: 100
-    },
-    {
       label: "任务名称",
       prop: "name",
       minWidth: 120
@@ -165,6 +160,10 @@ export function useJob() {
   };
   const onConfirmCron = async () => {
     await updateJob(cronFormData.id, { cron: cronFormData.cron });
+    message(`成功设置定时任务`, {
+      type: "success"
+    });
+    crontabVisible.value = false;
     onSearch();
   };
 

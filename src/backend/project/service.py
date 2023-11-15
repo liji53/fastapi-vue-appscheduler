@@ -3,13 +3,16 @@ from typing import Optional
 from .models import Project
 from .schemas import ProjectCreate, ProjectUpdate
 
+from ..auth.models import User
+
 
 def get_by_id(*, db_session, pk: int) -> Optional[Project]:
     return db_session.query(Project).filter(Project.id == pk).one_or_none()
 
 
-def create(*, db_session, project_in: ProjectCreate) -> Project:
+def create(*, db_session, project_in: ProjectCreate, user: User) -> Project:
     project = Project(**project_in.model_dump())
+    project.user = user
     db_session.add(project)
     db_session.commit()
     return project

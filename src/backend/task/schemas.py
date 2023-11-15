@@ -13,6 +13,7 @@ class TaskBase(MyBaseModel):
 
 
 class TaskCreate(TaskBase):
+    status: bool = True
     pass
 
 
@@ -32,7 +33,7 @@ class TaskRead(TaskBase):
     id: PrimaryKey
     project: str
     status: bool
-    cron: str
+    cron: Optional[str] = None
     updated_at: datetime
 
 

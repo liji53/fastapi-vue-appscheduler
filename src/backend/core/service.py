@@ -59,8 +59,13 @@ def sort_paginate(
             name_filter = [{"field": "name", 'op': 'like', 'value': f"%{query_name}%"}]
             query = apply_filters(query, filter_spec=name_filter)
 
+        if model in ["Project", "ApplicationInstalled"]:
+            # user外键
+            user_filter = [{"field": "user_id", 'op': '==', 'value': f"{current_user.id}"}]
+            query = apply_filters(query, filter_spec=user_filter)
+
         if filter_spec:
-            query = apply_filters(query, filter_spec)
+            query = apply_filters(query, filter_spec=filter_spec)
 
         if sort_by:
             sort_spec = _create_sort_spec(model, sort_by, descending)

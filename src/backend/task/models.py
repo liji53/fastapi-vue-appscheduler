@@ -16,6 +16,5 @@ class Task(Base, DateTimeMixin):
     project = relationship("Project", backref="tasks", uselist=False)
 
     # 安装的应用
-    application_id = Column(Integer, ForeignKey("application_installed.id"))
+    app_id = Column(Integer, ForeignKey("application_installed.id"))
     application = relationship("ApplicationInstalled", backref="tasks", uselist=False)
-

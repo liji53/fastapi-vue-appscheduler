@@ -31,7 +31,7 @@ class InstalledAppPagination(Pagination):
 class InstalledAppTreeNode(MyBaseModel):
     id: int
     name: NameStr
-    children: list['InstalledAppTreeNode']
+    children: Optional[list['InstalledAppTreeNode']] = None
 
 
 class InstalledAppTree(MyBaseModel):

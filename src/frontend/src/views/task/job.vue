@@ -205,52 +205,56 @@ const {
         </pure-table>
       </template>
     </PureTableBar>
-  </div>
-  <el-drawer
-    v-model="crontabVisible"
-    direction="rtl"
-    :destroy-on-close="true"
-    title="任务定时"
-    size="800px"
-  >
-    <div class="pr-20">
-      <el-form
-        class="edit-form"
-        :model="cronFormData"
-        ref="formRef"
-        label-width="100px"
-      >
-        <el-form-item label="cron表达式" prop="cron">
-          <el-input v-model="cronFormData.cron" placeholder="请输入cron表达式">
-            <template #append>
-              <el-tooltip content="配置cron表达式" placement="top">
-                <el-button
-                  :icon="useRenderIcon(ArrowDown)"
-                  @click="
-                    () => {
-                      isShowCronCore = !isShowCronCore;
-                    }
-                  "
-                />
-              </el-tooltip>
-            </template>
-          </el-input>
-        </el-form-item>
-        <div
-          style="width: 100%; padding-left: 10px; margin-top: -5px"
-          v-show="isShowCronCore"
+
+    <el-drawer
+      v-model="crontabVisible"
+      direction="rtl"
+      :destroy-on-close="true"
+      title="任务定时"
+      size="800px"
+    >
+      <div class="pr-20">
+        <el-form
+          class="edit-form"
+          :model="cronFormData"
+          ref="formRef"
+          label-width="100px"
         >
-          <crontab v-model:value="cronFormData.cron" />
-        </div>
-      </el-form>
-    </div>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="onCancelCron">取 消</el-button>
-        <el-button type="primary" @click="onConfirmCron">确 定</el-button>
-      </span>
-    </template>
-  </el-drawer>
+          <el-form-item label="cron表达式" prop="cron">
+            <el-input
+              v-model="cronFormData.cron"
+              placeholder="请输入cron表达式"
+            >
+              <template #append>
+                <el-tooltip content="配置cron表达式" placement="top">
+                  <el-button
+                    :icon="useRenderIcon(ArrowDown)"
+                    @click="
+                      () => {
+                        isShowCronCore = !isShowCronCore;
+                      }
+                    "
+                  />
+                </el-tooltip>
+              </template>
+            </el-input>
+          </el-form-item>
+          <div
+            style="width: 100%; padding-left: 10px; margin-top: -5px"
+            v-show="isShowCronCore"
+          >
+            <crontab v-model:value="cronFormData.cron" />
+          </div>
+        </el-form>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="onCancelCron">取 消</el-button>
+          <el-button type="primary" @click="onConfirmCron">确 定</el-button>
+        </span>
+      </template>
+    </el-drawer>
+  </div>
 </template>
 
 <style scoped lang="scss">

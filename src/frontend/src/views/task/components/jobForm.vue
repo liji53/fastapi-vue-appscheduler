@@ -26,18 +26,17 @@ function getRef() {
   return ruleFormRef.value;
 }
 const onSelectChnage = (value: any) => {
-  console.log(value);
   for (const app of newFormInline.value.apps) {
     if ("children" in app) {
       for (const child of app["children"]) {
-        if (child.value == value) {
-          newFormInline.value.name = child.label;
+        if (child.id === value) {
+          newFormInline.value.name = child.name;
           console.log(newFormInline.value.name);
         }
       }
     } else {
-      if (app.value == value) {
-        newFormInline.value.name = app.label;
+      if (app.id === value) {
+        newFormInline.value.name = app.name;
         console.log(newFormInline.value.name);
       }
     }

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from fastapi import APIRouter, HTTPException
 from loguru import logger
@@ -6,7 +6,7 @@ from loguru import logger
 from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate
 from .service import get_by_id, update, delete, create
 
-from ..core.service import CommonParameters, sort_paginate, DbSession
+from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
 
 
@@ -14,11 +14,22 @@ task_router = APIRouter()
 
 
 @task_router.get("", response_model=TaskPagination, summary="获取任务列表")
-def get_tasks(common: CommonParameters):
-    pagination = sort_paginate(model="Task", **common)
+def get_tasks(common: CommonParameters,
+              current_user: CurrentUser,
+              project_id: Optional[PrimaryKey] = None,
+              status: Optional[bool] = None):
+    filter_spec = []
+    if project_id is not None:
+        filter_spec.append({"field": "project_id", 'op': '==', 'value': project_id})
+    else:
+        project_ids = [project.id for project in current_user.projects]
+        filter_spec.append({"field": "project_id", 'op': 'in', 'value': project_ids})
+    if status is not None:
+        filter_spec.append({"field": "status", 'op': '==', 'value': status})
+
+    pagination = sort_paginate(model="Task", filter_spec=filter_spec, **common)
     ret = []
     for task in pagination["data"]:
-        logger.debug(**task.dict())
         ret.append({
             **task.dict(),
             "project": task.project.name

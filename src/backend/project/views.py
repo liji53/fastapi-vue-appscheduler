@@ -5,7 +5,7 @@ from loguru import logger
 from .schemas import ProjectPagination, ProjectCreate, ProjectUpdate
 from .service import get_by_id, update, delete, create
 
-from ..core.service import CommonParameters, sort_paginate, DbSession
+from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
 
 
@@ -28,9 +28,9 @@ def get_projects(common: CommonParameters):
 
 
 @project_router.post("", response_model=None, summary="创建项目")
-def create_project(project_in: ProjectCreate, db_session: DbSession):
+def create_project(project_in: ProjectCreate, db_session: DbSession, current_user: CurrentUser):
     try:
-        create(db_session=db_session, project_in=project_in)
+        create(db_session=db_session, project_in=project_in, user=current_user)
     except Exception as e:
         logger.warning(f"创建项目失败，原因：{e}")
         raise HTTPException(500, detail=[{"msg": "创建项目失败！"}])
@@ -51,4 +51,4 @@ def delete_project(project_id: PrimaryKey, db_session: DbSession):
         delete(db_session=db_session, pk=project_id)
     except Exception as e:
         logger.debug(f"删除项目失败，原因: {e}")
-        raise HTTPException(500, detail=[{"msg": f"删除项目失败！"}])
+        raise HTTPException(500, detail=[{"msg": f"删除项目失败, 请先删除该项目的任务"}])

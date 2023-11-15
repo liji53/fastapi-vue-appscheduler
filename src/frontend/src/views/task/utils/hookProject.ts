@@ -23,11 +23,6 @@ export function useProject() {
   });
   const columns: TableColumnList = [
     {
-      label: "项目编号",
-      prop: "id",
-      minWidth: 100
-    },
-    {
       label: "项目名称",
       prop: "name",
       minWidth: 120
