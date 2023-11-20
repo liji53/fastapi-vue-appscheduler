@@ -15,9 +15,13 @@ app 管理 + app 调度
 3.  xxxx
 
 #### 使用说明
-
-##### 非docker
+##### 运行项目
 前端打包：参考<https://yiming_chang.gitee.io/pure-admin-doc/pages/request/#%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95>
+
+##### docker运行
+```shell
+docker-compose -f docker/docker-compose.yml up -d
+```
 
 #### 参与贡献
 

@@ -1,0 +1,51 @@
+version: "2.18"
+services:
+  app-scheduler-mysql:
+    image: mysql:latest
+    container_name: app-scheduler-mysql
+    # 使用该参数，容器内的root拥有真正的root权限，否则，容器内的root只是外部的一个普通用户权限
+    # privileged: true
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_USER: "app_scheduler"
+      MYSQL_PASSWORD: "123456"
+      MYSQL_DATABASE: "appscheduler"
+      TZ: Asia/Shanghai
+    command:
+      --wait_timeout=31536000
+      --interactive_timeout=31536000
+      --max_connections=1000
+      --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "./docker_data/mysql/data:/var/lib/mysql"
+
+  app-scheduler-server:
+    image: appscheduler:latest
+    # 等价于 docker build -t appscheduler -f docker/dockerfile .
+    build:
+      # 由于docker-compose放在docker目录下，因此context为上一层目录
+      context: ..
+      dockerfile: ./docker/dockerfile
+    container_name: app-scheduler-server
+    depends_on:
+      - app-scheduler-mysql
+    environment:
+      LOG_LEVEL: "INFO"
+      DATABASE_HOSTNAME: "10.20.148.81"
+      DATABASE_PORT: "3307"
+      DATABASE_USER: "app_scheduler"
+      # web静态文件的路径
+      STATIC_DIR: "./web/dist"
+      TZ: Asia/Shanghai
+    volumes:
+      - ./docker_data/server/files:/src/files
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    restart: unless-stopped
+    entrypoint: "python3 ./cli.py database init && python3 ./run.py"
+
