@@ -89,13 +89,13 @@ const cardLogoClass = computed(() => [
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click="$emit('edit-app', app)"
-                  v-if="hasAuth('btn_update')"
+                  v-if="pagename == 'myApp' || hasAuth('btn_update')"
                 >
                   编辑
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click="$emit('upload-pic', app)"
-                  v-if="hasAuth('btn_update')"
+                  v-if="pagename == 'myApp' || hasAuth('btn_update')"
                 >
                   图标
                 </el-dropdown-item>

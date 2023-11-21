@@ -6,16 +6,25 @@ RUN npm install pnpm -g && \
 RUN npm run build
 
 FROM python:3.10-slim-buster
-# 设置环境变量
-ENV DATABASE_HOSTNAME="10.20.148.81"
-ENV DATABASE_PORT="3306"
-ENV DATABASE_USER="app_scheduler"
+WORKDIR /appscheduler
 # web静态文件的路径
 ENV STATIC_DIR="./web/dist"
-WORKDIR /appscheduler
+# 系统存储文件路径
+ENV FILES_DIR="./files"
 COPY --from=web_build /web/dist ./web/dist
 COPY ./requirements.txt .
+# RUN cat > /etc/apt/sources.list << EOF \
+#     deb http://mirrors.163.com/debian/ buster main contrib non-free \
+#     deb http://mirrors.163.com/debian/ buster-updates main contrib non-free \
+#     deb http://mirrors.163.com/debian/ buster-backports main contrib non-free \
+#     deb http://mirrors.163.com/debian-security buster/updates main contrib non-free \
+#     EOF && \
+#     cat /etc/apt/sources.list && \
+#     apt-get update && \
+#     apt-get install -y --no-install-recommends wget && \
+#     python3 -m pip install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
 RUN python3 -m pip install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+
 COPY ./src/backend ./src/backend
 COPY ./bin ./
 CMD ["python3", "./run.py"]

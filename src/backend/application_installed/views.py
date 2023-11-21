@@ -1,4 +1,5 @@
 from typing import Optional, Annotated
+import asyncio
 
 from fastapi import APIRouter, HTTPException, File
 from loguru import logger
@@ -10,10 +11,14 @@ from .schemas import InstalledAppCreate, InstalledAppPagination, InstalledAppUpd
 from ..application import service as app_service
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
+from ..core.database import SessionLocal
 from ..utils.storage import remove_old_file, create_new_file, remove_dir
+from ..utils import svn
+from ..core.config import SVN_USER, SVN_PASSWORD
 
 installed_app_router = APIRouter()
-STORAGE_MY_APP_DIR = "my_apps"
+STORAGE_MY_APP_DIR = "my_apps"  # 存储应用的logo图片
+STORAGE_INSTALLED_APP_DIR = "installed_apps"  # 存储安装的应用
 
 
 @installed_app_router.get("", response_model=InstalledAppPagination, summary="获取我的应用列表")
@@ -44,18 +49,29 @@ def get_installed_apps(
     }
 
 
-@installed_app_router.post("", response_model=InstalledAppRead, summary="安装应用")
-def install_application(app_in: InstalledAppCreate, db_session: DbSession, current_user: CurrentUser):
+@installed_app_router.post("", response_model=None, summary="安装应用")
+async def install_application(app_in: InstalledAppCreate, db_session: DbSession, current_user: CurrentUser):
+    """异步安装app"""
+    async def run_task():
+        if await svn.check_out(app.url, user=SVN_USER, passwd=SVN_PASSWORD,
+                               root_dir=STORAGE_INSTALLED_APP_DIR, pk=current_user.id):
+            # session已经关闭，需要重新创建
+            session_local = SessionLocal()
+            try:
+                create(db_session=session_local, app_in=app, user=current_user)
+            except Exception as e:
+                logger.warning(f"安装应用失败，原因：{e}")
+        else:
+            logger.warning(f"安装应用失败，原因：svn checkout失败")
+
     app = app_service.get_by_id(db_session=db_session, pk=app_in.app_id)
     if not app:
         raise HTTPException(404, detail=[{"msg": "安装应用失败，该应用不存在!"}])
 
-    try:
-        installed_app = create(db_session=db_session, app_in=app, user=current_user)
-    except Exception as e:
-        logger.warning(f"安装应用失败，原因：{e}")
-        raise HTTPException(500, detail=[{"msg": "安装应用失败！"}])
-    return installed_app
+    if app.url.endswith(".git"):
+        raise HTTPException(500, detail=[{"msg": "安装应用失败，暂时不支持安装git应用!"}])
+    else:
+        asyncio.create_task(run_task())
 
 
 @installed_app_router.put("/{app_id}", response_model=InstalledAppRead, summary="更新我的应用信息")
@@ -69,8 +85,12 @@ def update_application(app_id: PrimaryKey, app_in: InstalledAppUpdate, db_sessio
 
 
 @installed_app_router.delete("/{app_id}", response_model=None, summary="卸载我的应用")
-def delete_application(app_id: PrimaryKey, db_session: DbSession):
+def delete_application(app_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
+    installed_app = get_by_id(db_session=db_session, pk=app_id)
     try:
+        svn.delete_local_repo(url=installed_app.application.url,
+                              pk=current_user.id,
+                              root_dir=STORAGE_INSTALLED_APP_DIR)
         delete(db_session=db_session, pk=app_id)
     except Exception as e:
         logger.debug(f"卸载应用失败，原因: {e}")
@@ -98,7 +118,7 @@ def upload_file(app_id: PrimaryKey,
 
 
 @installed_app_router.get("/tree", response_model=InstalledAppTree, summary="获取我的应用树结构")
-def get_app_tree(db_session: DbSession, current_user: CurrentUser):
+def get_app_tree(current_user: CurrentUser):
     category = {}
     for app in current_user.installed_applications:
         category_name = app.application.category.name

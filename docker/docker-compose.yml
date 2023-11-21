@@ -37,11 +37,11 @@ services:
       DATABASE_HOSTNAME: "10.20.148.81"
       DATABASE_PORT: "3307"
       DATABASE_USER: "app_scheduler"
-      # web静态文件的路径
-      STATIC_DIR: "./web/dist"
+      DATABASE_PASSWORD: "123456"
+      DATABASE_NAME: "appscheduler"
       TZ: Asia/Shanghai
     volumes:
-      - ./docker_data/server/files:/src/files
+      - "./docker_data/server/files:/appscheduler/files"
     ports:
       - "8000:8000"
     expose:

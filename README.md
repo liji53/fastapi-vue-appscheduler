@@ -1,22 +1,21 @@
 # fastapi-vue-appscheduler
 
-#### 介绍
+### 介绍
 app 管理 + app 调度
 
 
-#### 软件架构
+### 软件架构
 软件架构说明
 
+### 使用说明
+#### 运行项目
+##### windows运行
+如果应用的项目仓库在svn上，则依赖svn命令行工具
+下载地址：https://www.visualsvn.com/downloads/
+下载之后解压，把bin目录加入到环境变量中。
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-##### 运行项目
 前端打包：参考<https://yiming_chang.gitee.io/pure-admin-doc/pages/request/#%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95>
+
 
 ##### docker运行
 ```shell

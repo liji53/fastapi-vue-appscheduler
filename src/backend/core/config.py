@@ -15,8 +15,7 @@ STATIC_DIR = config("STATIC_DIR", default=DEFAULT_STATIC_DIR)
 logger.debug(f"默认web路径：{STATIC_DIR}")
 
 # 本地存储文件路径 - 上传的图片
-DEFAULT_FILES_DIR_NAME = "files"
-FILES_DIR_NAME = config("FILES_DIR_NAME", default=DEFAULT_FILES_DIR_NAME)
+FILES_DIR_NAME = "files"
 DEFAULT_FILES_DIR = os.path.join(
     os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), FILES_DIR_NAME
 )
@@ -45,3 +44,7 @@ ALEMBIC_INI_PATH = config(
     "ALEMBIC_INI_PATH",
     default=os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "alembic.ini"),
 )
+
+# 安装app，如果是svn的项目，需要用到的svn账户、密码
+SVN_USER = config("SVN_USER", default="liji37951")
+SVN_PASSWORD = config("SVN_PASSWORD", default="???")
