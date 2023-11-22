@@ -13,12 +13,10 @@ from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUs
 from ..core.schemas import PrimaryKey
 from ..core.database import SessionLocal
 from ..utils.storage import remove_old_file, create_new_file, remove_dir
-from ..utils import svn
-from ..core.config import SVN_USER, SVN_PASSWORD
+from ..utils.repository import Svn
 
 installed_app_router = APIRouter()
 STORAGE_MY_APP_DIR = "my_apps"  # 存储应用的logo图片
-STORAGE_INSTALLED_APP_DIR = "installed_apps"  # 存储安装的应用
 
 
 @installed_app_router.get("", response_model=InstalledAppPagination, summary="获取我的应用列表")
@@ -53,8 +51,9 @@ def get_installed_apps(
 async def install_application(app_in: InstalledAppCreate, db_session: DbSession, current_user: CurrentUser):
     """异步安装app"""
     async def run_task():
-        if await svn.check_out(app.url, user=SVN_USER, passwd=SVN_PASSWORD,
-                               root_dir=STORAGE_INSTALLED_APP_DIR, pk=current_user.id):
+        svn = Svn(url=app.url, pk=current_user.id)
+        if await svn.check_out():
+            await svn.install_requirements()
             # session已经关闭，需要重新创建
             session_local = SessionLocal()
             try:
@@ -87,10 +86,9 @@ def update_application(app_id: PrimaryKey, app_in: InstalledAppUpdate, db_sessio
 @installed_app_router.delete("/{app_id}", response_model=None, summary="卸载我的应用")
 def delete_application(app_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
     installed_app = get_by_id(db_session=db_session, pk=app_id)
+    svn = Svn(url=installed_app.application.url, pk=current_user.id)
     try:
-        svn.delete_local_repo(url=installed_app.application.url,
-                              pk=current_user.id,
-                              root_dir=STORAGE_INSTALLED_APP_DIR)
+        svn.delete_local_repo()
         delete(db_session=db_session, pk=app_id)
     except Exception as e:
         logger.debug(f"卸载应用失败，原因: {e}")

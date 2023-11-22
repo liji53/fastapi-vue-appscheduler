@@ -1,7 +1,14 @@
 import dayjs from "dayjs";
 import editForm from "../components/jobForm.vue";
 import { message } from "@/utils/message";
-import { getJobList, createJob, updateJob, deleteJob } from "@/api/job";
+import {
+  getJobList,
+  createJob,
+  updateJob,
+  deleteJob,
+  runJob,
+  getWebSocket
+} from "@/api/job";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
@@ -141,8 +148,19 @@ export function useJob() {
       });
   }
 
-  function handleRun(row) {
+  async function handleRun(row) {
     console.log(row.id);
+    await runJob(row.id);
+    message(`开始运行${row.name}`, {
+      type: "success"
+    });
+    const ws = getWebSocket(row.id);
+    ws.onmessage = function (event) {
+      const message = event.data;
+      message(message, {
+        type: "warning"
+      });
+    };
   }
 
   // 定时任务相关逻辑

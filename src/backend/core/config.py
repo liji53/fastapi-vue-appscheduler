@@ -45,6 +45,9 @@ ALEMBIC_INI_PATH = config(
     default=os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "alembic.ini"),
 )
 
-# 安装app，如果是svn的项目，需要用到的svn账户、密码
+# 如果安装的是svn项目，需要用到的svn账户、密码
 SVN_USER = config("SVN_USER", default="liji37951")
 SVN_PASSWORD = config("SVN_PASSWORD", default="???")
+
+# pip源
+PIP_INDEX_URL = config("PIP_INDEX_URL", default="https://mirrors.aliyun.com/pypi/simple/")

@@ -32,3 +32,11 @@ export const updateJob = (job_id: number, data: object) => {
 export const deleteJob = (job_id: number) => {
   return http.delete(baseUrlApi(`tasks/${job_id}`));
 };
+
+export const runJob = (job_id: number) => {
+  return http.post(baseUrlApi(`tasks/${job_id}/run`));
+};
+
+export const getWebSocket = (job_id: number) => {
+  return new WebSocket(`ws://localhost:8000/api/v1/tasks/${job_id}/ws`);
+};

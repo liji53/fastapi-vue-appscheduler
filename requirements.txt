@@ -9,6 +9,7 @@ sqlalchemy_utils
 sqlalchemy_filters
 pymysql~=1.1.0
 loguru
+apscheduler
 alembic
 click
-
+websockets

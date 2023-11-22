@@ -11,6 +11,8 @@ WORKDIR /appscheduler
 ENV STATIC_DIR="./web/dist"
 # 系统存储文件路径
 ENV FILES_DIR="./files"
+# pip源
+ENV PIP_INDEX_URL="https://mirrors.aliyun.com/pypi/simple/"
 COPY --from=web_build /web/dist ./web/dist
 COPY ./requirements.txt .
 # RUN cat > /etc/apt/sources.list << EOF \
