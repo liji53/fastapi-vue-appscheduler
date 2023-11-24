@@ -13,5 +13,3 @@ export interface TabItem {
   name: string;
   list: ListItem[];
 }
-
-// export web_socket = new WebSocket(`ws://localhost:8000/`)

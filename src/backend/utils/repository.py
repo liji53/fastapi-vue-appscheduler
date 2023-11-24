@@ -70,19 +70,20 @@ class Repository:
             logger.warning(f'[stderr]\n{stderr}')
         return True
 
-    async def run_app(self) -> Optional[asyncio.Task]:
-        async def run_python():
-            command = f'cd {self.local_path} && python main.py'
-            stdout, stderr = await run_subprocess(command=command)
-            if stdout:
-                logger.info(f'[stdout]\n{stdout}')
-            if stderr:
-                logger.warning(f'[stderr]\n{stderr}')
-            return stdout
-
+    async def run_app(self) -> (bool, str):
         main_py = os.path.join(self.local_path, "main.py")
-        if os.path.exists(main_py):
-            return asyncio.create_task(run_python())
+        if not os.path.exists(main_py):
+            return False, "运行任务失败，该应用不存在main.py"
+
+        command = f'cd {self.local_path} && python main.py'
+        logger.debug("22222")
+        stdout, stderr = await run_subprocess(command=command)
+        logger.debug("33333")
+        if stdout:
+            logger.info(f'[stdout]\n{stdout}')
+        if stderr:
+            logger.warning(f'[stderr]\n{stderr}')
+        return True, stdout
 
 
 class Svn(Repository):

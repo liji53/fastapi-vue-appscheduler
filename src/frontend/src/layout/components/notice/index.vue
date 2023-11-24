@@ -1,14 +1,25 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { noticesData } from "./data";
+import { ref, computed } from "vue";
+// import { noticesData } from "./data";
 import NoticeList from "./noticeList.vue";
 import Bell from "@iconify-icons/ep/bell";
+import { useWebSocketStoreHook } from "@/store/modules/webSockets";
 
-const noticesNum = ref(0);
-const notices = ref(noticesData);
-const activeKey = ref(noticesData[0].key);
+const notices = ref([]);
 
-notices.value.map(v => (noticesNum.value += v.list.length));
+const socket = useWebSocketStoreHook().getTaskSocket();
+// 监听接收消息事件
+socket.onmessage = function (event) {
+  notices.value = JSON.parse(event.data);
+};
+
+const noticesNum = computed(() => {
+  let count = 0;
+  for (const v of notices.value) {
+    count += v.list.length;
+  }
+  return count;
+});
 </script>
 
 <template>
@@ -24,7 +35,6 @@ notices.value.map(v => (noticesNum.value += v.list.length));
       <el-dropdown-menu>
         <el-tabs
           :stretch="true"
-          v-model="activeKey"
           class="dropdown-tabs"
           :style="{ width: notices.length === 0 ? '200px' : '330px' }"
         >

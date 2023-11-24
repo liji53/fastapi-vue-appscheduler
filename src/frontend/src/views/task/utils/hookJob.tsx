@@ -1,14 +1,7 @@
 import dayjs from "dayjs";
 import editForm from "../components/jobForm.vue";
 import { message } from "@/utils/message";
-import {
-  getJobList,
-  createJob,
-  updateJob,
-  deleteJob,
-  runJob,
-  getWebSocket
-} from "@/api/job";
+import { getJobList, createJob, updateJob, deleteJob } from "@/api/job";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
@@ -16,6 +9,7 @@ import { addDialog } from "@/components/ReDialog";
 import { type JobItemProps } from "./types";
 import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, h, computed, toRaw } from "vue";
+import { useWebSocketStoreHook } from "@/store/modules/webSockets";
 
 export function useJob() {
   const form = reactive({
@@ -148,19 +142,12 @@ export function useJob() {
       });
   }
 
-  async function handleRun(row) {
-    console.log(row.id);
-    await runJob(row.id);
+  function handleRun(row) {
+    const socket = useWebSocketStoreHook().getTaskSocket();
+    socket.send(JSON.stringify({ task_id: row.id }));
     message(`开始运行${row.name}`, {
       type: "success"
     });
-    const ws = getWebSocket(row.id);
-    ws.onmessage = function (event) {
-      const message = event.data;
-      message(message, {
-        type: "warning"
-      });
-    };
   }
 
   // 定时任务相关逻辑
