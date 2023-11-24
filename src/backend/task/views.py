@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Union, Optional
 
@@ -91,14 +92,14 @@ async def run_task(socket: WebSocket):
         logger.debug("00000")
         is_success, result = await execute_task()
         tmp = [{
-            "key": "1",
-            "name": "任务结果通知",
+            "name": "任务结果",
             "list": [{
                 "avatar": "https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png",
-                "title": f"任务{task.name}执行{'成功' if is_success else '失败'}",
-                "datetime": "一年前",
+                "title": f"{task.name}",
+                "datetime": datetime.datetime.today().strftime("%m-%d %H:%M:%S"),
                 "description": f"{result}",
-                "type": "1"
+                "extra": '成功' if is_success else '失败',
+                "status": "success" if is_success else "danger",
              }]
         }]
         await socket.send_text(json.dumps(tmp))

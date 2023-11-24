@@ -44,11 +44,8 @@ const noticesNum = computed(() => {
             :image-size="60"
           />
           <span v-else>
-            <template v-for="item in notices" :key="item.key">
-              <el-tab-pane
-                :label="`${item.name}(${item.list.length})`"
-                :name="`${item.key}`"
-              >
+            <template v-for="(item, idx) in notices" :key="idx">
+              <el-tab-pane :label="`${item.name}(${item.list.length})`">
                 <el-scrollbar max-height="330px">
                   <div class="noticeList-container">
                     <NoticeList :list="item.list" />
