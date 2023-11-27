@@ -1,16 +1,37 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, Ref, computed } from "vue";
 // import { noticesData } from "./data";
 import NoticeList from "./noticeList.vue";
+import { TabItem } from "@/api/notice";
 import Bell from "@iconify-icons/ep/bell";
 import { useWebSocketStoreHook } from "@/store/modules/webSockets";
+import { ElNotification } from "element-plus";
 
-const notices = ref([]);
+const notices: Ref<TabItem[]> = ref([]);
 
 const socket = useWebSocketStoreHook().getTaskSocket();
 // 监听接收消息事件
 socket.onmessage = function (event) {
-  notices.value = JSON.parse(event.data);
+  const msg: TabItem = JSON.parse(event.data);
+  let is_exists = false;
+  notices.value.forEach(item => {
+    if (item.name === msg.name) {
+      is_exists = true;
+      for (const message of msg.list) {
+        item.list.push(message);
+      }
+    }
+  });
+  if (!is_exists) {
+    notices.value.push(msg);
+  }
+  for (const message of msg.list) {
+    ElNotification({
+      title: message.title,
+      type: message.status === "danger" ? "error" : message.status,
+      message: message.description
+    });
+  }
 };
 
 const noticesNum = computed(() => {
@@ -48,7 +69,7 @@ const noticesNum = computed(() => {
               <el-tab-pane :label="`${item.name}(${item.list.length})`">
                 <el-scrollbar max-height="330px">
                   <div class="noticeList-container">
-                    <NoticeList :list="item.list" />
+                    <NoticeList v-model:list="item.list" />
                   </div>
                 </el-scrollbar>
               </el-tab-pane>

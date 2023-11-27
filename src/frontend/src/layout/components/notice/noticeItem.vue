@@ -10,6 +10,7 @@ const props = defineProps({
     default: () => {}
   }
 });
+defineEmits(["read-done"]);
 
 const titleRef = ref(null);
 const titleTooltip = ref(false);
@@ -17,6 +18,7 @@ const descriptionRef = ref(null);
 const descriptionTooltip = ref(false);
 const { tooltipEffect } = useNav();
 const isMobile = deviceDetection();
+const showButton = ref(false);
 
 function hoverTitle() {
   nextTick(() => {
@@ -58,7 +60,11 @@ function hoverDescription(event, description) {
       class="notice-container-avatar"
     />
     <div class="notice-container-text">
-      <div class="notice-text-title text-[#000000d9] dark:text-white">
+      <div
+        class="notice-text-title text-[#000000d9] dark:text-white"
+        @mouseover="showButton = true"
+        @mouseout="showButton = false"
+      >
         <el-tooltip
           popper-class="notice-title-popper"
           :effect="tooltipEffect"
@@ -83,8 +89,17 @@ function hoverDescription(event, description) {
         >
           {{ props.noticeItem?.extra }}
         </el-tag>
+        <el-button
+          v-show="showButton"
+          size="small"
+          type="success"
+          style="position: absolute; right: 0"
+          @click="$emit('read-done')"
+          round
+          >已读</el-button
+        >
       </div>
-
+      <!-- 详情描述 -->
       <el-tooltip
         popper-class="notice-title-popper"
         :effect="tooltipEffect"
@@ -149,7 +164,6 @@ function hoverDescription(event, description) {
       }
 
       .notice-title-extra {
-        float: right;
         margin-top: -1.5px;
         font-weight: 400;
       }

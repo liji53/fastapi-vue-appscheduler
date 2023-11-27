@@ -76,9 +76,7 @@ class Repository:
             return False, "运行任务失败，该应用不存在main.py"
 
         command = f'cd {self.local_path} && python main.py'
-        logger.debug("22222")
         stdout, stderr = await run_subprocess(command=command)
-        logger.debug("33333")
         if stdout:
             logger.info(f'[stdout]\n{stdout}')
         if stderr:

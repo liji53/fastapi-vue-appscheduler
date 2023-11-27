@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import json
 from typing import Union, Optional
@@ -5,6 +6,7 @@ from typing import Union, Optional
 from fastapi import APIRouter, HTTPException, WebSocket
 from loguru import logger
 
+from .models import Task
 from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate
 from .service import get_by_id, update, delete, create
 
@@ -71,35 +73,39 @@ def delete_task(task_id: PrimaryKey, db_session: DbSession):
         raise HTTPException(500, detail=[{"msg": f"删除任务失败！"}])
 
 
-@task_router.websocket("/ws")
-async def run_task(socket: WebSocket):
-    """用户手动执行任务，服务器通知任务的执行结果"""
-
+async def run_task_and_send(task: Task, socket: WebSocket):
     async def execute_task():
         if not task:
             return False, "运行任务失败，该任务不存在！"
         repo = Repository(url=task.application.application.url, pk=task.application.user_id)
-        logger.debug("1111")
         return await repo.run_app()
 
+    # 单用户阻塞实现：如果一个用户同时执行了多个任务，后面的任务会阻塞
+    is_success, result = await execute_task()
+    tmp = {
+        "name": "任务结果",
+        "list": [{
+            "avatar": "https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png",
+            "title": f"{task.name}",
+            "datetime": datetime.datetime.today().strftime("%m-%d %H:%M:%S"),
+            "description": f"{result}",
+            "extra": '成功' if is_success else '失败',
+            "status": "success" if is_success else "danger",
+         }]
+    }
+    await socket.send_text(json.dumps(tmp))
+
+
+@task_router.websocket("/ws")
+async def run_task(socket: WebSocket):
+    """用户手动执行任务，服务器通知任务的执行结果"""
     await socket.accept()
 
     while True:
-        # 如果用户同时执行了多个任务，后面的任务会阻塞
         msg = await socket.receive_json()
         logger.debug(f"收到消息：{msg}")
         task = get_by_id(db_session=SessionLocal(), pk=msg["task_id"])
-        logger.debug("00000")
-        is_success, result = await execute_task()
-        tmp = [{
-            "name": "任务结果",
-            "list": [{
-                "avatar": "https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png",
-                "title": f"{task.name}",
-                "datetime": datetime.datetime.today().strftime("%m-%d %H:%M:%S"),
-                "description": f"{result}",
-                "extra": '成功' if is_success else '失败',
-                "status": "success" if is_success else "danger",
-             }]
-        }]
-        await socket.send_text(json.dumps(tmp))
+        # 方案一: 单用户任务阻塞
+        # await run_task_and_send(task=task, socket=socket)
+        # 方案二：任务异步
+        asyncio.create_task(run_task_and_send(task=task, socket=socket))

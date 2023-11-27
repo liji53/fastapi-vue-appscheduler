@@ -4,12 +4,11 @@ export interface ListItem {
   datetime: string;
   type: string;
   description: string;
-  status?: "" | "success" | "warning" | "info" | "danger";
+  status: "" | "success" | "warning" | "info" | "danger";
   extra?: string;
 }
 
 export interface TabItem {
-  key: string;
   name: string;
   list: ListItem[];
 }
