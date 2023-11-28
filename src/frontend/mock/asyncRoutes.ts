@@ -69,6 +69,31 @@ const securityRouter = {
     }
   ]
 };
+const monitorRouter = {
+  path: "/monitor",
+  meta: {
+    title: "监控中心",
+    icon: "monitor",
+    rank: 8
+  },
+  children: [
+    {
+      path: "/monitor/exception",
+      name: "Exception",
+      meta: { title: "异常监控" }
+    },
+    {
+      path: "/monitor/statistics",
+      name: "Statistics",
+      meta: { title: "统计管理" }
+    },
+    {
+      path: "/monitor/resource",
+      name: "Resource",
+      meta: { title: "系统资源" }
+    }
+  ]
+};
 
 export default [
   {
@@ -77,7 +102,7 @@ export default [
     response: () => {
       return {
         success: true,
-        data: [appRouter, taskRouter, securityRouter]
+        data: [appRouter, taskRouter, monitorRouter, securityRouter]
       };
     }
   }

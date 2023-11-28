@@ -13,3 +13,4 @@ apscheduler
 alembic
 click
 websockets
+psutil
