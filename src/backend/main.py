@@ -9,6 +9,7 @@ from loguru import logger
 from .core.config import LOG_LEVEL, STATIC_DIR, FILES_DIR, FILES_DIR_NAME
 from .core.api import api_router
 from .core.middleware import DBSessionMiddleware
+from .core.scheduler import init_scheduler
 
 # 配置日志等级
 logger.remove()
@@ -43,6 +44,8 @@ api = FastAPI(
 api.add_middleware(DBSessionMiddleware)
 # 添加所有的API路由
 api.include_router(api_router)
+# 启动定时任务
+init_scheduler()
 
 # 前端路由
 frontend = FastAPI(openapi_url="")

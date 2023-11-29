@@ -164,7 +164,12 @@ export function useJob() {
     crontabVisible.value = false;
   };
   const onConfirmCron = async () => {
-    await updateJob(cronFormData.id, { cron: cronFormData.cron });
+    if (cronFormData.cron != null && cronFormData.cron.trim() === "") {
+      await updateJob(cronFormData.id, { cron: null });
+    } else {
+      await updateJob(cronFormData.id, { cron: cronFormData.cron });
+    }
+
     message(`成功设置定时任务`, {
       type: "success"
     });

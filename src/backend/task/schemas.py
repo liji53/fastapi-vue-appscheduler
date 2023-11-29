@@ -1,6 +1,10 @@
 from typing import Optional
 from datetime import datetime
 
+from fastapi import HTTPException
+from croniter import croniter
+from pydantic import field_validator
+
 from ..core.schemas import MyBaseModel, NameStr, PrimaryKey
 from ..core.schemas import Pagination
 
@@ -26,7 +30,15 @@ class TaskStatusUpdate(MyBaseModel):
 
 
 class TaskCronUpdate(MyBaseModel):
-    cron: str
+    cron: Optional[str]
+
+    @field_validator("cron")
+    @classmethod
+    def ensure_foobar(cls, v: Optional[str]):
+        if v and not croniter.is_valid(expression=v):
+            # 不能使用 raise ValueError("xxx")
+            raise HTTPException(422, detail=[{"msg": "cron表达式非法！"}])
+        return v
 
 
 class TaskRead(TaskBase):

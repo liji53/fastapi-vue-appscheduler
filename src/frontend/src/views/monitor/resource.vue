@@ -92,7 +92,7 @@ onMounted(() => {
     });
   }
   setValue();
-  setInterval(setValue, 5000);
+  // setInterval(setValue, 5000);
 
   option && cpuChart.setOption(option);
   option && memoryChart.setOption(option);

@@ -473,7 +473,7 @@ export default defineComponent({
           case "2":
           case "4":
           case "11":
-            days = "?";
+            days = "*";
             break;
           case "3":
             days =
@@ -510,7 +510,7 @@ export default defineComponent({
           case "1":
           case "3":
           case "5":
-            weeks = "?";
+            weeks = "*";
             break;
           case "2":
             weeks =
@@ -527,7 +527,7 @@ export default defineComponent({
           case "8":
           case "9":
           case "10":
-            weeks = "?";
+            weeks = "*";
             break;
           case "11":
             weeks = state.week.cronNthDayDay + "#" + state.week.cronNthDayNth;
@@ -561,7 +561,7 @@ export default defineComponent({
       cron: computed(() => {
         return `${state.minutesText || "*"} ${state.hoursText || "*"} ${
           state.daysText || "*"
-        } ${state.monthsText || "*"} ${state.weeksText || "?"}`;
+        } ${state.monthsText || "*"} ${state.weeksText || "*"}`;
       })
     });
 

@@ -18,7 +18,7 @@ async def run_subprocess(*, command: str) -> (Optional[str], Optional[str]):
         command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
     )
     stdout, stderr = await process.communicate()
-    # todo: linux 和 windows 的解码
+    # todo: linux环境待测试
     try:
         return stdout.decode("GBK") if stdout else None, \
                stderr.decode("GBK") if stderr else None
@@ -73,6 +73,7 @@ class Repository:
     async def run_app(self) -> (bool, str):
         main_py = os.path.join(self.local_path, "main.py")
         if not os.path.exists(main_py):
+            logger.info("运行任务失败，该应用不存在main.py")
             return False, "运行任务失败，该应用不存在main.py"
 
         command = f'cd {self.local_path} && python main.py'

@@ -9,6 +9,7 @@ from loguru import logger
 from .models import Task
 from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate
 from .service import get_by_id, update, delete, create
+from .scheduler import update_scheduler, delete_scheduler
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
@@ -55,11 +56,20 @@ def create_task(task_in: TaskCreate, db_session: DbSession):
 
 @task_router.put("/{task_id}", response_model=None, summary="更新任务信息、使能任务状态、设置定时")
 def update_task(task_id: PrimaryKey,
-                task_in: Union[TaskUpdate, TaskStatusUpdate, TaskCronUpdate],
+                task_in: Union[TaskCronUpdate, TaskStatusUpdate, TaskUpdate],
                 db_session: DbSession):
+
     task = get_by_id(db_session=db_session, pk=task_id)
     if not task:
         raise HTTPException(404, detail=[{"msg": "更新任务失败，该任务不存在！"}])
+
+    # 更新/设置 定位任务
+    if isinstance(task_in, TaskCronUpdate):
+        update_scheduler(old_task=task, status=task.status, cron=task_in.cron)
+
+    # 更新状态，启动/暂停 定时任务
+    if isinstance(task_in, TaskStatusUpdate):
+        update_scheduler(old_task=task, status=task_in.status, cron=task.cron)
 
     update(db_session=db_session, task=task, task_in=task_in)
 
@@ -71,6 +81,9 @@ def delete_task(task_id: PrimaryKey, db_session: DbSession):
     except Exception as e:
         logger.debug(f"删除任务失败，原因: {e}")
         raise HTTPException(500, detail=[{"msg": f"删除任务失败！"}])
+
+    # 数据库删除成功，才能删除定时任务
+    delete_scheduler(task_id=task_id)
 
 
 async def run_task_and_send(task: Task, socket: WebSocket):

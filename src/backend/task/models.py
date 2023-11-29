@@ -18,3 +18,6 @@ class Task(Base, DateTimeMixin):
     # 安装的应用
     app_id = Column(Integer, ForeignKey("application_installed.id"))
     application = relationship("ApplicationInstalled", backref="tasks", uselist=False)
+
+    def __repr__(self) -> str:
+        return f"<{self.name} - {self.cron}>"

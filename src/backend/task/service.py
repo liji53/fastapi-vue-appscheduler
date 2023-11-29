@@ -2,10 +2,15 @@ from typing import Optional, Union
 
 from .models import Task
 from .schemas import TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate
+from sqlalchemy.orm import Session
 
 
 def get_by_id(*, db_session, pk: int) -> Optional[Task]:
     return db_session.query(Task).filter(Task.id == pk).one_or_none()
+
+
+def get_schedule_tasks(*, db_session: Session) -> list[Task]:
+    return db_session.query(Task).filter(Task.status).filter(Task.cron.isnot(None)).all()
 
 
 def create(*, db_session, task_in: TaskCreate) -> Task:
@@ -27,6 +32,6 @@ def update(*, db_session, task: Task, task_in: Union[TaskUpdate, TaskCronUpdate,
     return task
 
 
-def delete(*, db_session, pk: int):
+def delete(*, db_session: Session, pk: int):
     db_session.query(Task).filter(Task.id == pk).delete()
     db_session.commit()
