@@ -52,3 +52,7 @@ def update(*, db_session,
 def delete(*, db_session, pk: int):
     db_session.query(Application).filter(Application.id == pk).delete()
     db_session.commit()
+
+
+def get_all(*, db_session) -> list[Application]:
+    return db_session.query(Application).all()

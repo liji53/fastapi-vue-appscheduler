@@ -10,6 +10,7 @@ class MenuMeta(MyBaseModel):
     title: str
     icon: Optional[str] = None
     rank: Optional[int] = None
+    keepAlive: bool = False
     roles: Optional[list[str]] = None
     auths: list[str] = []
 

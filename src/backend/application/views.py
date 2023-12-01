@@ -3,8 +3,9 @@ from typing import Optional, Union, Annotated
 from fastapi import APIRouter, HTTPException, File
 from loguru import logger
 
-from .service import get_by_name, get_by_id, create, update, delete
-from .schemas import ApplicationPagination, ApplicationRead, ApplicationCreate, ApplicationUpdate, AppStatusUpdate
+from .service import get_by_name, get_by_id, create, update, delete, get_all
+from .schemas import ApplicationPagination, ApplicationRead, ApplicationCreate, \
+    ApplicationUpdate, AppStatusUpdate, AppTree
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
@@ -99,3 +100,20 @@ def upload_file(app_id: PrimaryKey,
     new_file_path = create_new_file(file=file, pk=app.id, root_dir=STORAGE_APP_DIR)
 
     update(db_session=db_session, app=app, app_in={"banner": new_file_path})
+
+
+@application_router.get("/tree", response_model=AppTree, summary="获取我的应用树结构")
+def get_app_tree(db_session: DbSession):
+    category = {}
+    apps = get_all(db_session=db_session)
+    for app in apps:
+        category_name = app.category.name
+        if not category.__contains__(category_name):
+            category[category_name] = {
+                **app.category.dict(),
+                "children": [{**app.dict()}]
+            }
+        else:
+            category[category_name]["children"].append({**app.dict()})
+
+    return {"data": [category[c] for c in category]}

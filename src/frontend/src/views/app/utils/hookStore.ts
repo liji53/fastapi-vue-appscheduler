@@ -58,6 +58,9 @@ export function useApp() {
         message: "请输入合法的URL地址",
         trigger: "blur"
       }
+    ],
+    category_id: [
+      { required: true, message: "应用分类为必填项", trigger: "blur" }
     ]
   });
 

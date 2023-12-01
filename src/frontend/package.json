@@ -51,6 +51,7 @@
     "qs": "^6.11.2",
     "responsive-storage": "^2.2.0",
     "sortablejs": "^1.15.0",
+    "starfish-editor": "^1.0.16",
     "vue": "^3.3.4",
     "vue-router": "^4.2.2",
     "vue-tippy": "^6.3.1",
@@ -131,6 +132,9 @@
       "sourcemap-codec": "*",
       "w3c-hr-time": "*",
       "stable": "*"
+    },
+    "patchedDependencies": {
+      "starfish-editor@1.0.16": "patches/starfish-editor@1.0.16.patch"
     }
   },
   "repository": "git@github.com:pure-admin/pure-admin-thin.git",

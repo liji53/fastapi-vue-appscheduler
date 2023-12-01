@@ -45,6 +45,7 @@ class MenuMeta(Base, DateTimeMixin):
     icon = Column(String(128), comment="菜单图标")
     rank = Column(Integer, comment="菜单排序，值越高排的越后（只针对顶级路由）")
     show_link = Column(Boolean, default=True, comment="是否显示菜单")
+    keepAlive = Column(Boolean, default=False, comment="页面是否缓存")
 
     menu_id = Column(Integer, ForeignKey(Menu.id))
 

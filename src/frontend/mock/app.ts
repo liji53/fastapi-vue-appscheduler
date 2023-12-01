@@ -108,5 +108,47 @@ export default [
         ]
       };
     }
+  },
+  {
+    url: "/apps/tree",
+    method: "get",
+    response: () => {
+      return {
+        data: [
+          {
+            id: 1,
+            name: "规范递交",
+            children: [
+              {
+                id: 12,
+                name: "SSL证书"
+              },
+              {
+                id: 13,
+                name: "SSL证书2"
+              },
+              {
+                id: 14,
+                name: "SSL证书4"
+              }
+            ]
+          },
+          {
+            id: 2,
+            name: "数据比对",
+            children: [
+              {
+                id: 15,
+                name: "SSL证书4"
+              },
+              {
+                id: 16,
+                name: "SSL证书6"
+              }
+            ]
+          }
+        ]
+      };
+    }
   }
 ] as MockMethod[];

@@ -16,6 +16,14 @@ type AppResult = {
   data: Array<App>;
 };
 
+// 应用的tree形式
+export type AppTree = {
+  id: number;
+  name: string;
+  children?: Array<AppTree>;
+};
+export type AppTreeResult = { data: Array<AppTree> };
+
 /** app列表 */
 export const getAppList = (params?: object) => {
   return http.request<AppResult>("get", baseUrlApi("apps"), { params });
@@ -36,4 +44,9 @@ export const deleteApp = (app_id: number) => {
 // 上传应用的图片
 export const uploadPic = (app_id: number, data: object) => {
   return http.upload(baseUrlApi(`apps/${app_id}/banner`), { data });
+};
+
+// 应用配置设计 - 获取应用的tree
+export const getAppTree = () => {
+  return http.request<AppTreeResult>("get", baseUrlApi("apps/tree"));
 };

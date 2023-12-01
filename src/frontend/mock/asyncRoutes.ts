@@ -32,6 +32,11 @@ const appRouter = {
       }
     },
     {
+      path: "/app/appForm",
+      name: "AppForm",
+      meta: { title: "配置设计" }
+    },
+    {
       path: "/app/myApp",
       name: "MyApp",
       meta: { title: "我的应用" }

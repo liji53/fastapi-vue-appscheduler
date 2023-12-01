@@ -1,5 +1,6 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "@/api/utils";
+import { type AppTreeResult } from "./app";
 
 type InstalledApp = {
   id: number;
@@ -13,14 +14,6 @@ type AppResult = {
   total: number;
   data: Array<InstalledApp>;
 };
-
-// 安装应用的tree形式
-type AppTree = {
-  id: number;
-  name: string;
-  children?: Array<AppTree>;
-};
-type AppTreeResult = { data: Array<AppTree> };
 
 // 我的应用列表
 export const getMyInstallApps = (params?: object) => {

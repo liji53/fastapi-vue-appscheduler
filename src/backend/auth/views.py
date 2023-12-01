@@ -23,7 +23,7 @@ STORAGE_USER_DIR = "users"
 
 @auth_router.post("/login", response_model=UserLoginResponse, summary="登录")
 def login(user_in: UserLogin, db_session: DbSession):
-    logger.debug(f"登录: {user_in.model_dump()}")
+    logger.debug(f"登录: {user_in.username}")
     user = get_by_name(db_session=db_session, username=user_in.username)
     if user and user.status and user.check_password(user_in.password):
         return {

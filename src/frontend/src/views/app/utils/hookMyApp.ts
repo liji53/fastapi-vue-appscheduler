@@ -94,7 +94,7 @@ export function useApp() {
 
   // 用于响应AppCard的事件
   const handleRevisionApp = (app_id: number) => {
-    message("暂时不支持查看应用版本", {
+    message(`暂时不支持查看应用${app_id}的版本`, {
       type: "error"
     });
   };

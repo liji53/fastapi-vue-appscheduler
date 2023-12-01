@@ -68,6 +68,11 @@ def init_database():
                         "path": "/app/myApp",
                         "name": "MyApp",
                         "meta": {"title": "我的应用"}
+                    },
+                    {
+                        "path": "/app/appForm",
+                        "name": "AppForm",
+                        "meta": {"title": "配置设计", "keepAlive": True}
                     }
                 ]
             },

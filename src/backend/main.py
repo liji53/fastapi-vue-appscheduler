@@ -20,18 +20,19 @@ logger.add(sys.stderr, level=LOG_LEVEL)
 app = FastAPI(openapi_url="")
 
 
-# api的异常处理
-async def not_found(request, exc):
-    return JSONResponse(
-        status_code=404, content={"detail": [{"msg": "API不支持."}]}
-    )
-
-
 async def internal_error(request, exc):
     return JSONResponse(
         status_code=500, content={"detail": [{"msg": "API服务内部错误."}]}
     )
-exception_handlers = {404: not_found, 500: internal_error}   # 404异常的处理
+exception_handlers = {
+    404: lambda request, exc: JSONResponse(
+        status_code=404, content={"detail": [{"msg": "API不支持."}]}
+    ),
+    405: lambda request, exc: JSONResponse(
+        status_code=405, content={"detail": [{"msg": "API不允许."}]}
+    ),
+    500: internal_error
+}
 
 # 后端api
 api = FastAPI(

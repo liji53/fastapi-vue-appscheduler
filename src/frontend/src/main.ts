@@ -21,6 +21,8 @@ import "element-plus/dist/index.css";
 // 导入字体图标
 import "./assets/iconfont/iconfont.js";
 import "./assets/iconfont/iconfont.css";
+import StarfishEditor from "starfish-editor";
+import "starfish-editor/src/styles/index.scss";
 
 const app = createApp(App);
 
@@ -44,12 +46,21 @@ app.component("FontIcon", FontIcon);
 import { Auth } from "@/components/ReAuth";
 app.component("Auth", Auth);
 
+import { Dynamicform } from "starfish-form";
+app.component(Dynamicform.name, Dynamicform);
+
 getServerConfig(app).then(async config => {
   app.use(router);
   await router.isReady();
   injectResponsiveStorage(app, config);
   setupStore(app);
-  app.use(MotionPlugin).use(ElementPlus).use(Table).use(PureDescriptions);
+  app
+    .use(MotionPlugin)
+    .use(ElementPlus)
+    .use(Table)
+    .use(PureDescriptions)
+    .use(StarfishEditor);
+
   // .use(useEcharts);
   // .use(Table);
   // .use(PureDescriptions);

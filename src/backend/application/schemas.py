@@ -8,8 +8,8 @@ from ..core.schemas import Pagination, MyBaseModel, NameStr, PrimaryKey
 class ApplicationBase(MyBaseModel):
     name: NameStr
     url: HttpUrl
+    category_id: PrimaryKey
     status: bool = True
-    category_id: Optional[PrimaryKey] = None
     banner: Optional[str] = None
     description: Optional[str] = None
 
@@ -33,3 +33,13 @@ class ApplicationRead(ApplicationBase):
 
 class ApplicationPagination(Pagination):
     data: list[ApplicationRead]
+
+
+class AppTreeNode(MyBaseModel):
+    id: int
+    name: NameStr
+    children: Optional[list['AppTreeNode']] = None
+
+
+class AppTree(MyBaseModel):
+    data: list[AppTreeNode]

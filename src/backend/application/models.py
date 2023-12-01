@@ -16,4 +16,5 @@ class Application(Base, DateTimeMixin):
     category_id = Column(Integer, ForeignKey("application_category.id"))
     category = relationship("ApplicationCategory", backref="applications", uselist=False)
 
-
+    # 应用配置的表单，需要级联删除
+    form = relationship("ApplicationForm", cascade="all, delete", uselist=False, backref="Application")
