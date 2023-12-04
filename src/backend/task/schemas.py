@@ -43,6 +43,7 @@ class TaskCronUpdate(MyBaseModel):
 
 class TaskRead(TaskBase):
     id: PrimaryKey
+    app_id: PrimaryKey
     project: str
     status: bool
     cron: Optional[str] = None

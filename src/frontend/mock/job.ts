@@ -13,7 +13,7 @@ export default [
             name: "获取数据",
             project: "信创",
             project_id: 1,
-            app_id: 1,
+            app_id: 12,
             remark:
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部",
             status: true,

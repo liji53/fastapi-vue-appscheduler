@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import editForm from "../components/jobForm.vue";
 import { message } from "@/utils/message";
 import { getJobList, createJob, updateJob, deleteJob } from "@/api/job";
+import { getAppForm } from "@/api/app_form";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
@@ -42,7 +43,8 @@ export function useJob() {
     id: null,
     cron: "* * * * *"
   });
-
+  const taskConifgVisible = ref(false);
+  const taskConfigData = ref([]);
   const columns: TableColumnList = [
     {
       label: "任务名称",
@@ -178,7 +180,14 @@ export function useJob() {
   };
 
   function handleConfig(row) {
-    console.log(row.id);
+    getAppForm(row.app_id).then(response => {
+      if (response.form === null) {
+        console.log(null);
+      } else {
+        taskConfigData.value = JSON.parse(response.form);
+        taskConifgVisible.value = true;
+      }
+    });
   }
 
   function handleDelete(row) {
@@ -295,6 +304,8 @@ export function useJob() {
     cronFormData,
     //onChangeCron,
     onCancelCron,
-    onConfirmCron
+    onConfirmCron,
+    taskConifgVisible,
+    taskConfigData
   };
 }

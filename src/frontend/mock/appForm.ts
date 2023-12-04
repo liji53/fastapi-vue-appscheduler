@@ -6,7 +6,7 @@ export default [
     method: "get",
     response: () => {
       return {
-        data: [
+        form: JSON.stringify([
           {
             ControlType: "TextArea",
             nameCn: "文本域",
@@ -40,7 +40,7 @@ export default [
               default: ""
             }
           }
-        ]
+        ])
       };
     }
   }

@@ -12,6 +12,7 @@ export function useAppForm() {
   const appTree = ref([]);
   const currentApp = ref<number>();
 
+  // 动态表单与现有框架结合使用有问题，因此动态表单额外单独实现，同时砍掉部分基础控件和布局
   const starfishRef = ref();
   // 工作区上方的操作menu
   const lowcodeMenu = ref({
@@ -20,8 +21,22 @@ export function useAppForm() {
     column: false
   });
   // 基础控件
-  // const basicFields = ref(["Text", "Switch"]);
-  const lowcodeBasicFields = ref([]);
+  const lowcodeBasicFields = ref([
+    "Text",
+    "TextArea",
+    "Switch",
+    "Radio",
+    "CheckBox",
+    "Date",
+    "Time",
+    "InputNumber",
+    "Slider",
+    "Selected",
+    "Selecteds"
+  ]);
+  // 布局控件，全部去掉
+  const lowcodeLayoutFields = ref(["?"]);
+  // const lowcodeBasicFields = ref([]);
 
   onMounted(() => {
     getAppTree().then(response => {
@@ -52,6 +67,7 @@ export function useAppForm() {
     starfishRef,
     lowcodeMenu,
     lowcodeBasicFields,
+    lowcodeLayoutFields,
     onLowcodeSave,
     handleTreeClick
   };

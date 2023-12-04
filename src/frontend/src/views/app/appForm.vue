@@ -11,6 +11,7 @@ const {
   starfishRef,
   lowcodeMenu,
   lowcodeBasicFields,
+  lowcodeLayoutFields,
   TreeProps,
   onLowcodeSave,
   handleTreeClick
@@ -33,6 +34,7 @@ const {
       <starfish-editor
         :headerShow="false"
         :basicFields="lowcodeBasicFields"
+        :layoutFields="lowcodeLayoutFields"
         :menu="lowcodeMenu"
         class="starfish-editor"
         @save="onLowcodeSave"

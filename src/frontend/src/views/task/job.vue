@@ -3,6 +3,7 @@ import { useJob } from "./utils/hookJob";
 import crontab from "./components/crontab.vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import dynForm from "./components/dynForm.vue";
 import { ref } from "vue";
 
 import Search from "@iconify-icons/ep/search";
@@ -41,7 +42,9 @@ const {
   cronFormData,
   //onChangeCron,
   onCancelCron,
-  onConfirmCron
+  onConfirmCron,
+  taskConifgVisible,
+  taskConfigData
 } = useJob();
 </script>
 
@@ -254,6 +257,9 @@ const {
         </span>
       </template>
     </el-drawer>
+    <el-dialog v-model="taskConifgVisible" title="任务配置">
+      <dynForm :formJson="taskConfigData" />
+    </el-dialog>
   </div>
 </template>
 
