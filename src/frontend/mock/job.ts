@@ -59,5 +59,123 @@ export default [
         ]
       };
     }
+  },
+  {
+    url: "/tasks/1/config",
+    method: "get",
+    response: () => {
+      return {
+        data: JSON.stringify([
+          {
+            ControlType: "Text",
+            nameCn: "文本框",
+            id: "mGdLbChWNP2iPCZxvhsns",
+            layout: false,
+            data: {
+              fieldName: "doc文档目录",
+              label: "doc文档目录",
+              tip: "",
+              placeholder: "请输入文档路径",
+              showRule: "{}",
+              required: true,
+              rule: "[]",
+              default: "",
+              csslist: []
+            }
+          },
+          {
+            ControlType: "Text",
+            nameCn: "文本框",
+            id: "tZ8bW7QEHP5Y5tgRh1O89",
+            layout: false,
+            data: {
+              fieldName: "生成execl的目录",
+              label: "生成execl的目录",
+              tip: "",
+              placeholder: "",
+              showRule: "{}",
+              required: false,
+              rule: "[]",
+              default: "./dist"
+            }
+          },
+          {
+            ControlType: "Text",
+            nameCn: "文本框",
+            id: "X-ovka9WGnkNoqMj50uQE",
+            layout: false,
+            data: {
+              fieldName: "指定doc文件名包含内容",
+              label: "指定doc文件名包含内容",
+              tip: "",
+              placeholder: "",
+              showRule: "{}",
+              required: false,
+              rule: "[]",
+              default: ""
+            }
+          }
+        ])
+      };
+    }
+  },
+  {
+    url: "/tasks/2/config",
+    method: "get",
+    response: () => {
+      return {
+        data: JSON.stringify([
+          {
+            ControlType: "Text",
+            nameCn: "文本框",
+            id: "mGdLbChWNP2iPCZxvhsns",
+            layout: false,
+            data: {
+              fieldName: "doc文档目录",
+              label: "doc文档目录",
+              tip: "",
+              placeholder: "请输入文档路径",
+              showRule: "{}",
+              required: true,
+              rule: "[]",
+              default: "./src",
+              csslist: []
+            }
+          },
+          {
+            ControlType: "Text",
+            nameCn: "文本框",
+            id: "tZ8bW7QEHP5Y5tgRh1O89",
+            layout: false,
+            data: {
+              fieldName: "生成execl的目录",
+              label: "生成execl的目录",
+              tip: "",
+              placeholder: "",
+              showRule: "{}",
+              required: false,
+              rule: "[]",
+              default: "./dist"
+            }
+          },
+          {
+            ControlType: "Text",
+            nameCn: "文本框",
+            id: "X-ovka9WGnkNoqMj50uQE",
+            layout: false,
+            data: {
+              fieldName: "指定doc文件名包含内容",
+              label: "指定doc文件名包含内容",
+              tip: "",
+              placeholder: "",
+              showRule: "{}",
+              required: false,
+              rule: "[]",
+              default: ""
+            }
+          }
+        ])
+      };
+    }
   }
 ] as MockMethod[];

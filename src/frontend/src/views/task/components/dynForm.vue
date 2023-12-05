@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { message } from "@/utils/message";
 import infoFilled from "@iconify-icons/ep/info-filled";
 import {
   ElInput,
@@ -42,7 +41,9 @@ interface Control {
 const props = defineProps<{
   formJson: Control[];
 }>();
+defineEmits(["confirm-config"]);
 
+const dynFormRef = ref();
 const formData = ref({});
 const rules = ref({});
 
@@ -145,12 +146,6 @@ function getRules(item: Control) {
   rules.value[item.data.fieldName] = rule;
 }
 
-function handleSubmit() {
-  console.log("Form Data:", formData.value);
-  // 处理表单提交逻辑
-  message(`${JSON.stringify(formData.value)}`);
-}
-
 const is_select_componet = (controlType: ControlType) => {
   return ["Radio", "CheckBox", "Selected", "Selecteds"].includes(controlType);
 };
@@ -174,11 +169,12 @@ onMounted(() => {
 <template>
   <div>
     <el-form
-      @submit.prevent="handleSubmit"
+      ref="dynFormRef"
+      @submit.prevent="$emit('confirm-config', dynFormRef, formData)"
       :model="formData"
       :rules="rules"
-      label-position="left"
-      label-width="100px"
+      label-position="right"
+      label-width="180px"
     >
       <el-form-item
         v-for="control in formControls"

@@ -5,10 +5,12 @@ from typing import Optional
 import os
 import asyncio
 import shutil
+import configparser
 
 from loguru import logger
 
 from ..core.config import FILES_DIR, SVN_USER, SVN_PASSWORD, PIP_INDEX_URL
+
 STORAGE_INSTALLED_APP_DIR = "installed_apps"  # 存储安装的应用
 
 
@@ -71,6 +73,7 @@ class Repository:
         return True
 
     async def run_app(self) -> (bool, str):
+        """执行仓库中的应用, 应用入口必须是main.py"""
         main_py = os.path.join(self.local_path, "main.py")
         if not os.path.exists(main_py):
             logger.info("运行任务失败，该应用不存在main.py")
@@ -83,6 +86,55 @@ class Repository:
         if stderr:
             logger.warning(f'[stderr]\n{stderr}')
         return True, stdout
+
+    def _get_config(self, config_path) -> dict:
+        config = configparser.ConfigParser()
+        config.read(config_path, encoding="utf-8")
+        ret = {}
+        for section in config.sections():
+            for (key, value) in config[section].items():
+                if key in ret:
+                    logger.warning(f"{self.url}应用的配置存在相同的key: {key}")
+                ret.update({key: value})
+        return ret
+
+    def read_task_config(self, task_id: int) -> dict:
+        """读取仓库中应用的任务配置, ini文件中的key不能重复(包括不同section下的key)"""
+        config_path = os.path.join(self.local_path, f"conf_{task_id}.ini")
+        if not os.path.exists(config_path):
+            return {}
+        return self._get_config(config_path)
+
+    def read_default_config(self):
+        """
+        如果应用的发布者没有通过前端设置应用的配置表单，则通过默认配置，自动生成
+        读取仓库中应用的默认配置, ini文件中的key不能重复(包括不同section下的key)
+        """
+        config_path = os.path.join(self.local_path, "config.ini")
+        if not os.path.exists(config_path):
+            return {}
+        return self._get_config(config_path)
+
+    def write_task_config(self, task_id: int, config: dict):
+        config_path = os.path.join(self.local_path, f"conf_{task_id}.ini")
+        if not os.path.exists(config_path):
+            config_path = os.path.join(self.local_path, "config.ini")
+            if not os.path.exists(config_path):
+                logger.warning(f"{self.url}应用的配置不存在，不能写入")
+                return
+
+        config_parser = configparser.ConfigParser()
+        config_parser.read(config_path, encoding="utf-8")
+        for section in config_parser.sections():
+            for key in config_parser[section]:
+                if key in config:
+                    config_parser[section][key] = config[key]
+                else:
+                    logger.warning(f"{self.url}应用的配置不存在key: {key}")
+
+        task_config_path = os.path.join(self.local_path, f"conf_{task_id}.ini")
+        with open(task_config_path, 'w', encoding="utf-8") as fd:
+            config_parser.write(fd)
 
 
 class Svn(Repository):

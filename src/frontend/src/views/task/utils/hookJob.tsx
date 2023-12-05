@@ -1,8 +1,14 @@
 import dayjs from "dayjs";
 import editForm from "../components/jobForm.vue";
 import { message } from "@/utils/message";
-import { getJobList, createJob, updateJob, deleteJob } from "@/api/job";
-import { getAppForm } from "@/api/app_form";
+import {
+  getJobList,
+  createJob,
+  updateJob,
+  deleteJob,
+  getJobConfig,
+  setJobConfig
+} from "@/api/job";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
@@ -13,6 +19,7 @@ import { reactive, ref, onMounted, h, computed, toRaw } from "vue";
 import { useWebSocketStoreHook } from "@/store/modules/webSockets";
 
 export function useJob() {
+  // header 表单的数据
   const form = reactive({
     name: "",
     project_id: "",
@@ -20,9 +27,9 @@ export function useJob() {
     page: 1,
     itemsPerPage: 10
   });
-  const dataList = ref([]);
-  const projects = ref([]);
-  const apps = ref([]);
+  const dataList = ref([]); // 任务列表
+  const projects = ref([]); // 项目列表
+  const apps = ref([]); // 安装的应用的树结构
   const loading = ref(true);
   const formRef = ref();
   const switchLoadMap = ref({});
@@ -37,14 +44,18 @@ export function useJob() {
     pageSize: 10,
     currentPage: 1
   });
+  // 定时设置
   const crontabVisible = ref(false);
   const isShowCronCore = ref(true);
   const cronFormData = reactive({
     id: null,
     cron: "* * * * *"
   });
+  // 任务配置
   const taskConifgVisible = ref(false);
-  const taskConfigData = ref([]);
+  const task_id = ref(0); // 设置配置时记录当前任务id
+  const taskConfigData = ref([]); // 任务的当前配置
+
   const columns: TableColumnList = [
     {
       label: "任务名称",
@@ -143,7 +154,7 @@ export function useJob() {
         row.status === false ? (row.status = true) : (row.status = false);
       });
   }
-
+  // 手动执行任务
   function handleRun(row) {
     const socket = useWebSocketStoreHook().getTaskSocket();
     socket.send(JSON.stringify({ task_id: row.id }));
@@ -179,17 +190,30 @@ export function useJob() {
     onSearch();
   };
 
+  // 设置任务的配置
   function handleConfig(row) {
-    getAppForm(row.app_id).then(response => {
-      if (response.form === null) {
-        console.log(null);
+    getJobConfig(row.id).then(response => {
+      if (response.data === null || response.data == "[]") {
+        message("该应用不需要配置", {
+          type: "warning"
+        });
       } else {
-        taskConfigData.value = JSON.parse(response.form);
+        taskConfigData.value = JSON.parse(response.data);
         taskConifgVisible.value = true;
+        task_id.value = row.id;
+      }
+    });
+  }
+  function handleConfirmConfig(formRef, config) {
+    formRef.validate(async valid => {
+      if (valid) {
+        await setJobConfig(task_id.value, { data: JSON.stringify(config) });
+        message("配置设置成功", { type: "success" });
       }
     });
   }
 
+  // 删除任务
   function handleDelete(row) {
     deleteJob(row.id).then(() => {
       message(`您删除了任务-${row.name}`, { type: "success" });
@@ -197,18 +221,18 @@ export function useJob() {
     });
   }
 
+  // 分页
   function handleSizeChange(val: number) {
     form.page = 1;
     form.itemsPerPage = val;
     onSearch();
   }
-
   function handleCurrentChange(val: number) {
     form.page = val;
     onSearch();
   }
 
-  // 表单
+  // 搜索任务列表
   function onSearch() {
     loading.value = true;
     getJobList(toRaw(form))
@@ -226,6 +250,7 @@ export function useJob() {
     onSearch();
   };
 
+  // 新增、编辑 任务
   function openDialog(title = "新增", row?: JobItemProps) {
     addDialog({
       title: `${title}任务`,
@@ -306,6 +331,7 @@ export function useJob() {
     onCancelCron,
     onConfirmCron,
     taskConifgVisible,
-    taskConfigData
+    taskConfigData,
+    handleConfirmConfig
   };
 }

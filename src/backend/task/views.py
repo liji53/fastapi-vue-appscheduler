@@ -2,15 +2,18 @@ import asyncio
 import datetime
 import json
 from typing import Union, Optional
+from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, WebSocket
 from loguru import logger
 
 from .models import Task
-from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate
+from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate, \
+    TaskConfigUpdate, TaskConfigRead
 from .service import get_by_id, update, delete, create
 from .scheduler import update_scheduler, delete_scheduler
 
+from ..application_form import service as app_form_service
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
 from ..core.database import SessionLocal
@@ -113,12 +116,87 @@ async def run_task_and_send(task: Task, socket: WebSocket):
 async def run_task(socket: WebSocket):
     """用户手动执行任务，服务器通知任务的执行结果"""
     await socket.accept()
+    try:
+        while True:
+            msg = await socket.receive_json()
+            logger.debug(f"收到消息：{msg}")
+            task = get_by_id(db_session=SessionLocal(), pk=msg["task_id"])
+            # 方案一: 单用户任务阻塞
+            # await run_task_and_send(task=task, socket=socket)
+            # 方案二：任务异步
+            asyncio.create_task(run_task_and_send(task=task, socket=socket))
+    except Exception as e:
+        logger.info(f"webSocket连接断开，原因：{e}")
 
-    while True:
-        msg = await socket.receive_json()
-        logger.debug(f"收到消息：{msg}")
-        task = get_by_id(db_session=SessionLocal(), pk=msg["task_id"])
-        # 方案一: 单用户任务阻塞
-        # await run_task_and_send(task=task, socket=socket)
-        # 方案二：任务异步
-        asyncio.create_task(run_task_and_send(task=task, socket=socket))
+
+def create_default_form(config: dict) -> list[dict]:
+    return [
+        {
+            "ControlType": "Text",
+            "nameCn": "文本框",
+            "id": str(uuid4()),
+            "layout": False,
+            "data": {
+                "fieldName": key,
+                "label": key,
+                "tip": "",
+                "placeholder": "",
+                "showRule": "{}",
+                "required": False,
+                "rule": "[]",
+                "default": value,
+                "csslist": []
+            }
+        } for (key, value) in config.items()
+    ]
+
+
+@task_router.get("/{task_id}/config", response_model=TaskConfigRead, summary="获取任务的配置")
+def get_task_config(task_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
+    """优先前端-配置设计-的表单，没有则用项目中默认配置生成的表单(全Text格式)"""
+    task = get_by_id(db_session=db_session, pk=task_id)
+    # 应用的配置表单
+    app_form = app_form_service.get_by_app_id(db_session=db_session, pk=task.application.application.id)
+    # 本地配置
+    repo = Repository(url=task.application.application.url, pk=current_user.id)
+    config = repo.read_task_config(task_id=task_id)
+
+    # 如果应用配置表单不存在或异常，则使用默认的配置表单
+    # 如果应用配置表单存在，如果当前任务没有配置，则优先使用应用配置表单中的默认值，而不是项目中的默认配置
+    if app_form:
+        try:
+            form_fields = json.loads(app_form.form)
+        except Exception as e:
+            logger.warning(f"获取应用的配置表单失败，原因: {e}")
+            if not config:
+                config = repo.read_default_config()
+            form_fields = create_default_form(config)
+            return {"data": json.dumps(form_fields)}
+
+        # 将应用表单中的默认值替换成当前任务的实际配置值
+        for field in form_fields:
+            field_name = field["data"]["fieldName"]
+            if field_name not in config:
+                continue
+            # 有选项的field
+            if field["data"].__contains__("itemConfig"):
+                field["data"]["itemConfig"]["value"] = config[field_name]
+            else:
+                field["data"]["default"] = config[field_name]
+    else:  # 如果应用配置表单不存在, 则使用默认的配置表单
+        if not config:
+            config = repo.read_default_config()
+        form_fields = create_default_form(config)
+
+    return {"data": json.dumps(form_fields)}
+
+
+@task_router.put("/{task_id}/config", response_model=None, summary="更新任务的配置")
+def update_task_config(task_id: PrimaryKey,
+                       task_in: TaskConfigUpdate,
+                       db_session: DbSession,
+                       current_user: CurrentUser):
+    task = get_by_id(db_session=db_session, pk=task_id)
+    repo = Repository(url=task.application.application.url, pk=current_user.id)
+    config = json.loads(task_in.data)
+    repo.write_task_config(task_id=task_id, config=config)

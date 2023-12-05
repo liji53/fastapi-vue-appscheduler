@@ -20,6 +20,7 @@ defineOptions({
   name: "Job"
 });
 
+const dynFormKey = ref(0);
 const formRef = ref();
 const {
   form,
@@ -44,7 +45,8 @@ const {
   onCancelCron,
   onConfirmCron,
   taskConifgVisible,
-  taskConfigData
+  taskConfigData,
+  handleConfirmConfig
 } = useJob();
 </script>
 
@@ -140,6 +142,7 @@ const {
               effect="dark"
               content="编辑"
               placement="top"
+              :hide-after="10"
             >
               <el-button
                 type="primary"
@@ -154,6 +157,7 @@ const {
               effect="dark"
               content="运行"
               placement="top"
+              :hide-after="10"
             >
               <el-button
                 type="info"
@@ -168,6 +172,7 @@ const {
               effect="dark"
               content="定时"
               placement="top"
+              :hide-after="10"
             >
               <el-button
                 type="success"
@@ -182,12 +187,16 @@ const {
               effect="dark"
               content="配置"
               placement="top"
+              :hide-after="10"
             >
               <el-button
                 type="warning"
                 size="small"
                 :icon="useRenderIcon(Setting)"
-                @click="handleConfig(row)"
+                @click="
+                  dynFormKey++;
+                  handleConfig(row);
+                "
                 circle
               />
             </el-tooltip>
@@ -257,8 +266,11 @@ const {
         </span>
       </template>
     </el-drawer>
-    <el-dialog v-model="taskConifgVisible" title="任务配置">
-      <dynForm :formJson="taskConfigData" />
+    <el-dialog v-model="taskConifgVisible" title="任务配置" :key="dynFormKey">
+      <dynForm
+        :formJson="taskConfigData"
+        @confirm-config="handleConfirmConfig"
+      />
     </el-dialog>
   </div>
 </template>

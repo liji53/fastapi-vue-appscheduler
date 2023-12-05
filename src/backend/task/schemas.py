@@ -52,3 +52,11 @@ class TaskRead(TaskBase):
 
 class TaskPagination(Pagination):
     data: list[TaskRead] = []
+
+
+class TaskConfigRead(MyBaseModel):
+    data: Optional[str] = None
+
+
+class TaskConfigUpdate(TaskConfigRead):
+    pass
