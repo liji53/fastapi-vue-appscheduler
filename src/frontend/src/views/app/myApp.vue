@@ -22,6 +22,7 @@ const {
   dialogTitle,
   appForm,
   appFormRules,
+  readme,
   onSearch,
   resetForm,
   onPageSizeChange,
@@ -31,6 +32,7 @@ const {
   handleUploadPicApp,
   handleRevisionApp,
   handleEditApp,
+  handleReadmeApp,
   getCategoryName
 } = useApp();
 </script>
@@ -108,11 +110,13 @@ const {
             <AppCard
               :app="app"
               :category="getCategoryName(app.category_id)"
+              :readme="readme"
               pagename="myApp"
               @revision-app="handleRevisionApp"
               @edit-app="handleEditApp"
               @uninstall-app="handleUninstallApp"
               @upload-pic="handleUploadPicApp"
+              @readme-app="handleReadmeApp"
             />
           </el-col>
         </el-row>

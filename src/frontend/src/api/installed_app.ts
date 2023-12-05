@@ -1,6 +1,6 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "@/api/utils";
-import { type AppTreeResult } from "./app";
+import { type AppTreeResult, type AppReadmeResult } from "./app";
 
 type InstalledApp = {
   id: number;
@@ -45,4 +45,11 @@ export const uploadPic = (app_id: number, data: object) => {
 // 任务管理-获取已安装应用的app Tree列表
 export const getMyAppTree = () => {
   return http.request<AppTreeResult>("get", baseUrlApi("installed_apps/tree"));
+};
+
+export const getAppReadme = (app_id: number) => {
+  return http.request<AppReadmeResult>(
+    "get",
+    baseUrlApi(`installed_apps/${app_id}/readme`)
+  );
 };

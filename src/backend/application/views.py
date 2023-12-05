@@ -5,11 +5,12 @@ from loguru import logger
 
 from .service import get_by_name, get_by_id, create, update, delete, get_all
 from .schemas import ApplicationPagination, ApplicationRead, ApplicationCreate, \
-    ApplicationUpdate, AppStatusUpdate, AppTree
+    ApplicationUpdate, AppStatusUpdate, AppTree, AppReadme
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
 from ..utils.storage import remove_old_file, create_new_file, remove_dir
+from ..utils.repository import Svn
 
 application_router = APIRouter()
 STORAGE_APP_DIR = "apps"
@@ -102,7 +103,7 @@ def upload_file(app_id: PrimaryKey,
     update(db_session=db_session, app=app, app_in={"banner": new_file_path})
 
 
-@application_router.get("/tree", response_model=AppTree, summary="获取我的应用树结构")
+@application_router.get("/tree", response_model=AppTree, summary="获取应用的树结构")
 def get_app_tree(db_session: DbSession):
     category = {}
     apps = get_all(db_session=db_session)
@@ -117,3 +118,12 @@ def get_app_tree(db_session: DbSession):
             category[category_name]["children"].append({**app.dict()})
 
     return {"data": [category[c] for c in category]}
+
+
+@application_router.get("/{app_id}/readme", response_model=AppReadme, summary="获取应用的readme")
+async def get_app_readme(app_id: PrimaryKey, db_session: DbSession):
+    app = get_by_id(db_session=db_session, pk=app_id)
+    if not app:
+        raise HTTPException(404, detail=[{"msg": "获取应用的readme失败，该应用不存在！"}])
+    readme = await Svn(url=app.url, pk=-1).cat(file_path="readme.md")
+    return {"data": readme}

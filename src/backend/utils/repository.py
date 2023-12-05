@@ -139,6 +139,7 @@ class Repository:
 
 class Svn(Repository):
     async def check_out(self, user=SVN_USER, passwd=SVN_PASSWORD, revision: int = None) -> bool:
+        """导出svn远程仓库到本地，本地文件夹名为url的hash值"""
         command = f'svn co {self.url} {self.local_path} --username {user} --password "{passwd}" ' \
                   f' --non-interactive --trust-server-cert --no-auth-cache --quiet'
         if revision is not None:
@@ -150,3 +151,18 @@ class Svn(Repository):
         if stderr:
             logger.warning(f'[stderr]\n{stderr}')
         return True
+
+    async def cat(self, file_path, user=SVN_USER, passwd=SVN_PASSWORD, revision: int = None) -> Optional[str]:
+        """读取本地(没有本地，则远程)仓库中指定文件的内容"""
+        local_file = os.path.join(self.local_path, file_path)
+        if os.path.exists(local_file):
+            with open(local_file, 'r', encoding='utf-8') as fd:
+                return fd.read()
+
+        file_url = self.url + '/' + file_path
+        command = f'svn cat {file_url} --username {user} --password "{passwd}" ' \
+                  f' --non-interactive --trust-server-cert --no-auth-cache'
+        if revision is not None:
+            command += f" -r {revision} "
+        stdout, stderr = await run_subprocess(command=command)
+        return stdout

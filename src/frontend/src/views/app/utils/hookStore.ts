@@ -6,7 +6,8 @@ import {
   createApp,
   updateApp,
   deleteApp,
-  uploadPic
+  uploadPic,
+  getAppReadme
 } from "@/api/app";
 import { installApp } from "@/api/installed_app";
 import { message } from "@/utils/message";
@@ -63,6 +64,7 @@ export function useApp() {
       { required: true, message: "应用分类为必填项", trigger: "blur" }
     ]
   });
+  const readme = ref("");
 
   // 搜索表单的响应
   function onSearch() {
@@ -130,7 +132,7 @@ export function useApp() {
     onSearch();
   };
   const handleRevisionApp = (app_id: number) => {
-    message("暂时不支持查看应用版本", {
+    message(`暂时不支持查看应用版本${app_id}`, {
       type: "error"
     });
   };
@@ -174,6 +176,15 @@ export function useApp() {
       }
     });
   };
+  const handleReadmeApp = (app_id: number) => {
+    getAppReadme(app_id)
+      .then(response => {
+        readme.value = response.data;
+      })
+      .catch(() => {
+        readme.value = "";
+      });
+  };
 
   onMounted(() => {
     onSearch();
@@ -201,6 +212,7 @@ export function useApp() {
     dialogTitle,
     appForm,
     appFormRules,
+    readme,
     onSearch,
     resetForm,
     onPageSizeChange,
@@ -214,6 +226,7 @@ export function useApp() {
     handleEnableApp,
     handleDeleteApp,
     handleUploadPicApp,
+    handleReadmeApp,
     getCategoryName
   };
 }

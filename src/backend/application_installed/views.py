@@ -6,7 +6,7 @@ from loguru import logger
 
 from .service import get_by_id, create, update, delete
 from .schemas import InstalledAppCreate, InstalledAppPagination, InstalledAppUpdate, \
-    InstalledAppRead, InstalledAppTree
+    InstalledAppRead, InstalledAppTree, InstalledAppReadme
 
 from ..application import service as app_service
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
@@ -129,3 +129,12 @@ def get_app_tree(current_user: CurrentUser):
             category[category_name]["children"].append({**app.dict()})
 
     return {"data": [category[c] for c in category]}
+
+
+@installed_app_router.get("/{app_id}/readme", response_model=InstalledAppReadme, summary="获取应用的readme")
+async def get_app_readme(app_id: PrimaryKey, db_session: DbSession):
+    app = get_by_id(db_session=db_session, pk=app_id)
+    if not app:
+        raise HTTPException(404, detail=[{"msg": "获取应用的readme失败，该应用不存在！"}])
+    readme = await Svn(url=app.application.url, pk=app.user_id).cat(file_path="readme.md")
+    return {"data": readme}

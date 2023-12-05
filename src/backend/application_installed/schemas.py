@@ -36,3 +36,7 @@ class InstalledAppTreeNode(MyBaseModel):
 
 class InstalledAppTree(MyBaseModel):
     data: list[InstalledAppTreeNode]
+
+
+class InstalledAppReadme(MyBaseModel):
+    data: str

@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
 import { hasAuth } from "@/router/utils";
 
-const props = defineProps(["app", "category", "pagename"]);
+const props = defineProps(["app", "category", "pagename", "readme"]);
 defineEmits([
   "install-app",
   "revision-app",
@@ -12,7 +12,8 @@ defineEmits([
   "enable-app",
   "delete-app",
   "uninstall-app",
-  "upload-pic"
+  "upload-pic",
+  "readme-app"
 ]);
 
 const infoDialogVisible = ref(false);
@@ -127,7 +128,12 @@ const cardLogoClass = computed(() => [
                 >
                   卸载
                 </el-dropdown-item>
-                <el-dropdown-item @click="infoDialogVisible = true">
+                <el-dropdown-item
+                  @click="
+                    infoDialogVisible = true;
+                    $emit('readme-app', app.id);
+                  "
+                >
                   详情
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -159,7 +165,7 @@ const cardLogoClass = computed(() => [
 
   <!-- dialog -->
   <el-dialog v-model="infoDialogVisible" title="详情信息">
-    <span>{{ app.description }}</span>
+    <span>{{ readme }}</span>
   </el-dialog>
 </template>
 

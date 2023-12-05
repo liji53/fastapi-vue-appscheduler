@@ -5,7 +5,8 @@ import {
   getMyInstallApps,
   uninstallApp,
   updateApp,
-  uploadPic
+  uploadPic,
+  getAppReadme
 } from "@/api/installed_app";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
@@ -47,6 +48,7 @@ export function useApp() {
   const appFormRules = reactive(<FormRules>{
     name: [{ required: true, message: "应用名称为必填项", trigger: "blur" }]
   });
+  const readme = ref("");
 
   // 搜索表单的响应
   async function onSearch() {
@@ -137,6 +139,15 @@ export function useApp() {
       }
     });
   };
+  const handleReadmeApp = (app_id: number) => {
+    getAppReadme(app_id)
+      .then(response => {
+        readme.value = response.data;
+      })
+      .catch(() => {
+        readme.value = "";
+      });
+  };
 
   onMounted(() => {
     onSearch();
@@ -164,6 +175,7 @@ export function useApp() {
     dialogTitle,
     appForm,
     appFormRules,
+    readme,
     onSearch,
     resetForm,
     onPageSizeChange,
@@ -173,6 +185,7 @@ export function useApp() {
     handleRevisionApp,
     handleEditApp,
     handleUploadPicApp,
+    handleReadmeApp,
     getCategoryName
   };
 }

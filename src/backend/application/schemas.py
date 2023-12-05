@@ -43,3 +43,7 @@ class AppTreeNode(MyBaseModel):
 
 class AppTree(MyBaseModel):
     data: list[AppTreeNode]
+
+
+class AppReadme(MyBaseModel):
+    data: str

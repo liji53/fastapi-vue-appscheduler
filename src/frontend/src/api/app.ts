@@ -24,6 +24,8 @@ export type AppTree = {
 };
 export type AppTreeResult = { data: Array<AppTree> };
 
+export type AppReadmeResult = { data: string };
+
 /** app列表 */
 export const getAppList = (params?: object) => {
   return http.request<AppResult>("get", baseUrlApi("apps"), { params });
@@ -49,4 +51,11 @@ export const uploadPic = (app_id: number, data: object) => {
 // 应用配置设计 - 获取应用的tree
 export const getAppTree = () => {
   return http.request<AppTreeResult>("get", baseUrlApi("apps/tree"));
+};
+
+export const getAppReadme = (app_id: number) => {
+  return http.request<AppReadmeResult>(
+    "get",
+    baseUrlApi(`apps/${app_id}/readme`)
+  );
 };
