@@ -10,6 +10,7 @@ from ..application_form.views import app_form_router
 from ..project.views import project_router
 from ..task.views import task_router
 from ..sys_resource.views import sys_resource_router
+from ..log.views import log_router
 
 
 class ErrorResponse(BaseModel):
@@ -38,3 +39,4 @@ api_router.include_router(project_router, prefix="/projects", tags=["project"])
 api_router.include_router(task_router, prefix="/tasks", tags=["task"])
 api_router.include_router(sys_resource_router, prefix="/sys_resources", tags=["sys_resource"])
 api_router.include_router(app_form_router, prefix="/appforms", tags=["app_form"])
+api_router.include_router(log_router, prefix="/logs", tags=["log"])

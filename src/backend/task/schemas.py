@@ -60,3 +60,13 @@ class TaskConfigRead(MyBaseModel):
 
 class TaskConfigUpdate(TaskConfigRead):
     pass
+
+
+class TaskTreeNode(MyBaseModel):
+    id: Optional[int] = None
+    name: NameStr
+    children: Optional[list['TaskTreeNode']] = None
+
+
+class TaskTree(MyBaseModel):
+    data: list[TaskTreeNode]

@@ -49,6 +49,13 @@ class Repository:
         """
         raise NotImplementedError
 
+    async def cat(self, file_path, user, passwd, revision: int = None) -> Optional[str]:
+        """
+        查看仓库指定文件的内容
+        revision: 版本号
+        """
+        raise NotImplementedError
+
     def delete_local_repo(self):
         """删除本地svn仓库"""
         if os.path.exists(self.local_path):

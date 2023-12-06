@@ -9,7 +9,7 @@ from loguru import logger
 
 from .models import Task
 from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate, \
-    TaskConfigUpdate, TaskConfigRead
+    TaskConfigUpdate, TaskConfigRead, TaskTree
 from .service import get_by_id, update, delete, create
 from .scheduler import update_scheduler, delete_scheduler
 
@@ -18,6 +18,7 @@ from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUs
 from ..core.schemas import PrimaryKey
 from ..core.database import SessionLocal
 from ..utils.repository import Repository
+from ..log import log_parser, service as log_service
 
 
 task_router = APIRouter()
@@ -94,9 +95,13 @@ async def run_task_and_send(task: Task, socket: WebSocket):
         if not task:
             return False, "运行任务失败，该任务不存在！"
         repo = Repository(url=task.application.application.url, pk=task.application.user_id)
-        return await repo.run_app()
+        ret_status, log = await repo.run_app()
+        log_service.create(db_session=SessionLocal(),
+                           log_in=log_parser.parse(ret_status, log, "手动"),
+                           task=task)
+        return ret_status, log
 
-    # 单用户阻塞实现：如果一个用户同时执行了多个任务，后面的任务会阻塞
+        # 单用户阻塞实现：如果一个用户同时执行了多个任务，后面的任务会阻塞
     is_success, result = await execute_task()
     tmp = {
         "name": "任务结果",
@@ -200,3 +205,25 @@ def update_task_config(task_id: PrimaryKey,
     repo = Repository(url=task.application.application.url, pk=current_user.id)
     config = json.loads(task_in.data)
     repo.write_task_config(task_id=task_id, config=config)
+
+
+@task_router.get("/tree", response_model=TaskTree, summary="获取项目-任务的树结构")
+def get_task_tree(current_user: CurrentUser):
+    project_tasks = {}
+    for project in current_user.projects:
+        for task in project.tasks:
+            if not project_tasks.__contains__(project.id):
+                project_tasks[project.id] = {
+                    "name": project.name,
+                    "children": [{
+                        "id": task.id,
+                        "name": task.name,
+                    }]
+                }
+            else:
+                project_tasks[project.id]["children"].append({
+                    "id": task.id,
+                    "name": task.name,
+                })
+
+    return {"data": [project_tasks[p] for p in project_tasks]}

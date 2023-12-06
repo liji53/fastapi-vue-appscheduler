@@ -177,5 +177,45 @@ export default [
         ])
       };
     }
+  },
+  {
+    url: "/tasks/tree",
+    method: "get",
+    response: () => {
+      return {
+        data: [
+          {
+            name: "测试项目",
+            children: [
+              {
+                id: 1,
+                name: "测试任务1"
+              },
+              {
+                id: 2,
+                name: "测试任务2"
+              },
+              {
+                id: 3,
+                name: "测试任务3"
+              }
+            ]
+          },
+          {
+            name: "开发项目",
+            children: [
+              {
+                id: 7,
+                name: "开发任务1"
+              },
+              {
+                id: 8,
+                name: "开发任务2"
+              }
+            ]
+          }
+        ]
+      };
+    }
   }
 ] as MockMethod[];

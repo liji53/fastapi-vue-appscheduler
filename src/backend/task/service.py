@@ -9,6 +9,10 @@ def get_by_id(*, db_session, pk: int) -> Optional[Task]:
     return db_session.query(Task).filter(Task.id == pk).one_or_none()
 
 
+def get_by_ids(*, db_session, pks: list[int]) -> list[Task]:
+    return db_session.query(Task).filter(Task.id.in_(pks)).all()
+
+
 def get_schedule_tasks(*, db_session: Session) -> list[Task]:
     return db_session.query(Task).filter(Task.status).filter(Task.cron.isnot(None)).all()
 

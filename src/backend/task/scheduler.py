@@ -8,7 +8,7 @@ from .service import get_by_id
 from ..core.scheduler import scheduler
 from ..utils.repository import Repository
 from ..core.database import SessionLocal
-
+from ..log import log_parser, service as log_service
 
 # 只暴露 update和delete
 __all__ = ["update_scheduler", "delete_scheduler"]
@@ -18,7 +18,10 @@ def run_job(task_id: int):
     """scheduler 添加的运行任务"""
     task = get_by_id(db_session=SessionLocal(), pk=task_id)
     repo = Repository(url=task.application.application.url, pk=task.application.user_id)
-    asyncio.run(repo.run_app())
+    ret_status, log = asyncio.run(repo.run_app())
+    log_service.create(db_session=SessionLocal(),
+                       log_in=log_parser.parse(ret_status, log, "定时"),
+                       task=task)
 
 
 def update_scheduler(old_task, status, cron):

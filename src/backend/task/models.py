@@ -19,5 +19,8 @@ class Task(Base, DateTimeMixin):
     app_id = Column(Integer, ForeignKey("application_installed.id"))
     application = relationship("ApplicationInstalled", backref="tasks", uselist=False)
 
+    # 关联的日志
+    logs = relationship("Log", cascade="all, delete", backref="task")
+
     def __repr__(self) -> str:
         return f"<{self.name} - {self.cron}>"

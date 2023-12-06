@@ -20,6 +20,14 @@ type JobResult = {
 type JobConfigResult = {
   data: string;
 };
+type TaskTree = {
+  id?: number;
+  name: string;
+  children?: Array<TaskTree>;
+};
+type TaskTreeResult = {
+  data: Array<TaskTree>;
+};
 
 export const getJobList = (params?: object) => {
   return http.request<JobResult>("get", baseUrlApi("tasks"), { params });
@@ -50,4 +58,8 @@ export const getJobConfig = (job_id: number) => {
 
 export const setJobConfig = (job_id: number, data: object) => {
   return http.put(baseUrlApi(`tasks/${job_id}/config`), { data });
+};
+// 异常监控
+export const getTaskTree = () => {
+  return http.request<TaskTreeResult>("get", baseUrlApi("tasks/tree"));
 };
