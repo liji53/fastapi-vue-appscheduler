@@ -150,5 +150,19 @@ export default [
         ]
       };
     }
+  },
+  {
+    url: "/apps/1/readme",
+    method: "get",
+    response: () => {
+      return {
+        data: "# 批量提取doc文档的目录\n\
+### 功能描述\n\
+用于提取指定目录下的doc文档的目录，并将目录结构保存成execl文档。\n\
+一个doc文档会对应的生成一个execl文档。\n\
+### 配置说明\n\
+略\n"
+      };
+    }
   }
 ] as MockMethod[];

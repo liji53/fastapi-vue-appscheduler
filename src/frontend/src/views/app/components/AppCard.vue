@@ -2,6 +2,8 @@
 import { ref, computed } from "vue";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
 import { hasAuth } from "@/router/utils";
+import { MdPreview } from "md-editor-v3";
+import "md-editor-v3/lib/preview.css";
 
 const props = defineProps(["app", "category", "pagename", "readme"]);
 defineEmits([
@@ -164,8 +166,12 @@ const cardLogoClass = computed(() => [
   </div>
 
   <!-- dialog -->
-  <el-dialog v-model="infoDialogVisible" title="详情信息">
-    <span>{{ readme }}</span>
+  <el-dialog v-model="infoDialogVisible" title="readme">
+    <MdPreview
+      :editorId="'preview-only'"
+      :modelValue="readme"
+      style="padding: auto"
+    />
   </el-dialog>
 </template>
 
