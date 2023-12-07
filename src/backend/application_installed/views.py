@@ -9,6 +9,7 @@ from .schemas import InstalledAppCreate, InstalledAppPagination, InstalledAppUpd
     InstalledAppRead, InstalledAppTree, InstalledAppReadme
 
 from ..application import service as app_service
+from ..task.models import Task
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
 from ..core.database import SessionLocal
@@ -19,32 +20,31 @@ installed_app_router = APIRouter()
 STORAGE_MY_APP_DIR = "my_apps"  # 存储应用的logo图片
 
 
+def task_is_online(task: Task):
+    return task.cron and task.status
+
+
 @installed_app_router.get("", response_model=InstalledAppPagination, summary="获取我的应用列表")
 def get_installed_apps(
         common: CommonParameters,
         category_id: Optional[int] = None,
         is_online: Optional[bool] = None
 ):
-    filter_spec = []
-    if is_online is not None:
-        filter_spec.append({"field": "is_online", 'op': '==', 'value': is_online})
-
-    pagination = sort_paginate(model="ApplicationInstalled", filter_spec=filter_spec, **common)
-    if not category_id:
-        return {
-            **pagination,
-            "data": [{**app.dict(), "category_id": app.application.category_id} for app in pagination["data"]]
-        }
-
-    # 根据category_id 进行过滤
-    res = [
-        {**app.dict(), "category_id": category_id} for app in pagination["data"]
-        if category_id == app.application.category_id
-    ]
-    return {
-        **pagination,
-        "data": res
+    pagination = sort_paginate(model="ApplicationInstalled", **common)
+    ret = {
+        'data': [{
+            **app.dict(),
+            "category_id": app.application.category_id,
+            "is_online": any(task_is_online(task) for task in app.tasks)
+        } for app in pagination["data"]
+            if (category_id is None or category_id == app.application.category_id) and
+               (is_online is None or is_online == any(task_is_online(task) for task in app.tasks))
+        ]
     }
+
+    ret["total"] = len(ret['data'])
+
+    return ret
 
 
 @installed_app_router.post("", response_model=None, summary="安装应用")

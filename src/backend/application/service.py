@@ -3,7 +3,7 @@ from typing import Optional, Union
 from loguru import logger
 
 from .models import Application
-from .schemas import ApplicationCreate, ApplicationUpdate, AppStatusUpdate
+from .schemas import ApplicationCreate, ApplicationUpdate
 
 from ..application_category import service as app_category_service
 
@@ -33,7 +33,7 @@ def create(*, db_session, app_in: ApplicationCreate) -> Application:
 
 def update(*, db_session,
            app: Application,
-           app_in: Union[ApplicationUpdate, AppStatusUpdate, dict]) -> Application:
+           app_in: Union[ApplicationUpdate, dict]) -> Application:
 
     app_data = app.dict()
     if isinstance(app_in, dict):
@@ -42,7 +42,7 @@ def update(*, db_session,
         update_data = app_in.model_dump()
 
     for field in app_data:
-        if field in update_data:
+        if field in update_data and update_data[field] is not None:
             setattr(app, field, update_data[field])
 
     db_session.commit()

@@ -10,7 +10,6 @@ class ApplicationBase(MyBaseModel):
     url: HttpUrl
     category_id: PrimaryKey
     status: bool = True
-    banner: Optional[str] = None
     description: Optional[str] = None
 
 
@@ -19,15 +18,14 @@ class ApplicationCreate(ApplicationBase):
 
 
 class ApplicationUpdate(ApplicationBase):
-    pass
-
-
-class AppStatusUpdate(MyBaseModel):
-    status: bool
+    name: Optional[NameStr] = None
+    url: Optional[HttpUrl] = None
+    category_id: Optional[PrimaryKey] = None
 
 
 class ApplicationRead(ApplicationBase):
     id: PrimaryKey
+    banner: Optional[str] = None
     is_installed: bool = False
 
 

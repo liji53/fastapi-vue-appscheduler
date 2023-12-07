@@ -9,7 +9,7 @@ class ApplicationInstalled(Base, DateTimeMixin):
     name = Column(String(128), nullable=False, index=True, comment="我的应用名称")
     banner = Column(String(256), comment="我的应用logo")
     description = Column(String(512), comment="描述")
-    is_online = Column(Boolean, comment="应用是否已经上线")
+    # is_online = Column(Boolean, comment="应用是否已经上线")
     version = Column(String(32), comment="当前应用的版本")
 
     # 原应用

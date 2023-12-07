@@ -5,7 +5,7 @@ from loguru import logger
 
 from .service import get_by_name, get_by_id, create, update, delete, get_all
 from .schemas import ApplicationPagination, ApplicationRead, ApplicationCreate, \
-    ApplicationUpdate, AppStatusUpdate, AppTree, AppReadme
+    ApplicationUpdate, AppTree, AppReadme
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
@@ -61,7 +61,7 @@ def create_application(app_in: ApplicationCreate, db_session: DbSession):
 
 @application_router.put("/{app_id}", response_model=ApplicationRead, summary="更新应用信息, 更新应用状态")
 def update_application(app_id: PrimaryKey,
-                       app_in: Union[ApplicationUpdate, AppStatusUpdate],
+                       app_in: Union[ApplicationUpdate],
                        db_session: DbSession):
     app = get_by_id(db_session=db_session, pk=app_id)
     if not app:
