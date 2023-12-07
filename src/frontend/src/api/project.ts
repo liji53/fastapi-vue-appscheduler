@@ -6,7 +6,7 @@ type Project = {
   name: string;
   remark: string;
   task_count: number;
-  running_count: number;
+  online_count: number;
   failed_count: number;
   created_at: string;
 };

@@ -21,7 +21,7 @@ class ProjectUpdate(ProjectBase):
 class ProjectRead(ProjectBase):
     id: PrimaryKey
     task_count: int
-    running_count: int
+    online_count: int
     failed_count: int
     created_at: datetime
 

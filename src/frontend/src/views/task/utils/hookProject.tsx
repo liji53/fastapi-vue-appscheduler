@@ -10,7 +10,23 @@ import {
 import { addDialog } from "@/components/ReDialog";
 import { type ProjectItemProps } from "./types";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h } from "vue";
+import { reactive, ref, onMounted, h, computed } from "vue";
+
+const faildCountTagStyle = computed(() => {
+  return (faild_count: number) => {
+    return faild_count
+      ? {
+          "--el-tag-text-color": "#cf1322",
+          "--el-tag-bg-color": "#fff1f0",
+          "--el-tag-border-color": "#ffa39e"
+        }
+      : {
+          "--el-tag-text-color": "#389e0d",
+          "--el-tag-bg-color": "#f6ffed",
+          "--el-tag-border-color": "#b7eb8f"
+        };
+  };
+});
 
 export function useProject() {
   const dataList = ref([]);
@@ -30,17 +46,23 @@ export function useProject() {
     {
       label: "任务数量",
       prop: "task_count",
+      minWidth: 120,
+      cellRenderer: ({ row }) => <el-tag>{row.task_count}</el-tag>
+    },
+    {
+      label: "已上线的任务",
+      prop: "online_count",
       minWidth: 120
     },
     {
-      label: "正在运行的任务数",
-      prop: "running_count",
-      minWidth: 120
-    },
-    {
-      label: "运行失败的任务数",
+      label: "运行失败的任务",
       prop: "failed_count",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => (
+        <el-tag style={faildCountTagStyle.value(row.failed_count)}>
+          {row.failed_count}
+        </el-tag>
+      )
     },
     {
       label: "备注",

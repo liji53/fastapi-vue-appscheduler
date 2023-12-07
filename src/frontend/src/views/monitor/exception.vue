@@ -51,7 +51,7 @@ const {
           clearable
           multiple
           collapse-tags
-          class="!w-[180px]"
+          class="!w-[280px]"
         />
       </el-form-item>
       <el-form-item label="执行状态：" prop="status">

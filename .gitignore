@@ -213,3 +213,6 @@ docker/.env
 
 # Typescript
 components.d.ts
+
+# 项目临时文件
+/src/files

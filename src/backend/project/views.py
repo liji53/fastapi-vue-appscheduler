@@ -7,21 +7,24 @@ from .service import get_by_id, update, delete, create
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
+from ..log import service as log_service
 
 
 project_router = APIRouter()
 
 
 @project_router.get("", response_model=ProjectPagination, summary="获取项目列表")
-def get_projects(common: CommonParameters):
+def get_projects(common: CommonParameters, db_session: DbSession):
     project_pagination = sort_paginate(model="Project", **common)
+
     ret = []
     for project in project_pagination["data"]:
         ret.append({
             **project.dict(),
             "task_count": len(project.tasks),
-            "running_count": 0,
-            "failed_count": 0
+            "online_count": len([task for task in project.tasks if task.cron and task.status]),
+            "failed_count": log_service.get_failed_count(db_session=db_session,
+                                                         task_ids=[task.id for task in project.tasks])
         })
 
     return {**project_pagination, "data": ret}

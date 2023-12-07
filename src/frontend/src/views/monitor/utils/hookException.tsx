@@ -25,9 +25,9 @@ const logLevelTagStyle = computed(() => {
     switch (log_type) {
       case "fatal":
         return {
-          "--el-tag-text-color": "#696969",
-          "--el-tag-bg-color": "#F8F8FF",
-          "--el-tag-border-color": "#000000"
+          "--el-tag-text-color": "#FFFFFF",
+          "--el-tag-bg-color": "#8B0000",
+          "--el-tag-border-color": "#FF0000"
         };
       case "error":
         return {

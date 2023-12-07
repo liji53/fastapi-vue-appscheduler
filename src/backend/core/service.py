@@ -50,7 +50,10 @@ def sort_paginate(
     current_user: User = None,
     roles: list[Role] = None,
 ):
-    """用于分页、排序 的通用函数"""
+    """
+    用于分页、排序 的通用函数
+    如果需要对用户的数据进行权限控制，则需要改动该函数
+    """
     model_cls = get_model_by_table_name(model)
     try:
         query = db_session.query(model_cls)
