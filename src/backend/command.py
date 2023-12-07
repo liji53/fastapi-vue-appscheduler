@@ -73,6 +73,11 @@ def init_database():
                         "path": "/app/appForm",
                         "name": "AppForm",
                         "meta": {"title": "配置设计", "keepAlive": True}
+                    },
+                    {
+                        "path": "/app/category",
+                        "name": "AppCategory",
+                        "meta": {"title": "应用分类"}
                     }
                 ]
             },
@@ -137,11 +142,10 @@ def init_database():
         user_service.create(user_in=UserCreate(username="admin", password="admin123", roles=[role]),
                             db_session=db_session)
 
-    # 初始化app category
+    # 初始化app category，应用的默认分类
     app_categories = app_category_service.get_all(db_session=db_session)
     if not app_categories:
-        app_category_service.create(db_session=db_session, app_category_in=ApplicationCategoryCreate(name="规范递交"))
-        app_category_service.create(db_session=db_session, app_category_in=ApplicationCategoryCreate(name="数据比对"))
+        app_category_service.create(db_session=db_session, app_category_in=ApplicationCategoryCreate(name="其他应用"))
 
 
 def get_alembic_config():

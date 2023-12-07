@@ -39,8 +39,8 @@ def create_project(project_in: ProjectCreate, db_session: DbSession, current_use
         raise HTTPException(500, detail=[{"msg": "创建项目失败！"}])
 
 
-@project_router.put("/{project_id}", response_model=None, summary="更新我的应用信息")
-def update_application(project_id: PrimaryKey, project_in: ProjectUpdate, db_session: DbSession):
+@project_router.put("/{project_id}", response_model=None, summary="更新项目的信息")
+def update_project(project_id: PrimaryKey, project_in: ProjectUpdate, db_session: DbSession):
     project = get_by_id(db_session=db_session, pk=project_id)
     if not project:
         raise HTTPException(404, detail=[{"msg": "更新项目失败，该项目不存在！"}])

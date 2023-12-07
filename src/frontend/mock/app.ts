@@ -98,11 +98,19 @@ export default [
           {
             id: 1,
             name: "规范递交",
+            app_count: 2,
+            installed_app_count: 2,
+            installed_sum_count: 4,
+            created_at: "2023-01-11 20:10:01",
             description: "检查程序规范化递交"
           },
           {
             id: 2,
             name: "数据比对",
+            app_count: 3,
+            installed_app_count: 2,
+            installed_sum_count: 9,
+            created_at: "2023-01-11 20:10:01",
             description: "数据库的数据比对工具"
           }
         ]
