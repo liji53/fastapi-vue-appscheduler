@@ -5,10 +5,8 @@ from ..core.schemas import Pagination
 from .models import SeverityEnum
 
 
-class LogRead(MyBaseModel):
+class LogBase(MyBaseModel):
     id: PrimaryKey
-    project_name: str
-    task_name: str
     status: bool
     log_type: SeverityEnum
     execute_type: str
@@ -19,5 +17,14 @@ class LogContentRead(MyBaseModel):
     data: str
 
 
+class LogRead(LogBase):
+    project_name: str
+    task_name: str
+
+
 class LogPagination(Pagination):
     data: list[LogRead] = []
+
+
+class LogRecently(LogBase):
+    content: str

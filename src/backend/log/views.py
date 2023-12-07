@@ -3,8 +3,8 @@ from typing import Optional, Annotated
 from fastapi import APIRouter, HTTPException, Query
 from loguru import logger
 
-from .schemas import LogPagination, LogContentRead
-from .service import delete, get_by_id
+from .schemas import LogPagination, LogContentRead, LogRecently
+from .service import delete, get_by_id, get_recently_by_task_id
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
@@ -65,3 +65,11 @@ def get_log_content(log_id: PrimaryKey, db_session: DbSession):
     if not log:
         raise HTTPException(404, detail=[{"msg": f"获取日志失败，不存在该日志"}])
     return {"data": log.content}
+
+
+@log_router.get("/recently", response_model=LogRecently, summary="根据任务，获取最新一条日志的内容")
+def get_log_recently(task_id: int, db_session: DbSession):
+    log = get_recently_by_task_id(db_session=db_session, task_id=task_id)
+    if not log:
+        raise HTTPException(404, detail=[{"msg": f"该任务最近没有日志"}])
+    return log

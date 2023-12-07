@@ -144,8 +144,16 @@ const {
       </template>
     </PureTableBar>
 
-    <el-dialog v-model="dialogVisible" title="日志详情">
-      <el-input type="textarea" disabled v-model="logTxt" autosize />
+    <el-dialog v-model="dialogVisible" title="日志详情" fullscreen>
+      <el-input
+        v-if="logTxt != ''"
+        type="textarea"
+        disabled
+        v-model="logTxt"
+        autosize
+        input-style="background-color: black;color: white;"
+      />
+      <div v-else>本次执行没有日志打印</div>
     </el-dialog>
   </div>
 </template>

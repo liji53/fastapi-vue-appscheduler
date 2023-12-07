@@ -56,5 +56,21 @@ export default [
         data: "?????\n日志 打印"
       };
     }
+  },
+  {
+    url: "/logs/recently",
+    method: "get",
+    response: () => {
+      return {
+        id: 1,
+        project_name: "测试项目",
+        task_name: "测试任务1",
+        status: true,
+        log_type: "error",
+        execute_type: "手动",
+        created_at: "2023-01-11 20:10:01",
+        content: "?????\n运行日志\n打印"
+      };
+    }
   }
 ] as MockMethod[];

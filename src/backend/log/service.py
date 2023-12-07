@@ -1,5 +1,6 @@
 from typing import Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 from sqlalchemy.sql import func
 
 from .models import Log
@@ -9,6 +10,10 @@ from ..task.models import Task
 
 def get_by_id(*, db_session, pk: int) -> Optional[Log]:
     return db_session.query(Log).filter(Log.id == pk).one_or_none()
+
+
+def get_recently_by_task_id(*, db_session: Session, task_id: int) -> Optional[Log]:
+    return db_session.query(Log).filter(Log.task_id == task_id).order_by(desc(Log.created_at)).first()
 
 
 def create(*, db_session, log_in: dict, task: Task):

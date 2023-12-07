@@ -9,6 +9,7 @@ import {
   getJobConfig,
   setJobConfig
 } from "@/api/job";
+import { getRecentlyLog, type Log } from "@/api/log";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
@@ -67,6 +68,9 @@ export function useJob() {
   const taskConifgVisible = ref(false);
   const task_id = ref(0); // 设置配置时记录当前任务id
   const taskConfigData = ref([]); // 任务的当前配置
+  // 运行日志
+  const logVisible = ref(false);
+  const log = ref<Log>({});
 
   const columns: TableColumnList = [
     {
@@ -322,6 +326,13 @@ export function useJob() {
     });
   }
 
+  function handleLog(row) {
+    getRecentlyLog({ task_id: row.id }).then(response => {
+      log.value = response;
+      logVisible.value = true;
+    });
+  }
+
   onMounted(() => {
     onSearch();
     getProjectList().then(response => {
@@ -356,6 +367,9 @@ export function useJob() {
     onConfirmCron,
     taskConifgVisible,
     taskConfigData,
-    handleConfirmConfig
+    handleConfirmConfig,
+    logVisible,
+    log,
+    handleLog
   };
 }

@@ -1,14 +1,15 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "@/api/utils";
 
-type Log = {
+export type Log = {
   id: number;
-  project_name: string;
-  task_name: string;
+  project_name?: string;
+  task_name?: string;
   status: boolean;
   log_type: string;
   execute_type: string;
   created_at: string;
+  content?: string;
 };
 type LogResult = {
   total: number;
@@ -32,4 +33,8 @@ export const getLog = (log_id: number) => {
     "get",
     baseUrlApi(`logs/${log_id}/content`)
   );
+};
+
+export const getRecentlyLog = (params: object) => {
+  return http.request<Log>("get", baseUrlApi("logs/recently"), { params });
 };

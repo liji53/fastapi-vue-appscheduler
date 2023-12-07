@@ -15,6 +15,7 @@ import Setting from "@iconify-icons/ep/setting";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
 import ArrowDown from "@iconify-icons/ep/arrow-down";
+import Document from "@iconify-icons/ep/document";
 
 defineOptions({
   name: "Job"
@@ -46,7 +47,10 @@ const {
   onConfirmCron,
   taskConifgVisible,
   taskConfigData,
-  handleConfirmConfig
+  handleConfirmConfig,
+  logVisible,
+  log,
+  handleLog
 } = useJob();
 </script>
 
@@ -213,6 +217,21 @@ const {
                 />
               </template>
             </el-popconfirm>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="日志"
+              placement="top"
+              :hide-after="0"
+            >
+              <el-button
+                type="primary"
+                size="small"
+                :icon="useRenderIcon(Document)"
+                @click="handleLog(row)"
+                circle
+              />
+            </el-tooltip>
           </template>
         </pure-table>
       </template>
@@ -271,6 +290,21 @@ const {
         :formJson="taskConfigData"
         @confirm-config="handleConfirmConfig"
       />
+    </el-dialog>
+    <el-dialog
+      v-model="logVisible"
+      :title="`日志执行${log.status ? '成功' : '失败'}`"
+      fullscreen
+    >
+      <el-input
+        v-if="log.content != ''"
+        type="textarea"
+        disabled
+        v-model="log.content"
+        autosize
+        input-style="background-color: black;color: white;"
+      />
+      <div v-else>本次执行没有日志打印</div>
     </el-dialog>
   </div>
 </template>

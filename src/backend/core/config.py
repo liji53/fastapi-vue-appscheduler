@@ -49,5 +49,9 @@ ALEMBIC_INI_PATH = config(
 SVN_USER = config("SVN_USER", default="liji37951")
 SVN_PASSWORD = config("SVN_PASSWORD", default="???")
 
-# pip源
+# 安装时, 会下载requirements.txt的python包，需要pip源
 PIP_INDEX_URL = config("PIP_INDEX_URL", default="https://mirrors.aliyun.com/pypi/simple/")
+
+# 解析日志时，要用到的错误、警告的日志格式
+LOG_ERROR_PATTERN = config("LOG_ERROR_PATTERN", default=r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \| ERROR')
+LOG_WARNING_PATTERN = config("LOG_WARNING_PATTERN", default=r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \| WARNING')

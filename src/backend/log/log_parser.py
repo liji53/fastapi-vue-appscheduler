@@ -1,18 +1,17 @@
 import re
 
 from .models import SeverityEnum
+from ..core.config import LOG_ERROR_PATTERN, LOG_WARNING_PATTERN
 
 
 def parse_log_content(log_text):
     if "Traceback (most recent call last):" in log_text:
         return SeverityEnum.FATAL
 
-    error_pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \| ERROR'
-    if re.search(error_pattern, log_text):
+    if re.search(LOG_ERROR_PATTERN, log_text):
         return SeverityEnum.ERROR
 
-    warning_pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \| WARNING'
-    if re.search(warning_pattern, log_text):
+    if re.search(LOG_WARNING_PATTERN, log_text):
         return SeverityEnum.WARNING
 
     return SeverityEnum.OTHER
