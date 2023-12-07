@@ -9,6 +9,7 @@ type Job = {
   app_id: number; // 指的是已安装的应用
   remark: string;
   status: boolean;
+  next_at: string;
   updated_at: string;
   cron: string;
 };

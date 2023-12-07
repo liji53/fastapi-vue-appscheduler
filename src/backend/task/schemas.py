@@ -47,6 +47,7 @@ class TaskRead(TaskBase):
     project: str
     status: bool
     cron: Optional[str] = None
+    next_at: Optional[datetime] = None
     updated_at: datetime
 
 

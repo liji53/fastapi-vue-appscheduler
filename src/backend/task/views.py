@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, WebSocket
 from loguru import logger
+from croniter import croniter
 
 from .models import Task
 from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate, \
@@ -43,6 +44,7 @@ def get_tasks(common: CommonParameters,
     for task in pagination["data"]:
         ret.append({
             **task.dict(),
+            "next_at": croniter(task.cron).get_next(datetime.datetime) if task.cron and task.status else None,
             "project": task.project.name
         })
 
@@ -96,10 +98,14 @@ async def run_task_and_send(task: Task, socket: WebSocket):
             return False, "运行任务失败，该任务不存在！"
         repo = Repository(url=task.application.application.url, pk=task.application.user_id)
         ret_status, log = await repo.run_app()
+        # 解析日志
+        log_in = log_parser.parse(ret_status, log, "手动")
         log_service.create(db_session=SessionLocal(),
-                           log_in=log_parser.parse(ret_status, log, "手动"),
+                           log_in=log_in,
                            task=task)
-        return ret_status, log
+        return log_in["status"], \
+            "任务执行成功，但存在error打印" if log_in["log_type"] == log_parser.SeverityEnum.ERROR else "任务执行成功" \
+            if log_in["status"] else "运行任务失败，应用执行报错"
 
         # 单用户阻塞实现：如果一个用户同时执行了多个任务，后面的任务会阻塞
     is_success, result = await execute_task()

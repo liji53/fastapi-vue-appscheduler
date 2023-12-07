@@ -18,6 +18,18 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, h, computed, toRaw } from "vue";
 import { useWebSocketStoreHook } from "@/store/modules/webSockets";
 
+const nextAtStyle = computed(() => {
+  return (next_at: string) => {
+    return next_at == null
+      ? {
+          "--el-tag-text-color": "#cf1322",
+          "--el-tag-bg-color": "#fff1f0",
+          "--el-tag-border-color": "#ffa39e"
+        }
+      : {};
+  };
+});
+
 export function useJob() {
   // header 表单的数据
   const form = reactive({
@@ -69,7 +81,7 @@ export function useJob() {
     },
     {
       label: "状态",
-      minWidth: 130,
+      minWidth: 80,
       cellRenderer: scope => (
         <el-switch
           size={scope.props.size === "small" ? "small" : "default"}
@@ -91,8 +103,20 @@ export function useJob() {
       minWidth: 150
     },
     {
+      label: "下次执行时间",
+      minWidth: 160,
+      prop: "next_at",
+      cellRenderer: ({ row }) => (
+        <el-tag size="small" style={nextAtStyle.value(row.next_at)}>
+          {row.next_at != null
+            ? dayjs(row.next_at).format("YYYY-MM-DD HH:mm:ss")
+            : "未上线"}
+        </el-tag>
+      )
+    },
+    {
       label: "更新时间",
-      minWidth: 180,
+      minWidth: 160,
       prop: "updated_at",
       formatter: ({ updated_at }) =>
         dayjs(updated_at).format("YYYY-MM-DD HH:mm:ss")
