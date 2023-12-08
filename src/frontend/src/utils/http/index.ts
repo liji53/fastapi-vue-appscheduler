@@ -27,7 +27,7 @@ const defaultConfig: AxiosRequestConfig = {
 
     serialize: params => {
       // 如果查询参数的属性值为"", 则去掉该字段
-      params = lodash.pickBy(params, item => item);
+      params = lodash.pickBy(params, item => item !== "");
       // 数组参数 变成 xx=?&xx=?，否则为xx[0]=?&xx[1]=?
       return stringify(params, { arrayFormat: "repeat" });
     }

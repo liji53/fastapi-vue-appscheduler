@@ -42,7 +42,7 @@ export function useUser(tableRef: Ref) {
   const form = reactive({
     username: "",
     phone: "",
-    status: null,
+    status: "",
     page: 1,
     itemsPerPage: 10
   });

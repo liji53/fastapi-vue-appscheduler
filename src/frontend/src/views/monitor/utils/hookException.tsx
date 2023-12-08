@@ -126,7 +126,7 @@ export function useException() {
     currentPage: 1
   });
   const form = reactive({
-    task_ids: null,
+    task_ids: "",
     status: "",
     log_type: "",
     page: 1,
