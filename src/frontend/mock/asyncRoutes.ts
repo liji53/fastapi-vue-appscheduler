@@ -96,11 +96,6 @@ const monitorRouter = {
       path: "/monitor/statistics",
       name: "Statistics",
       meta: { title: "统计管理" }
-    },
-    {
-      path: "/monitor/resource",
-      name: "Resource",
-      meta: { title: "系统资源" }
     }
   ]
 };

@@ -9,7 +9,7 @@ import {
   getJobConfig,
   setJobConfig
 } from "@/api/job";
-import { getRecentlyLog, type Log } from "@/api/log";
+import { getRecentlyLog } from "@/api/log";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";
@@ -70,7 +70,7 @@ export function useJob() {
   const taskConfigData = ref([]); // 任务的当前配置
   // 运行日志
   const logVisible = ref(false);
-  const log = ref<Log>({});
+  const log = ref({});
 
   const columns: TableColumnList = [
     {
