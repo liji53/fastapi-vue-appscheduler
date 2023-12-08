@@ -44,7 +44,8 @@ def get_tasks(common: CommonParameters,
     for task in pagination["data"]:
         ret.append({
             **task.dict(),
-            "next_at": croniter(task.cron).get_next(datetime.datetime) if task.cron and task.status else None,
+            "next_at": croniter(task.cron).get_next(datetime.datetime).strftime("%Y-%m-%d %M:%H:%S")
+            if task.cron and task.status else None,
             "project": task.project.name
         })
 
