@@ -2,7 +2,7 @@ import { MockMethod } from "vite-plugin-mock";
 
 export default [
   {
-    url: "/logs",
+    url: "/task_logs",
     method: "get",
     response: () => {
       return {
@@ -58,7 +58,7 @@ export default [
     }
   },
   {
-    url: "/logs/recently",
+    url: "/task_logs/recently",
     method: "get",
     response: () => {
       return {

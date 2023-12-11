@@ -19,7 +19,7 @@ from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUs
 from ..core.schemas import PrimaryKey
 from ..core.database import SessionLocal
 from ..utils.repository import Repository
-from ..log import log_parser, service as log_service
+from ..task_log import log_parser, service as log_service
 
 
 task_router = APIRouter()

@@ -2,7 +2,7 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, toRaw, computed } from "vue";
 import { message } from "@/utils/message";
 import dayjs from "dayjs";
-import { getLogList, deleteLog, getLog } from "@/api/log";
+import { getLogList, deleteLog, getLog } from "@/api/job_log";
 import { getTaskTree } from "@/api/job";
 
 const statusTagStyle = computed(() => {

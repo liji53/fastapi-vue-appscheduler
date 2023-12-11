@@ -8,7 +8,7 @@ from .service import get_by_id
 from ..core.scheduler import scheduler
 from ..utils.repository import Repository
 from ..core.database import SessionLocal
-from ..log import log_parser, service as log_service
+from ..task_log import log_parser, service as log_service
 
 # 只暴露 update和delete
 __all__ = ["update_scheduler", "delete_scheduler"]

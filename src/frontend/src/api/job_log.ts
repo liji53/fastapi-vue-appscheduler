@@ -21,20 +21,20 @@ type LogContentResult = {
 };
 
 export const getLogList = (params?: object) => {
-  return http.request<LogResult>("get", baseUrlApi("logs"), { params });
+  return http.request<LogResult>("get", baseUrlApi("task_logs"), { params });
 };
 
 export const deleteLog = (log_id: number) => {
-  return http.delete(baseUrlApi(`logs/${log_id}`));
+  return http.delete(baseUrlApi(`task_logs/${log_id}`));
 };
 
 export const getLog = (log_id: number) => {
   return http.request<LogContentResult>(
     "get",
-    baseUrlApi(`logs/${log_id}/content`)
+    baseUrlApi(`task_logs/${log_id}/content`)
   );
 };
 
 export const getRecentlyLog = (params: object) => {
-  return http.request<Log>("get", baseUrlApi("logs/recently"), { params });
+  return http.request<Log>("get", baseUrlApi("task_logs/recently"), { params });
 };

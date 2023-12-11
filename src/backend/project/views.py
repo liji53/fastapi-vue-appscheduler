@@ -7,7 +7,7 @@ from .service import get_by_id, update, delete, create
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
-from ..log import service as log_service
+from ..task_log import service as log_service
 
 
 project_router = APIRouter()

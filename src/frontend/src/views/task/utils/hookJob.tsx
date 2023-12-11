@@ -9,7 +9,7 @@ import {
   getJobConfig,
   setJobConfig
 } from "@/api/job";
-import { getRecentlyLog } from "@/api/log";
+import { getRecentlyLog } from "@/api/job_log";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { ElMessageBox } from "element-plus";

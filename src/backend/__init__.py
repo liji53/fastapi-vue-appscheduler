@@ -11,4 +11,4 @@ from .application_form.models import ApplicationForm
 
 from .project.models import Project
 from .task.models import Task
-from .log.models import Log
+from .task_log.models import Log
