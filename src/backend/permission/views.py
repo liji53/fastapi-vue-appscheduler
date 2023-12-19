@@ -71,7 +71,8 @@ def routes(current_roles: CurrentRoles):
     logger.debug(f"获取web路由, 当前角色为: {current_roles}")
     menus = []
     for role in current_roles:
-        for menu in role.menus:
+        sorted_menus = sorted(role.menus, key=lambda x: x.meta.rank)
+        for menu in sorted_menus:
             recursion_menu(menu, menus)
     # 写死，后续优化
     if list(filter(lambda x: x.code == "admin", current_roles)):

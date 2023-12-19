@@ -46,12 +46,12 @@ def init_database():
                     {
                         "path": "/task/job",
                         "name": "Job",
-                        "meta": {"title": "任务管理"}
+                        "meta": {"title": "任务管理", "rank": 2}
                     },
                     {
                         "path": "/task/project",
                         "name": "Project",
-                        "meta": {"title": "项目管理"}
+                        "meta": {"title": "项目管理", "rank": 1}
                     }
                 ]
             },
@@ -62,22 +62,22 @@ def init_database():
                     {
                         "path": "/app/store",
                         "name": "Store",
-                        "meta": {"title": "应用商城"}
+                        "meta": {"title": "应用商城", "rank": 1}
                     },
                     {
                         "path": "/app/myApp",
                         "name": "MyApp",
-                        "meta": {"title": "我的应用"}
+                        "meta": {"title": "我的应用", "rank": 2}
                     },
                     {
                         "path": "/app/appForm",
                         "name": "AppForm",
-                        "meta": {"title": "配置设计", "keepAlive": True}
+                        "meta": {"title": "配置设计", "keepAlive": True, "rank": 4}
                     },
                     {
                         "path": "/app/category",
                         "name": "AppCategory",
-                        "meta": {"title": "应用分类"}
+                        "meta": {"title": "应用分类", "rank": 3}
                     }
                 ]
             },
@@ -88,12 +88,12 @@ def init_database():
                     {
                         "path": "/monitor/exception",
                         "name": "Exception",
-                        "meta": {"title": "异常监控"}
+                        "meta": {"title": "异常监控", "rank": 1}
                     },
                     {
                         "path": "/monitor/statistics",
                         "name": "Statistics",
-                        "meta": {"title": "统计管理"}
+                        "meta": {"title": "统计管理", "rank": 2}
                     }
                 ]
             },
@@ -104,17 +104,17 @@ def init_database():
                     {
                         "path": "/security/role/index",
                         "name": "Role",
-                        "meta": {"title": "角色管理"}
+                        "meta": {"title": "角色管理", "rank": 2}
                     },
                     {
                         "path": "/security/user/index",
                         "name": "User",
-                        "meta": {"title": "用户管理"}
+                        "meta": {"title": "用户管理", "rank": 1}
                     },
                     {
                         "path": "/security/config",
                         "name": "Config",
-                        "meta": {"title": "系统配置"}
+                        "meta": {"title": "系统配置", "rank": 3}
                     }
                 ]
             }
