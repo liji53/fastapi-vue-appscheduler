@@ -63,7 +63,7 @@ export function setToken(data: DataInfo<Date>) {
     });
   }
 
-  if (data.username && data.roles && data.avatar) {
+  if (data.username && data.roles) {
     const { username, roles, avatar } = data;
     setSessionKey(username, avatar, roles);
   } else {
