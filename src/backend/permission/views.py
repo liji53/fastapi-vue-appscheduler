@@ -73,6 +73,7 @@ def routes(current_roles: CurrentRoles):
     for role in current_roles:
         sorted_menus = sorted(role.menus, key=lambda x: x.meta.rank)
         for menu in sorted_menus:
+            menu.meta.rank = None
             recursion_menu(menu, menus)
     # 写死，后续优化
     if list(filter(lambda x: x.code == "admin", current_roles)):
