@@ -44,7 +44,7 @@ onMounted(() => {
         <el-card
           header="统计"
           shadow="never"
-          :style="{ height: `calc(${height}px - 35vh - 250px)` }"
+          :style="{ height: `calc(${height}px - 35vh - 150px)` }"
         >
           <div>待实现</div>
         </el-card>
@@ -73,7 +73,7 @@ onMounted(() => {
         <el-card
           header="系统资源"
           shadow="never"
-          :style="{ height: `calc(${height}px - 35vh - 250px)` }"
+          :style="{ height: `calc(${height}px - 35vh - 150px)` }"
         >
           <el-row :gutter="24">
             <el-col :span="8">
