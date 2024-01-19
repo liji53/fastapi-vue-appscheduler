@@ -1,5 +1,11 @@
-import { getSystemResource } from "@/api/system_resource";
+import { invoke } from "@tauri-apps/api";
 import * as echarts from "echarts";
+type SysResource = {
+  cpu: number;
+  memory: number;
+  disk: number;
+  full_disk: number;
+};
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -72,14 +78,16 @@ export async function initSysResource(cpuDom, memoryDom, diskDom) {
   option && memoryChart.setOption(option);
   option && diskChart.setOption(option);
 
-  const res = await getSystemResource();
+  const res: SysResource = await invoke("get_sys_info");
+  console.log(res);
+
   cpuChart.setOption<echarts.EChartsOption>({
     title: { text: "cpu" },
-    series: [{ data: [{ value: res.cpu }] }]
+    series: [{ data: [{ value: res.cpu.toFixed(1) }] }]
   });
   memoryChart.setOption<echarts.EChartsOption>({
     title: { text: "内存" },
-    series: [{ data: [{ value: res.memory }] }]
+    series: [{ data: [{ value: res.memory.toFixed(1) }] }]
   });
   diskChart.setOption<echarts.EChartsOption>({
     title: { text: "磁盘" },
