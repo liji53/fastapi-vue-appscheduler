@@ -59,3 +59,7 @@ export const getAppReadme = (app_id: number) => {
     baseUrlApi(`apps/${app_id}/readme`)
   );
 };
+
+export const getApp = (app_id: number) => {
+  return http.request<App>("get", baseUrlApi(`apps/${app_id}`));
+};

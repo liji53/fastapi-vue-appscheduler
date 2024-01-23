@@ -7,9 +7,11 @@ import {
   updateApp,
   deleteApp,
   uploadPic,
-  getAppReadme
+  getAppReadme,
+  getApp
 } from "@/api/app";
-import { installApp } from "@/api/installed_app";
+import { createInstalledApp } from "@/api/installed_app";
+import { invoke } from "@tauri-apps/api";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import croppingUpload from "../components/upload.vue";
@@ -128,7 +130,19 @@ export function useApp() {
 
   // 用于响应AppCard的事件
   const handleInstallApp = async (app_id: number) => {
-    await installApp({ app_id: app_id });
+    // await installApp({ app_id: app_id });
+    const app = await getApp(app_id);
+    loading.value = true;
+    const res: boolean = await invoke("install_svn_app", {
+      repoUrl: app.url
+    });
+    loading.value = false;
+    if (!res) {
+      message("应用安装失败!", { type: "error" });
+    } else {
+      message("应用安装成功!", { type: "success" });
+    }
+    await createInstalledApp({ app_id: app_id });
     onSearch();
   };
   const handleRevisionApp = (app_id: number) => {

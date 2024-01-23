@@ -47,30 +47,13 @@ def get_installed_apps(
     return ret
 
 
-@installed_app_router.post("", response_model=None, summary="安装应用")
+@installed_app_router.post("", response_model=None, summary="安装本地应用")
 async def install_application(app_in: InstalledAppCreate, db_session: DbSession, current_user: CurrentUser):
-    """异步安装app"""
-    async def run_task():
-        svn = Svn(url=app.url, pk=current_user.id)
-        if await svn.check_out():
-            await svn.install_requirements()
-            # session已经关闭，需要重新创建
-            session_local = SessionLocal()
-            try:
-                create(db_session=session_local, app_in=app, user=current_user)
-            except Exception as e:
-                logger.warning(f"安装应用失败，原因：{e}")
-        else:
-            logger.warning(f"安装应用失败，原因：svn checkout失败")
-
     app = app_service.get_by_id(db_session=db_session, pk=app_in.app_id)
     if not app:
         raise HTTPException(404, detail=[{"msg": "安装应用失败，该应用不存在!"}])
 
-    if app.url.endswith(".git"):
-        raise HTTPException(500, detail=[{"msg": "安装应用失败，暂时不支持安装git应用!"}])
-    else:
-        asyncio.create_task(run_task())
+    create(db_session=db_session, app_in=app, user=current_user)
 
 
 @installed_app_router.put("/{app_id}", response_model=InstalledAppRead, summary="更新我的应用信息")

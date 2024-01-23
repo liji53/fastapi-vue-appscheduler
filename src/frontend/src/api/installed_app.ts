@@ -23,7 +23,7 @@ export const getMyInstallApps = (params?: object) => {
 };
 
 /** 安装应用 */
-export const installApp = (data: object) => {
+export const createInstalledApp = (data: object) => {
   return http.post(baseUrlApi("installed_apps"), { data });
 };
 
