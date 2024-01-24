@@ -1,6 +1,6 @@
 import { http } from "@/utils/http";
 import { baseUrlApi } from "@/api/utils";
-import { type AppTreeResult, type AppReadmeResult } from "./app";
+import { type AppTreeResult } from "./app";
 
 type InstalledApp = {
   id: number;
@@ -9,6 +9,7 @@ type InstalledApp = {
   is_online: boolean;
   category_id: number;
   version: string;
+  url: string;
 };
 type AppResult = {
   total: number;
@@ -28,7 +29,7 @@ export const createInstalledApp = (data: object) => {
 };
 
 /** 卸载应用 */
-export const uninstallApp = (app_id: number) => {
+export const deleteInstalledApp = (app_id: number) => {
   return http.delete(baseUrlApi(`installed_apps/${app_id}`));
 };
 
@@ -45,11 +46,4 @@ export const uploadPic = (app_id: number, data: object) => {
 // 任务管理-获取已安装应用的app Tree列表
 export const getMyAppTree = () => {
   return http.request<AppTreeResult>("get", baseUrlApi("installed_apps/tree"));
-};
-
-export const getAppReadme = (app_id: number) => {
-  return http.request<AppReadmeResult>(
-    "get",
-    baseUrlApi(`installed_apps/${app_id}/readme`)
-  );
 };

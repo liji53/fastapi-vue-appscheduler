@@ -3,14 +3,19 @@ import { getAppCategory } from "@/api/app_category";
 import type { FormRules } from "element-plus";
 import {
   getMyInstallApps,
-  uninstallApp,
+  deleteInstalledApp,
   updateApp,
-  uploadPic,
-  getAppReadme
+  uploadPic
 } from "@/api/installed_app";
+import { invoke } from "@tauri-apps/api";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import croppingUpload from "../components/upload.vue";
+
+type readme = {
+  success: boolean;
+  content: string;
+};
 
 export function useApp() {
   const loading = ref(true);
@@ -105,10 +110,17 @@ export function useApp() {
     dialogTitle.value = "编辑";
     appForm.value = { ...app };
   };
-  const handleUninstallApp = async (app_id: number) => {
-    uninstallApp(app_id)
+  const handleUninstallApp = async app => {
+    // 本地安装应用
+    const res: boolean = await invoke("uninstall_app", { repoUrl: app.url });
+    if (!res) {
+      message("应用卸载失败!", { type: "error" });
+      return;
+    }
+    // 删除数据库中应用的元数据
+    deleteInstalledApp(app.id)
       .then(() => {
-        message(`您卸载了应用${appForm.value.name}`, {
+        message(`您卸载了应用${app.name}`, {
           type: "success"
         });
       })
@@ -139,14 +151,16 @@ export function useApp() {
       }
     });
   };
-  const handleReadmeApp = (app_id: number) => {
-    getAppReadme(app_id)
-      .then(response => {
-        readme.value = response.data;
-      })
-      .catch(() => {
-        readme.value = "";
-      });
+  const handleReadmeApp = async app => {
+    // 产看本地应用的readme.md
+    const res: readme = await invoke("readme_app", {
+      repoUrl: app.url
+    });
+    if (!res.success) {
+      readme.value = "";
+      return;
+    }
+    readme.value = res.content;
   };
 
   onMounted(() => {

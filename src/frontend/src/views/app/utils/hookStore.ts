@@ -7,8 +7,7 @@ import {
   updateApp,
   deleteApp,
   uploadPic,
-  getAppReadme,
-  getApp
+  getAppReadme
 } from "@/api/app";
 import { createInstalledApp } from "@/api/installed_app";
 import { invoke } from "@tauri-apps/api";
@@ -129,20 +128,19 @@ export function useApp() {
   };
 
   // 用于响应AppCard的事件
-  const handleInstallApp = async (app_id: number) => {
+  const handleInstallApp = async app => {
     // await installApp({ app_id: app_id });
-    const app = await getApp(app_id);
     loading.value = true;
-    const res: boolean = await invoke("install_svn_app", {
+    const res: boolean = await invoke("install_app", {
       repoUrl: app.url
     });
     loading.value = false;
     if (!res) {
       message("应用安装失败!", { type: "error" });
-    } else {
-      message("应用安装成功!", { type: "success" });
+      return;
     }
-    await createInstalledApp({ app_id: app_id });
+    await createInstalledApp({ app_id: app.id });
+    message("应用安装成功!", { type: "success" });
     onSearch();
   };
   const handleRevisionApp = (app_id: number) => {
@@ -190,8 +188,8 @@ export function useApp() {
       }
     });
   };
-  const handleReadmeApp = (app_id: number) => {
-    getAppReadme(app_id)
+  const handleReadmeApp = app => {
+    getAppReadme(app.id)
       .then(response => {
         readme.value = response.data;
       })

@@ -45,11 +45,6 @@ def get_applications(
     }
 
 
-@application_router.get("", response_model=ApplicationRead, summary="获取指定应用的元数据")
-def get_application(app_id: PrimaryKey, db_session: DbSession):
-    return get_by_id(db_session=db_session, pk=app_id)
-
-
 @application_router.post("", response_model=ApplicationRead, summary="上架应用")
 def create_application(app_in: ApplicationCreate, db_session: DbSession):
     app = get_by_name(db_session=db_session, name=app_in.name)

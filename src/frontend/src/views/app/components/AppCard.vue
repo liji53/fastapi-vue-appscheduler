@@ -83,7 +83,7 @@ const cardLogoClass = computed(() => [
               <el-dropdown-menu>
                 <el-dropdown-item
                   v-if="pagename === 'store' && !app.is_installed && app.status"
-                  @click="$emit('install-app', app.id)"
+                  @click="$emit('install-app', app)"
                 >
                   安装
                 </el-dropdown-item>
@@ -126,14 +126,14 @@ const cardLogoClass = computed(() => [
                 </el-dropdown-item>
                 <el-dropdown-item
                   v-if="pagename === 'myApp'"
-                  @click="$emit('uninstall-app', app.id)"
+                  @click="$emit('uninstall-app', app)"
                 >
                   卸载
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click="
                     infoDialogVisible = true;
-                    $emit('readme-app', app.id);
+                    $emit('readme-app', app);
                   "
                 >
                   详情

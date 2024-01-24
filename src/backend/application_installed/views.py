@@ -1,20 +1,17 @@
 from typing import Optional, Annotated
-import asyncio
 
 from fastapi import APIRouter, HTTPException, File
 from loguru import logger
 
 from .service import get_by_id, create, update, delete
 from .schemas import InstalledAppCreate, InstalledAppPagination, InstalledAppUpdate, \
-    InstalledAppRead, InstalledAppTree, InstalledAppReadme
+    InstalledAppRead, InstalledAppTree
 
 from ..application import service as app_service
 from ..task.models import Task
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
-from ..core.database import SessionLocal
-from ..utils.storage import remove_old_file, create_new_file, remove_dir
-from ..utils.repository import Svn
+from ..utils.storage import remove_old_file, create_new_file
 
 installed_app_router = APIRouter()
 STORAGE_MY_APP_DIR = "my_apps"  # 存储应用的logo图片
@@ -35,6 +32,7 @@ def get_installed_apps(
         'data': [{
             **app.dict(),
             "category_id": app.application.category_id,
+            "url": app.application.url,
             "is_online": any(task_is_online(task) for task in app.tasks)
         } for app in pagination["data"]
             if (category_id is None or category_id == app.application.category_id) and
@@ -47,7 +45,7 @@ def get_installed_apps(
     return ret
 
 
-@installed_app_router.post("", response_model=None, summary="安装本地应用")
+@installed_app_router.post("", response_model=None, summary="安装我的应用(本地安装，元数据存数据库)")
 async def install_application(app_in: InstalledAppCreate, db_session: DbSession, current_user: CurrentUser):
     app = app_service.get_by_id(db_session=db_session, pk=app_in.app_id)
     if not app:
@@ -66,17 +64,13 @@ def update_application(app_id: PrimaryKey, app_in: InstalledAppUpdate, db_sessio
     return app
 
 
-@installed_app_router.delete("/{app_id}", response_model=None, summary="卸载我的应用")
+@installed_app_router.delete("/{app_id}", response_model=None, summary="卸载我的应用(本地安装，元数据存数据库)")
 def delete_application(app_id: PrimaryKey, db_session: DbSession, current_user: CurrentUser):
-    installed_app = get_by_id(db_session=db_session, pk=app_id)
-    svn = Svn(url=installed_app.application.url, pk=current_user.id)
     try:
-        svn.delete_local_repo()
         delete(db_session=db_session, pk=app_id)
     except Exception as e:
         logger.debug(f"卸载应用失败，原因: {e}")
         raise HTTPException(500, detail=[{"msg": f"应用卸载失败！"}])
-    remove_dir(pk=app_id, root_dir=STORAGE_MY_APP_DIR)
 
 
 @installed_app_router.post("/{app_id}/banner", response_model=None, summary="上传我的应用logo")
@@ -112,12 +106,3 @@ def get_app_tree(current_user: CurrentUser):
             category[category_name]["children"].append({**app.dict()})
 
     return {"data": [category[c] for c in category]}
-
-
-@installed_app_router.get("/{app_id}/readme", response_model=InstalledAppReadme, summary="获取应用的readme")
-async def get_app_readme(app_id: PrimaryKey, db_session: DbSession):
-    app = get_by_id(db_session=db_session, pk=app_id)
-    if not app:
-        raise HTTPException(404, detail=[{"msg": "获取应用的readme失败，该应用不存在！"}])
-    readme = await Svn(url=app.application.url, pk=app.user_id).cat(file_path="readme.md")
-    return {"data": readme}

@@ -13,12 +13,14 @@ export default [
             is_online: true,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             name: "SSL证书",
             description:
               "SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部"
           },
           {
             id: 2,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
             is_online: false,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -28,6 +30,7 @@ export default [
           },
           {
             id: 3,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
             is_online: true,
             category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -37,6 +40,7 @@ export default [
           },
           {
             id: 4,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
             is_online: true,
             category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -46,6 +50,7 @@ export default [
           },
           {
             id: 5,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
             is_online: false,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",

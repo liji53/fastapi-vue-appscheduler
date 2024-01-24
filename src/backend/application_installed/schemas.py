@@ -22,6 +22,7 @@ class InstalledAppRead(InstalledApp):
     is_online: bool = False
     category_id: Optional[int] = None
     version: Optional[str] = None
+    url: Optional[str] = None
 
 
 class InstalledAppPagination(Pagination):
@@ -36,7 +37,3 @@ class InstalledAppTreeNode(MyBaseModel):
 
 class InstalledAppTree(MyBaseModel):
     data: list[InstalledAppTreeNode]
-
-
-class InstalledAppReadme(MyBaseModel):
-    data: str
