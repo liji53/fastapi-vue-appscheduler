@@ -4,15 +4,13 @@ import { ref, Ref, computed } from "vue";
 import NoticeList from "./noticeList.vue";
 import { TabItem } from "@/api/notice";
 import Bell from "@iconify-icons/ep/bell";
-import { useWebSocketStoreHook } from "@/store/modules/webSockets";
 import { ElNotification } from "element-plus";
+import { listen } from "@tauri-apps/api/event";
 
 const notices: Ref<TabItem[]> = ref([]);
 
-const socket = useWebSocketStoreHook().getTaskSocket();
-// 监听接收消息事件
-socket.onmessage = function (event) {
-  const msg: TabItem = JSON.parse(event.data);
+listen("run_app_result", (event: any) => {
+  const msg: TabItem = event.payload;
   let is_exists = false;
   notices.value.forEach(item => {
     if (item.name === msg.name) {
@@ -32,7 +30,7 @@ socket.onmessage = function (event) {
       message: message.description
     });
   }
-};
+});
 
 const noticesNum = computed(() => {
   let count = 0;

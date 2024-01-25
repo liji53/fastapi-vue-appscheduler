@@ -79,7 +79,6 @@ export async function initSysResource(cpuDom, memoryDom, diskDom) {
   option && diskChart.setOption(option);
 
   const res: SysResource = await invoke("get_sys_info");
-  console.log(res);
 
   cpuChart.setOption<echarts.EChartsOption>({
     title: { text: "cpu" },

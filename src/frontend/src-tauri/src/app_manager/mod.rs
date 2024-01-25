@@ -3,6 +3,7 @@ mod svn_app;
 use self::base_app::RepoCommand;
 use serde::Serialize;
 use svn_app::SvnRepo;
+use tauri::Window;
 
 #[tauri::command]
 pub fn install_app(repo_url: &str) -> bool {
@@ -47,4 +48,10 @@ pub fn readme_app(repo_url: &str) -> Readme {
             content: "".to_string(),
         }
     }
+}
+
+#[tauri::command]
+pub fn run_app(window: Window, repo_url: String, task_name: String) -> Result<(), String> {
+    let svn_repo: SvnRepo = SvnRepo::new(repo_url);
+    svn_repo.run_app(window, task_name)
 }

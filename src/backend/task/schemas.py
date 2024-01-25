@@ -49,6 +49,7 @@ class TaskRead(TaskBase):
     cron: Optional[str] = None
     next_at: Optional[str] = None
     updated_at: datetime
+    url: str
 
 
 class TaskPagination(Pagination):

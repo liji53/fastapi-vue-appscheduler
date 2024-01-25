@@ -12,6 +12,7 @@ type Job = {
   next_at: string;
   updated_at: string;
   cron: string;
+  url: string;
 };
 type JobResult = {
   total: number;

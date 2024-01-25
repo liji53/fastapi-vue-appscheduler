@@ -11,6 +11,7 @@ export default [
           {
             id: 1,
             name: "获取数据",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             project: "信创",
             project_id: 1,
             app_id: 12,
@@ -24,6 +25,7 @@ export default [
           {
             id: 2,
             name: "获取数据2",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             project: "信创",
             project_id: 1,
             app_id: 1,
@@ -37,6 +39,7 @@ export default [
           {
             id: 3,
             name: "获取数据3",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             project: "招商",
             project_id: 2,
             app_id: 2,
@@ -50,6 +53,7 @@ export default [
           {
             id: 4,
             name: "获取数据4",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             project: "信创",
             project_id: 1,
             app_id: 1,

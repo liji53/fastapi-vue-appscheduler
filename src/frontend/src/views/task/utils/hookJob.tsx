@@ -17,7 +17,7 @@ import { addDialog } from "@/components/ReDialog";
 import { type JobItemProps } from "./types";
 import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, h, computed, toRaw } from "vue";
-import { useWebSocketStoreHook } from "@/store/modules/webSockets";
+import { invoke } from "@tauri-apps/api";
 
 const nextAtStyle = computed(() => {
   return (next_at: string) => {
@@ -182,13 +182,19 @@ export function useJob() {
         row.status === false ? (row.status = true) : (row.status = false);
       });
   }
-  // 手动执行任务
-  function handleRun(row) {
-    const socket = useWebSocketStoreHook().getTaskSocket();
-    socket.send(JSON.stringify({ task_id: row.id }));
-    message(`开始运行${row.name}`, {
-      type: "success"
-    });
+  // 手动执行任务(异步，在通知栏中listen任务完成的事件)
+  async function handleRun(row) {
+    invoke("run_app", { repoUrl: row.url, taskName: row.name })
+      .then(() => {
+        message(`开始运行【${row.name}】`, {
+          type: "success"
+        });
+      })
+      .catch(error => {
+        message(`运行【${row.name}】失败: ${error}`, {
+          type: "error"
+        });
+      });
   }
 
   // 定时任务相关逻辑

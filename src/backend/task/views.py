@@ -46,7 +46,8 @@ def get_tasks(common: CommonParameters,
             **task.dict(),
             "next_at": croniter(task.cron).get_next(datetime.datetime).strftime("%Y-%m-%d %M:%H:%S")
             if task.cron and task.status else None,
-            "project": task.project.name
+            "project": task.project.name,
+            "url": task.application.application.url
         })
 
     return {**pagination, "data": ret}
