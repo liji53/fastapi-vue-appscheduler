@@ -19,19 +19,11 @@ logger.add(sys.stderr, level=LOG_LEVEL)
 # app-scheduler应用
 app = FastAPI(openapi_url="")
 
-
-async def internal_error(request, exc):
-    return JSONResponse(
-        status_code=500, content={"detail": [{"msg": "API服务内部错误."}]}
-    )
+# 默认的异常处理
 exception_handlers = {
-    404: lambda request, exc: JSONResponse(
-        status_code=404, content={"detail": [{"msg": "API不支持."}]}
-    ),
     405: lambda request, exc: JSONResponse(
-        status_code=405, content={"detail": [{"msg": "API不允许."}]}
+        status_code=405, content={"detail": [{"msg": "API没有实现."}]}
     ),
-    500: internal_error
 }
 
 # 后端api
