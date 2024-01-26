@@ -57,8 +57,8 @@ def create_task(task_in: TaskCreate, db_session: DbSession):
     try:
         create(db_session=db_session, task_in=task_in)
     except Exception as e:
-        logger.warning(f"创建项目失败，原因：{e}")
-        raise HTTPException(500, detail=[{"msg": "创建项目失败！"}])
+        logger.warning(f"创建任务失败，原因：{e}")
+        raise HTTPException(500, detail=[{"msg": "创建任务失败！"}])
 
 
 @task_router.put("/{task_id}", response_model=None, summary="更新任务信息、使能任务状态、设置定时")
@@ -174,8 +174,8 @@ def get_task_config(task_id: PrimaryKey, db_session: DbSession, current_user: Cu
     config = repo.read_task_config(task_id=task_id)
 
     # 如果应用配置表单不存在或异常，则使用默认的配置表单
-    # 如果应用配置表单存在，如果当前任务没有配置，则优先使用应用配置表单中的默认值，而不是项目中的默认配置
-    if app_form:
+    # 如果应用配置表单存在，且当前任务没有配置，则优先使用应用配置表单中的默认值，而不是项目中的默认配置
+    if app_form and app_form.form != "[]":
         try:
             form_fields = json.loads(app_form.form)
         except Exception as e:
