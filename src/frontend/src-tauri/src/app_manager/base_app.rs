@@ -7,7 +7,7 @@ use std::{env, fs};
 use tauri::Window;
 
 #[derive(Clone, serde::Serialize)]
-struct ListItem {
+struct NoticeItem {
     avatar: String,
     title: String,
     datetime: String,
@@ -16,10 +16,25 @@ struct ListItem {
     status: String,
     extra: String,
 }
+/// 用于通知栏的数据格式
+#[derive(Clone, serde::Serialize)]
+struct Notice {
+    name: String,
+    list: Vec<NoticeItem>,
+}
+/// 服务器后端保存的日志格式
+#[derive(Clone, serde::Serialize)]
+struct Log {
+    status: bool,
+    execute_type: String,
+    content: String,
+    task_id: u32,
+}
+/// 返回给前端的payload
 #[derive(Clone, serde::Serialize)]
 struct RunAppPayload {
-    name: String,
-    list: Vec<ListItem>,
+    notice: Notice,
+    log: Log,
 }
 
 // 版本管理工具命令 接口
@@ -54,7 +69,7 @@ pub trait RepoCommand {
         false
     }
     /// 执行应用程序，python main.py
-    fn run_app(&self, window: Window, task_name: String) -> Result<(), String> {
+    fn run_app(&self, window: Window, task_name: String, task_id: u32) -> Result<(), String> {
         let repo_path = self.local_path().clone();
         let path = Path::new(&repo_path).join("main.py");
         if !path.exists() {
@@ -65,22 +80,25 @@ pub trait RepoCommand {
             let output = Command::new("python")
                 .arg("main.py")
                 .output()
-                .map_err(|e| format!("{}", e));
+                .map_err(|e| format!("执行Command报错: {}", e));
 
             let mut success = false;
-            let err_msg: String;
-
+            let description: String;
+            let log_content: String;
             match output {
                 Ok(ret) => {
                     if ret.status.success() {
                         success = true;
-                        err_msg = "任务执行成功".to_string();
+                        description = "任务执行成功".to_string();
+                        log_content = String::from_utf8_lossy(&ret.stdout).to_string();
                     } else {
-                        err_msg = "任务脚本执行报错".to_string();
+                        description = "任务脚本执行报错".to_string();
+                        log_content = String::from_utf8_lossy(&ret.stderr).to_string();
                     }
                 }
                 Err(e) => {
-                    err_msg = e;
+                    description = e.clone();
+                    log_content = e;
                 }
             }
 
@@ -90,16 +108,24 @@ pub trait RepoCommand {
                 .emit(
                     "run_app_result",
                     RunAppPayload {
-                        name: "任务结果".to_string(),
-                        list: vec![ListItem {
-                            title: task_name,
-                            avatar: "https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png".to_string(),
-                            datetime: formatted_time,
-                            r#type: "1".to_string(),
-                            description: err_msg,
-                            status: if success {"success".to_string()} else {"danger".to_string()},
-                            extra: if success {"成功".to_string()} else {"失败".to_string()},
-                        }],
+                        notice: Notice{
+                            name: "任务结果".to_string(),
+                            list: vec![NoticeItem {
+                                title: task_name,
+                                avatar: "https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png".to_string(),
+                                datetime: formatted_time,
+                                r#type: "1".to_string(),
+                                description,
+                                status: if success {"success".to_string()} else {"danger".to_string()},
+                                extra: if success {"成功".to_string()} else {"失败".to_string()},
+                            }],
+                        },
+                        log: Log{
+                            status: success,
+                            execute_type: "手动".to_string(),
+                            content: log_content,
+                            task_id
+                        }
                     },
                 )
                 .unwrap();

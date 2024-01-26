@@ -3,8 +3,9 @@ from typing import Optional, Annotated
 from fastapi import APIRouter, HTTPException, Query
 from loguru import logger
 
-from .schemas import LogPagination, LogContentRead, LogRecently
-from .service import delete, get_by_id, get_recently_by_task_id
+from .schemas import LogPagination, LogContentRead, LogRecently, LogCreate
+from .service import delete, get_by_id, get_recently_by_task_id, create
+from .log_parser import parse
 
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
@@ -73,3 +74,12 @@ def get_log_recently(task_id: int, db_session: DbSession):
     if not log:
         raise HTTPException(404, detail=[{"msg": f"该任务最近没有日志"}])
     return log
+
+
+@log_router.post("", response_model=None, summary="前端执行应用之后，上传到后台的应用执行日志")
+def create_log(db_session: DbSession, log_in: LogCreate):
+    task = task_service.get_by_id(db_session=db_session, pk=log_in.task_id)
+    if not task:
+        raise HTTPException(404, detail=[{"msg": "提交任务的执行日志失败，该任务不存在！"}])
+    log_dict = parse(running_status=log_in.status, log=log_in.content, execute_type=log_in.execute_type)
+    create(db_session=db_session, log_in=log_dict, task=task)

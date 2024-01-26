@@ -38,3 +38,7 @@ export const getLog = (log_id: number) => {
 export const getRecentlyLog = (params: object) => {
   return http.request<Log>("get", baseUrlApi("task_logs/recently"), { params });
 };
+
+export const createLog = (data: object) => {
+  return http.post(baseUrlApi(`task_logs`), { data });
+};

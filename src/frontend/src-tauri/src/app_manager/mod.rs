@@ -51,7 +51,12 @@ pub fn readme_app(repo_url: &str) -> Readme {
 }
 
 #[tauri::command]
-pub fn run_app(window: Window, repo_url: String, task_name: String) -> Result<(), String> {
+pub fn run_app(
+    window: Window,
+    repo_url: String,
+    task_name: String,
+    task_id: u32,
+) -> Result<(), String> {
     let svn_repo: SvnRepo = SvnRepo::new(repo_url);
-    svn_repo.run_app(window, task_name)
+    svn_repo.run_app(window, task_name, task_id)
 }

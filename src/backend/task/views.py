@@ -58,8 +58,8 @@ def create_task(task_in: TaskCreate, db_session: DbSession):
     try:
         create(db_session=db_session, task_in=task_in)
     except Exception as e:
-        logger.warning(f"创建项目失败，原因：{e}")
-        raise HTTPException(500, detail=[{"msg": "创建项目失败！"}])
+        logger.warning(f"创建任务失败，原因：{e}")
+        raise HTTPException(500, detail=[{"msg": "创建任务失败！"}])
 
 
 @task_router.put("/{task_id}", response_model=None, summary="更新任务信息、使能任务状态、设置定时")
@@ -89,57 +89,6 @@ def delete_task(task_id: PrimaryKey, db_session: DbSession):
     except Exception as e:
         logger.debug(f"删除任务失败，原因: {e}")
         raise HTTPException(500, detail=[{"msg": f"删除任务失败！"}])
-
-    # 数据库删除成功，才能删除定时任务
-    delete_scheduler(task_id=task_id)
-
-
-async def run_task_and_send(task: Task, socket: WebSocket):
-    async def execute_task():
-        if not task:
-            return False, "运行任务失败，该任务不存在！"
-        repo = Repository(url=task.application.application.url, pk=task.application.user_id)
-        ret_status, log = await repo.run_app()
-        # 解析日志
-        log_in = log_parser.parse(ret_status, log, "手动")
-        log_service.create(db_session=SessionLocal(),
-                           log_in=log_in,
-                           task=task)
-        return log_in["status"], \
-            "任务执行成功，但存在error打印" if log_in["log_type"] == log_parser.SeverityEnum.ERROR else "任务执行成功" \
-            if log_in["status"] else "运行任务失败，应用执行报错"
-
-        # 单用户阻塞实现：如果一个用户同时执行了多个任务，后面的任务会阻塞
-    is_success, result = await execute_task()
-    tmp = {
-        "name": "任务结果",
-        "list": [{
-            "avatar": "https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png",
-            "title": f"{task.name}",
-            "datetime": datetime.datetime.today().strftime("%m-%d %H:%M:%S"),
-            "description": f"{result}",
-            "extra": '成功' if is_success else '失败',
-            "status": "success" if is_success else "danger",
-         }]
-    }
-    await socket.send_text(json.dumps(tmp))
-
-
-@task_router.websocket("/ws")
-async def run_task(socket: WebSocket):
-    """用户手动执行任务，服务器通知任务的执行结果"""
-    await socket.accept()
-    try:
-        while True:
-            msg = await socket.receive_json()
-            logger.debug(f"收到消息：{msg}")
-            task = get_by_id(db_session=SessionLocal(), pk=msg["task_id"])
-            # 方案一: 单用户任务阻塞
-            # await run_task_and_send(task=task, socket=socket)
-            # 方案二：任务异步
-            asyncio.create_task(run_task_and_send(task=task, socket=socket))
-    except Exception as e:
-        logger.info(f"webSocket连接断开，原因：{e}")
 
 
 def create_default_form(config: dict) -> list[dict]:

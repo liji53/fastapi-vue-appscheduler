@@ -184,7 +184,7 @@ export function useJob() {
   }
   // 手动执行任务(异步，在通知栏中listen任务完成的事件)
   async function handleRun(row) {
-    invoke("run_app", { repoUrl: row.url, taskName: row.name })
+    invoke("run_app", { repoUrl: row.url, taskName: row.name, taskId: row.id })
       .then(() => {
         message(`开始运行【${row.name}】`, {
           type: "success"

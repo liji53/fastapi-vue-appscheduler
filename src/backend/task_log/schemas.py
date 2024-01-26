@@ -6,11 +6,13 @@ from .models import SeverityEnum
 
 
 class LogBase(MyBaseModel):
-    id: PrimaryKey
     status: bool
-    log_type: SeverityEnum
     execute_type: str
-    created_at: datetime
+
+
+class LogCreate(LogBase):
+    task_id: PrimaryKey
+    content: str
 
 
 class LogContentRead(MyBaseModel):
@@ -18,6 +20,9 @@ class LogContentRead(MyBaseModel):
 
 
 class LogRead(LogBase):
+    id: PrimaryKey
+    log_type: SeverityEnum
+    created_at: datetime
     project_name: str
     task_name: str
 
@@ -27,4 +32,7 @@ class LogPagination(Pagination):
 
 
 class LogRecently(LogBase):
+    id: PrimaryKey
+    log_type: SeverityEnum
+    created_at: datetime
     content: str
