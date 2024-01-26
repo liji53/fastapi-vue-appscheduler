@@ -120,8 +120,8 @@ def get_task_config(task_id: PrimaryKey, db_session: DbSession, current_user: Cu
     config = repo.read_task_config(task_id=task_id)
 
     # 如果应用配置表单不存在或异常，则使用默认的配置表单
-    # 如果应用配置表单存在，如果当前任务没有配置，则优先使用应用配置表单中的默认值，而不是项目中的默认配置
-    if app_form:
+    # 如果应用配置表单存在，且当前任务没有配置，则优先使用应用配置表单中的默认值，而不是项目中的默认配置
+    if app_form and app_form.form != "[]":
         try:
             form_fields = json.loads(app_form.form)
         except Exception as e:
