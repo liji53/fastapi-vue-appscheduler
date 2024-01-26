@@ -1,25 +1,21 @@
-import asyncio
 import datetime
 import json
 from typing import Union, Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException, WebSocket
+from fastapi import APIRouter, HTTPException
 from loguru import logger
 from croniter import croniter
 
-from .models import Task
 from .schemas import TaskPagination, TaskCreate, TaskUpdate, TaskCronUpdate, TaskStatusUpdate, \
     TaskConfigUpdate, TaskConfigRead, TaskTree
 from .service import get_by_id, update, delete, create
-from .scheduler import update_scheduler, delete_scheduler
+from .scheduler import update_scheduler
 
 from ..application_form import service as app_form_service
 from ..core.service import CommonParameters, sort_paginate, DbSession, CurrentUser
 from ..core.schemas import PrimaryKey
-from ..core.database import SessionLocal
 from ..utils.repository import Repository
-from ..task_log import log_parser, service as log_service
 
 
 task_router = APIRouter()
