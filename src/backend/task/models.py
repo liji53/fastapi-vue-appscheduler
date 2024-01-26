@@ -20,7 +20,7 @@ class Task(Base, DateTimeMixin):
     application = relationship("ApplicationInstalled", backref="tasks", uselist=False)
 
     # 关联的日志
-    logs = relationship("Log", cascade="all, delete", backref="task")
+    logs = relationship("Log", backref="task", passive_deletes=True)
 
     def __repr__(self) -> str:
         return f"<{self.name} - {self.cron}>"

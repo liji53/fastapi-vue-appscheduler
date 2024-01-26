@@ -17,4 +17,4 @@ class Log(Base, DateTimeMixin):
     execute_type = Column(String(16), nullable=False, comment="任务执行的方式")
     content = Column(Text, comment="任务执行时生成的日志内容")
 
-    task_id = Column(Integer, ForeignKey("task.id"))
+    task_id = Column(Integer, ForeignKey("task.id", ondelete='cascade'))

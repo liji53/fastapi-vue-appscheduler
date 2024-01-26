@@ -17,4 +17,4 @@ class Application(Base, DateTimeMixin):
     category = relationship("ApplicationCategory", backref="applications", uselist=False)
 
     # 应用配置的表单，需要级联删除
-    form = relationship("ApplicationForm", cascade="all, delete", uselist=False, backref="Application")
+    form = relationship("ApplicationForm", uselist=False, backref="Application", passive_deletes=True)
