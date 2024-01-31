@@ -131,17 +131,17 @@ export function useApp() {
   const handleInstallApp = async app => {
     // await installApp({ app_id: app_id });
     loading.value = true;
-    const res: boolean = await invoke("install_app", {
-      repoUrl: app.url
-    });
+    invoke("install_app", { repoUrl: app.url })
+      .then(async () => {
+        await createInstalledApp({ app_id: app.id });
+        message("应用安装成功!", { type: "success" });
+        onSearch();
+      })
+      .catch((response: string) => {
+        console.error(response);
+        message("应用安装失败!", { type: "error" });
+      });
     loading.value = false;
-    if (!res) {
-      message("应用安装失败!", { type: "error" });
-      return;
-    }
-    await createInstalledApp({ app_id: app.id });
-    message("应用安装成功!", { type: "success" });
-    onSearch();
   };
   const handleRevisionApp = (app_id: number) => {
     message(`暂时不支持查看应用版本${app_id}`, {

@@ -1,4 +1,5 @@
 use super::schemas::{FormData, FormItem, Log, Notice, NoticeItem, RunAppPayload};
+
 use chrono::{DateTime, Local};
 use ini::Ini;
 use rand::Rng;
@@ -15,37 +16,46 @@ pub trait RepoCommand {
     fn local_path(&self) -> &String;
 
     /// 使用版本管理工具，导出python项目
-    fn checkout(&self) -> bool;
+    fn checkout(&self) -> Result<(), String>;
 
     /// 读取本地仓库中指定文件的内容
-    fn cat(&self, file_path: &str) -> Result<String, std::io::Error> {
+    fn cat(&self, file_path: &str) -> Result<String, String> {
         let file = Path::new(self.local_path()).join(file_path);
+        if !file.exists() {
+            return Err("readme.md文件不存在".to_string());
+        }
         fs::read_to_string(file.to_string_lossy().to_string())
+            .map_err(|e| format!("readme.md文件读取失败: {}", e))
     }
 
     /// 删除本地仓库
-    fn delete(&self) -> Result<(), std::io::Error> {
+    fn delete(&self) -> Result<(), String> {
         println!("delete dir: {}", self.local_path());
-        fs::remove_dir_all(self.local_path())?;
-        Ok(())
+        fs::remove_dir_all(self.local_path()).map_err(|e| format!("删除本地应用失败: {}", e))
     }
 
     /// 安装python项目中的依赖库，pip install -r requirements.txt
-    fn install_requirements(&self) -> bool {
+    fn install_requirements(&self) -> Result<(), String> {
         let requirement_path = Path::new(self.local_path()).join("requirements.txt");
         if !requirement_path.exists() {
-            return false;
+            eprintln!("requirements.txt文件不存在");
+            return Ok(());
         }
-        let output: std::process::Output = Command::new("pip")
+        let output = Command::new("pip")
             .arg("install")
             .arg("-r")
             .arg(format!("{}", requirement_path.to_string_lossy()))
             .output()
-            .expect(&format!("执行pip install失败"));
+            .map_err(|e| format!("执行pip install失败: {}", e))?;
         if output.status.success() {
-            return true;
+            Ok(())
+        } else {
+            eprintln!(
+                "pip install 失败：{}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            Err("执行pip install失败".to_string())
         }
-        false
     }
 
     /// 执行应用程序，python main.py

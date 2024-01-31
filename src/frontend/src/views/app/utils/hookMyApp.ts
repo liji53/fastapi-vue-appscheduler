@@ -12,11 +12,6 @@ import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import croppingUpload from "../components/upload.vue";
 
-type readme = {
-  success: boolean;
-  content: string;
-};
-
 export function useApp() {
   const loading = ref(true);
   const pagination = reactive({
@@ -112,20 +107,22 @@ export function useApp() {
   };
   const handleUninstallApp = async app => {
     // 本地安装应用
-    const res: boolean = await invoke("uninstall_app", { repoUrl: app.url });
-    if (!res) {
-      message("应用卸载失败!", { type: "error" });
-      return;
-    }
-    // 删除数据库中应用的元数据
-    deleteInstalledApp(app.id)
+    invoke("uninstall_app", { repoUrl: app.url })
       .then(() => {
-        message(`您卸载了应用${app.name}`, {
-          type: "success"
-        });
+        // 删除数据库中应用的元数据
+        deleteInstalledApp(app.id)
+          .then(() => {
+            message(`您卸载了应用${app.name}`, {
+              type: "success"
+            });
+          })
+          .finally(() => {
+            onSearch();
+          });
       })
-      .finally(() => {
-        onSearch();
+      .catch((res: string) => {
+        message(res, { type: "error" });
+        return;
       });
   };
   const handleUploadPicApp = app => {
@@ -153,14 +150,14 @@ export function useApp() {
   };
   const handleReadmeApp = async app => {
     // 产看本地应用的readme.md
-    const res: readme = await invoke("readme_app", {
-      repoUrl: app.url
-    });
-    if (!res.success) {
-      readme.value = "";
-      return;
-    }
-    readme.value = res.content;
+    invoke("readme_app", { repoUrl: app.url })
+      .then((response: string) => {
+        readme.value = response;
+      })
+      .catch((err: string) => {
+        readme.value = "";
+        message(err, { type: "error" });
+      });
   };
 
   onMounted(() => {

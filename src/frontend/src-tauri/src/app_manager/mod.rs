@@ -2,54 +2,29 @@ mod base_app;
 mod schemas;
 mod svn_app;
 use self::base_app::RepoCommand;
-use serde::Serialize;
 use svn_app::SvnRepo;
 use tauri::Window;
 
 #[tauri::command]
-pub fn install_app(repo_url: String) -> bool {
+pub fn install_app(repo_url: String) -> Result<(), String> {
     if repo_url.ends_with(".git") {
-        return false;
+        return Err("不支持安装git应用".to_string());
     }
-    println!("安装地址：{}", repo_url);
     let svn_repo = SvnRepo::new(repo_url);
-    let ret = svn_repo.checkout();
-    if !ret {
-        return false;
-    }
+    svn_repo.checkout()?;
     svn_repo.install_requirements()
 }
 
 #[tauri::command]
-pub fn uninstall_app(repo_url: &str) -> bool {
+pub fn uninstall_app(repo_url: &str) -> Result<(), String> {
     let svn_repo = SvnRepo::new(repo_url.to_string());
-    if let Ok(_) = svn_repo.delete() {
-        true
-    } else {
-        false
-    }
-}
-
-#[derive(Serialize)]
-pub struct Readme {
-    success: bool,
-    content: String,
+    svn_repo.delete()
 }
 
 #[tauri::command]
-pub fn readme_app(repo_url: &str) -> Readme {
+pub fn readme_app(repo_url: &str) -> Result<String, String> {
     let svn_repo: SvnRepo = SvnRepo::new(repo_url.to_string());
-    if let Ok(content) = svn_repo.cat("readme.md") {
-        Readme {
-            success: true,
-            content,
-        }
-    } else {
-        Readme {
-            success: false,
-            content: "".to_string(),
-        }
-    }
+    svn_repo.cat("readme.md")
 }
 
 #[tauri::command]

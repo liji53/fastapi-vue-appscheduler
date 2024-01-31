@@ -18,7 +18,7 @@ impl RepoCommand for SvnRepo {
         &self.local_path
     }
 
-    fn checkout(&self) -> bool {
+    fn checkout(&self) -> Result<(), String> {
         /* 默认使用本地svn的账号 */
         let output = Command::new("svn")
             .arg("checkout")
@@ -27,13 +27,13 @@ impl RepoCommand for SvnRepo {
             .arg("--non-interactive")
             .arg("--trust-server-cert")
             .output()
-            .expect(&format!("执行svn checkout {}失败", self.url));
+            .map_err(|e| format!("执行svn checkout失败: {}", e))?;
         if output.status.success() {
-            true
+            Ok(())
         } else {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            eprintln!("pip install failed: {}", stderr);
-            false
+            eprintln!("svn checkout 失败: {}", stderr);
+            Err("执行svn checkout失败".to_string())
         }
     }
 }
