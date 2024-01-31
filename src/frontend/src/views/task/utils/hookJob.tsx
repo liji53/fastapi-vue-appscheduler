@@ -6,12 +6,12 @@ import {
   createJob,
   updateJob,
   deleteJob,
-  getJobConfig,
   setJobConfig
 } from "@/api/job";
 import { getRecentlyLog } from "@/api/job_log";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
+import { getAppForm } from "@/api/app_form";
 import { ElMessageBox } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { type JobItemProps } from "./types";
@@ -226,16 +226,28 @@ export function useJob() {
 
   // 设置任务的配置
   function handleConfig(row) {
-    getJobConfig(row.id).then(response => {
-      if (response.data === null || response.data == "[]") {
-        message("该应用不需要配置", {
-          type: "warning"
+    getAppForm({ task_id: row.id }).then(response => {
+      invoke("getconfig_app", {
+        repoUrl: row.url,
+        appForm: response.form === null ? "[]" : response.form,
+        taskId: row.id
+      })
+        .then((response: string) => {
+          if (response === "") {
+            message(`应用【${row.name}】不需要配置`, {
+              type: "warning"
+            });
+          } else {
+            taskConfigData.value = JSON.parse(response);
+            taskConifgVisible.value = true;
+            task_id.value = row.id;
+          }
+        })
+        .catch(error => {
+          message(`应用【${row.name}】的配置异常: ${error}`, {
+            type: "error"
+          });
         });
-      } else {
-        taskConfigData.value = JSON.parse(response.data);
-        taskConifgVisible.value = true;
-        task_id.value = row.id;
-      }
     });
   }
   function handleConfirmConfig(formRef, config) {
@@ -331,7 +343,7 @@ export function useJob() {
       }
     });
   }
-
+  // 查看日志
   function handleLog(row) {
     getRecentlyLog({ task_id: row.id }).then(response => {
       log.value = response;

@@ -51,7 +51,7 @@ export function useAppForm() {
   const handleTreeClick = data => {
     if (!("children" in data) || data["children"] === null) {
       currentApp.value = data.id;
-      getAppForm(data.id).then(response => {
+      getAppForm({ app_id: data.id }).then(response => {
         if (response.form != null) {
           starfishRef.value.setJson(JSON.parse(response.form));
         } else {

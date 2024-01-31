@@ -2,7 +2,7 @@ import { MockMethod } from "vite-plugin-mock";
 
 export default [
   {
-    url: "/appforms/12",
+    url: "/appforms",
     method: "get",
     response: () => {
       return {
@@ -13,8 +13,8 @@ export default [
             id: "fU1ocjKnSLOA3Djmpus1g",
             layout: false,
             data: {
-              fieldName: "TextArea_k3Qy8gCo_4FVYDsO7nwS0",
-              label: "标签名称",
+              fieldName: "doc文档目录",
+              label: "doc文档目录",
               tip: "",
               placeholder: "",
               showRule: "{}",

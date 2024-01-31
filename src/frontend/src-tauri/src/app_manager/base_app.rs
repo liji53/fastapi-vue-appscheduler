@@ -1,52 +1,28 @@
+use super::schemas::{FormData, FormItem, Log, Notice, NoticeItem, RunAppPayload};
 use chrono::{DateTime, Local};
+use ini::Ini;
+use rand::Rng;
+use serde_json::Value;
 use sha1::{Digest, Sha1};
+use std::collections::HashMap;
 use std::path::Path;
 use std::process::Command;
-use std::thread;
-use std::{env, fs};
+use std::{env, fs, thread};
 use tauri::Window;
-
-#[derive(Clone, serde::Serialize)]
-struct NoticeItem {
-    avatar: String,
-    title: String,
-    datetime: String,
-    r#type: String,
-    description: String,
-    status: String,
-    extra: String,
-}
-/// 用于通知栏的数据格式
-#[derive(Clone, serde::Serialize)]
-struct Notice {
-    name: String,
-    list: Vec<NoticeItem>,
-}
-/// 服务器后端保存的日志格式
-#[derive(Clone, serde::Serialize)]
-struct Log {
-    status: bool,
-    execute_type: String,
-    content: String,
-    task_id: u32,
-}
-/// 返回给前端的payload
-#[derive(Clone, serde::Serialize)]
-struct RunAppPayload {
-    notice: Notice,
-    log: Log,
-}
 
 // 版本管理工具命令 接口
 pub trait RepoCommand {
     fn local_path(&self) -> &String;
+
     /// 使用版本管理工具，导出python项目
     fn checkout(&self) -> bool;
+
     /// 读取本地仓库中指定文件的内容
     fn cat(&self, file_path: &str) -> Result<String, std::io::Error> {
         let file = Path::new(self.local_path()).join(file_path);
         fs::read_to_string(file.to_string_lossy().to_string())
     }
+
     /// 删除本地仓库
     fn delete(&self) -> Result<(), std::io::Error> {
         println!("delete dir: {}", self.local_path());
@@ -57,6 +33,9 @@ pub trait RepoCommand {
     /// 安装python项目中的依赖库，pip install -r requirements.txt
     fn install_requirements(&self) -> bool {
         let requirement_path = Path::new(self.local_path()).join("requirements.txt");
+        if !requirement_path.exists() {
+            return false;
+        }
         let output: std::process::Output = Command::new("pip")
             .arg("install")
             .arg("-r")
@@ -68,6 +47,7 @@ pub trait RepoCommand {
         }
         false
     }
+
     /// 执行应用程序，python main.py
     fn run_app(&self, window: Window, task_name: String, task_id: u32) -> Result<(), String> {
         let repo_path = self.local_path().clone();
@@ -132,6 +112,104 @@ pub trait RepoCommand {
         });
 
         Ok(())
+    }
+
+    /// 获取当前任务的配置
+    fn getconfig_app(&self, app_form: String, task_id: u32) -> Result<String, String> {
+        // 如果有设置过配置，则用该任务的配置，没有则用默认配置
+        let mut config_path = Path::new(self.local_path()).join(format!("conf_{}.ini", task_id));
+        if !config_path.exists() {
+            config_path = Path::new(self.local_path()).join("config.ini");
+        }
+
+        let mut config = HashMap::new();
+        let i = Ini::load_from_file(config_path).map_err(|_| "配置文件解析失败!".to_string())?;
+        for (_section, prop) in i.iter() {
+            for (k, v) in prop.iter() {
+                config.insert(k.to_string(), v.to_string());
+            }
+        }
+
+        println!("app表单: {}", app_form);
+        // println!("应用配置: {:?}", config);
+
+        if app_form == "[]" {
+            default_config_form(&config)
+        } else {
+            app_config_form(&config, app_form)
+        }
+    }
+}
+
+// 生成默认配置表单
+fn default_config_form(config: &HashMap<String, String>) -> Result<String, String> {
+    let mut config_form: Vec<FormItem> = Vec::new();
+    for (key, value) in config.iter() {
+        let random = rand::thread_rng().gen_range(1..=10000);
+        config_form.push(FormItem {
+            control_type: "Text".to_string(),
+            name_cn: "文本框".to_string(),
+            layout: false,
+            id: random.to_string(),
+            data: FormData {
+                field_name: key.to_string(),
+                label: key.to_string(),
+                tip: "".to_string(),
+                placeholder: "".to_string(),
+                show_rule: "{}".to_string(),
+                required: false,
+                rule: "[]".to_string(),
+                default: value.to_string(),
+                csslist: "[]".to_string(),
+            },
+        })
+    }
+    let ret =
+        serde_json::to_string(&config_form).map_err(|_| "struct转json str失败!".to_string())?;
+    Ok(ret)
+}
+
+// 基于应用配置表单生成 表单
+fn app_config_form(
+    config: &HashMap<String, String>,
+    app_form_str: String,
+) -> Result<String, String> {
+    // 存在应用的配置表单
+    let app_form_array: Result<Value, serde_json::Error> = serde_json::from_str(&app_form_str);
+    match app_form_array {
+        Ok(mut app_form) => {
+            let forms_val = app_form.as_array_mut();
+            match forms_val {
+                Some(forms) => {
+                    for form in forms {
+                        let field_name = form["data"]["fieldName"].as_str().unwrap();
+                        if !config.contains_key(field_name) {
+                            continue;
+                        }
+                        // 将当前配置的值更新到应用配置表单中
+                        let config_val = &config[field_name];
+                        if form["data"].get("itemConfig").is_none() {
+                            let tmp = form["data"].as_object_mut().unwrap();
+                            tmp.insert(
+                                "default".to_string(),
+                                Value::String(config_val.to_string()),
+                            );
+                        } else {
+                            let tmp = form["data"]["itemConfig"].as_object_mut().unwrap();
+                            tmp.insert("value".to_string(), Value::String(config_val.to_string()));
+                        }
+                    }
+                }
+                None => return default_config_form(&config),
+            }
+            let ret = serde_json::to_string(&app_form)
+                .map_err(|_| "app_form转json str失败!".to_string())?;
+            Ok(ret)
+        }
+        Err(e) => {
+            println!("app表单str转json失败：{}", e);
+            default_config_form(config)
+        }
     }
 }
 

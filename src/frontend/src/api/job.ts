@@ -19,9 +19,6 @@ type JobResult = {
   data: Array<Job>;
 };
 
-type JobConfigResult = {
-  data: string;
-};
 type TaskTree = {
   id?: number;
   name: string;
@@ -49,13 +46,6 @@ export const deleteJob = (job_id: number) => {
 
 export const runJob = (job_id: number) => {
   return http.post(baseUrlApi(`tasks/${job_id}/run`));
-};
-
-export const getJobConfig = (job_id: number) => {
-  return http.request<JobConfigResult>(
-    "get",
-    baseUrlApi(`tasks/${job_id}/config`)
-  );
 };
 
 export const setJobConfig = (job_id: number, data: object) => {

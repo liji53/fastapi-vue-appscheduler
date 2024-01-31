@@ -20,7 +20,7 @@ export default [
           },
           {
             id: 2,
-            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: false,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -30,7 +30,7 @@ export default [
           },
           {
             id: 3,
-            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: true,
             category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -40,7 +40,7 @@ export default [
           },
           {
             id: 4,
-            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: true,
             category_id: 2,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -50,7 +50,7 @@ export default [
           },
           {
             id: 5,
-            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Sources/DevCodes/SqlPatch",
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: false,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -60,6 +60,7 @@ export default [
           },
           {
             id: 6,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: true,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -69,6 +70,7 @@ export default [
           },
           {
             id: 7,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: true,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",
@@ -78,6 +80,7 @@ export default [
           },
           {
             id: 8,
+            url: "https://192.168.57.30/secu/dep1/UftdbSett/trunk/Documents/D5.Others/产品质量提升工具脚本/S6_项目辅助类工具/[16]批量提取doc文档目录",
             is_online: true,
             category_id: 1,
             banner: "https://tdesign.gtimg.com/tdesign-pro/cloud-server.jpg",

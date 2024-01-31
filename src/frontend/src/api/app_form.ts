@@ -6,8 +6,8 @@ type AppForm = {
 };
 
 // 应用配置设计 - 获取应用的表单
-export const getAppForm = (app_id: number) => {
-  return http.request<AppForm>("get", baseUrlApi(`appforms/${app_id}`));
+export const getAppForm = (params: object) => {
+  return http.request<AppForm>("get", baseUrlApi("appforms"), { params });
 };
 // 设置应用的表单
 export const setAppForm = (app_id: number, data: object) => {
