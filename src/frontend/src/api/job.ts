@@ -44,13 +44,6 @@ export const deleteJob = (job_id: number) => {
   return http.delete(baseUrlApi(`tasks/${job_id}`));
 };
 
-export const runJob = (job_id: number) => {
-  return http.post(baseUrlApi(`tasks/${job_id}/run`));
-};
-
-export const setJobConfig = (job_id: number, data: object) => {
-  return http.put(baseUrlApi(`tasks/${job_id}/config`), { data });
-};
 // 异常监控
 export const getTaskTree = () => {
   return http.request<TaskTreeResult>("get", baseUrlApi("tasks/tree"));

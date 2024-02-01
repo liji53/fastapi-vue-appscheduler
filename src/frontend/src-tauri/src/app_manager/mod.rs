@@ -43,3 +43,9 @@ pub fn getconfig_app(repo_url: String, app_form: String, task_id: u32) -> Result
     let svn_repo: SvnRepo = SvnRepo::new(repo_url);
     svn_repo.getconfig_app(app_form, task_id)
 }
+
+#[tauri::command]
+pub fn setconfig_app(repo_url: String, config: String, task_id: u32) -> Result<(), String> {
+    let svn_repo: SvnRepo = SvnRepo::new(repo_url);
+    svn_repo.setconfig_app(config, task_id)
+}

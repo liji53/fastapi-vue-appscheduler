@@ -1,14 +1,8 @@
 import dayjs from "dayjs";
 import editForm from "../components/jobForm.vue";
 import { message } from "@/utils/message";
-import {
-  getJobList,
-  createJob,
-  updateJob,
-  deleteJob,
-  setJobConfig
-} from "@/api/job";
-import { getRecentlyLog } from "@/api/job_log";
+import { getJobList, createJob, updateJob, deleteJob } from "@/api/job";
+import { getRecentlyLog, type Log } from "@/api/job_log";
 import { getMyAppTree } from "@/api/installed_app";
 import { getProjectList } from "@/api/project";
 import { getAppForm } from "@/api/app_form";
@@ -66,11 +60,11 @@ export function useJob() {
   });
   // 任务配置
   const taskConifgVisible = ref(false);
-  const task_id = ref(0); // 设置配置时记录当前任务id
+  const taskRow = ref(); // 设置配置时记录当前任务id
   const taskConfigData = ref([]); // 任务的当前配置
   // 运行日志
   const logVisible = ref(false);
-  const log = ref({});
+  const log = ref<Log>({ status: true });
 
   const columns: TableColumnList = [
     {
@@ -240,7 +234,7 @@ export function useJob() {
           } else {
             taskConfigData.value = JSON.parse(response);
             taskConifgVisible.value = true;
-            task_id.value = row.id;
+            taskRow.value = row;
           }
         })
         .catch(error => {
@@ -253,8 +247,17 @@ export function useJob() {
   function handleConfirmConfig(formRef, config) {
     formRef.validate(async valid => {
       if (valid) {
-        await setJobConfig(task_id.value, { data: JSON.stringify(config) });
-        message("配置设置成功", { type: "success" });
+        invoke("setconfig_app", {
+          repoUrl: taskRow.value.url,
+          taskId: taskRow.value.id,
+          config: JSON.stringify(config)
+        })
+          .then(() => {
+            message("配置设置成功", { type: "success" });
+          })
+          .catch((error: string) => {
+            message(error, { type: "error" });
+          });
       }
     });
   }

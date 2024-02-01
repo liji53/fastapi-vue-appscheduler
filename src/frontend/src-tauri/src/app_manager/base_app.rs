@@ -124,7 +124,8 @@ pub trait RepoCommand {
         Ok(())
     }
 
-    /// 获取当前任务的配置
+    /// 获取当前任务的配置(注：配置的section会忽略，不能存在相同的key，如有相同的key最后的生效)
+    /// todo: 需要考虑：多section、应用升级的情况
     fn getconfig_app(&self, app_form: String, task_id: u32) -> Result<String, String> {
         // 如果有设置过配置，则用该任务的配置，没有则用默认配置
         let mut config_path = Path::new(self.local_path()).join(format!("conf_{}.ini", task_id));
@@ -146,8 +147,36 @@ pub trait RepoCommand {
         if app_form == "[]" {
             default_config_form(&config)
         } else {
-            app_config_form(&config, app_form)
+            task_config_form(&config, app_form)
         }
+    }
+
+    /// 设置当前任务的配置
+    /// todo: 需要考虑：多section、应用升级的情况
+    fn setconfig_app(&self, config_in: String, task_id: u32) -> Result<(), String> {
+        let config_in: Value = serde_json::from_str(&config_in).map_err(|_| "配置转json失败!")?;
+        let config_in = config_in.as_object().unwrap();
+        let task_config_path = Path::new(self.local_path()).join(format!("conf_{task_id}.ini"));
+        let mut config_path = task_config_path.clone();
+        if !config_path.exists() {
+            config_path = Path::new(self.local_path()).join("config.ini");
+            if !config_path.exists() {
+                return Err("该应用不存在配置，无需设置!".to_string());
+            }
+        }
+
+        let mut cur_config =
+            Ini::load_from_file(config_path).map_err(|_| "配置文件解析失败!".to_string())?;
+        for (_section, prop) in cur_config.iter_mut() {
+            for (key, _value) in config_in.iter() {
+                if prop.contains_key(key) {
+                    prop.insert(key, config_in[key].as_str().unwrap());
+                }
+            }
+        }
+        cur_config
+            .write_to_file(task_config_path)
+            .map_err(|e| format!("保存配置失败：{e}"))
     }
 }
 
@@ -180,7 +209,7 @@ fn default_config_form(config: &HashMap<String, String>) -> Result<String, Strin
 }
 
 // 基于应用配置表单生成 表单
-fn app_config_form(
+fn task_config_form(
     config: &HashMap<String, String>,
     app_form_str: String,
 ) -> Result<String, String> {
