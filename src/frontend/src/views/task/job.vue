@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useJob } from "./utils/hookJob";
-import crontab from "./components/crontab.vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import dynForm from "./components/dynForm.vue";
 import { ref } from "vue";
+import { CronElementPlus } from "@vue-js-cron/element-plus";
+import "@vue-js-cron/element-plus/dist/element-plus.css";
 
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
@@ -14,7 +15,6 @@ import Clock from "@iconify-icons/ep/clock";
 import Setting from "@iconify-icons/ep/setting";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
-import ArrowDown from "@iconify-icons/ep/arrow-down";
 import Document from "@iconify-icons/ep/document";
 
 defineOptions({
@@ -40,7 +40,6 @@ const {
   handleSizeChange,
   handleCurrentChange,
   crontabVisible,
-  isShowCronCore,
   cronFormData,
   //onChangeCron,
   onCancelCron,
@@ -245,6 +244,12 @@ const {
       size="800px"
     >
       <div class="pr-20">
+        <cron-element-plus
+          v-model="cronFormData.cron"
+          :button-props="{ type: 'primary' }"
+          locale="zh-cn"
+        />
+        <br />
         <el-form
           class="edit-form"
           :model="cronFormData"
@@ -255,27 +260,8 @@ const {
             <el-input
               v-model="cronFormData.cron"
               placeholder="请输入cron表达式"
-            >
-              <template #append>
-                <el-tooltip content="配置cron表达式" placement="top">
-                  <el-button
-                    :icon="useRenderIcon(ArrowDown)"
-                    @click="
-                      () => {
-                        isShowCronCore = !isShowCronCore;
-                      }
-                    "
-                  />
-                </el-tooltip>
-              </template>
-            </el-input>
+            />
           </el-form-item>
-          <div
-            style="width: 100%; padding-left: 10px; margin-top: -5px"
-            v-show="isShowCronCore"
-          >
-            <crontab v-model:value="cronFormData.cron" />
-          </div>
         </el-form>
       </div>
       <template #footer>
