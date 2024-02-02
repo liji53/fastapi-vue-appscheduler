@@ -33,6 +33,7 @@
     "@pureadmin/table": "^2.3.2",
     "@pureadmin/utils": "^1.9.6",
     "@tauri-apps/api": "^1.5.3",
+    "@vue-js-cron/element-plus": "^2.1.2",
     "@vueuse/core": "^10.2.0",
     "@vueuse/motion": "^2.0.0",
     "@zxcvbn-ts/core": "^3.0.4",

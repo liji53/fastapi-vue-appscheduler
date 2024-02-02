@@ -53,7 +53,6 @@ export function useJob() {
   });
   // 定时设置
   const crontabVisible = ref(false);
-  const isShowCronCore = ref(true);
   const cronFormData = reactive({
     id: null,
     cron: "* * * * *"
@@ -64,7 +63,13 @@ export function useJob() {
   const taskConfigData = ref([]); // 任务的当前配置
   // 运行日志
   const logVisible = ref(false);
-  const log = ref<Log>({ status: true });
+  const log = ref<Log>({
+    status: false,
+    id: null,
+    log_type: null,
+    execute_type: null,
+    created_at: null
+  });
 
   const columns: TableColumnList = [
     {
@@ -348,7 +353,7 @@ export function useJob() {
   }
   // 查看日志
   function handleLog(row) {
-    getRecentlyLog({ task_id: row.id }).then(response => {
+    getRecentlyLog({ task_id: row.id }).then((response: Log) => {
       log.value = response;
       logVisible.value = true;
     });
@@ -381,7 +386,6 @@ export function useJob() {
     handleSizeChange,
     handleCurrentChange,
     crontabVisible,
-    isShowCronCore,
     cronFormData,
     //onChangeCron,
     onCancelCron,
