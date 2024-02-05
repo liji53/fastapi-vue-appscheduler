@@ -14,6 +14,7 @@ engine = create_engine(
     DATABASE_URI,
     pool_size=DATABASE_ENGINE_POOL_SIZE,
     max_overflow=DATABASE_ENGINE_MAX_OVERFLOW,
+    pool_recycle=2 * 3600
 )
 SessionLocal = sessionmaker(bind=engine)
 
