@@ -7,7 +7,7 @@ services:
     # privileged: true
     restart: unless-stopped
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "123456"
       MYSQL_USER: "app_scheduler"
@@ -34,8 +34,8 @@ services:
       - app-scheduler-mysql
     environment:
       LOG_LEVEL: "INFO"
-      DATABASE_HOSTNAME: "10.20.148.81"
-      DATABASE_PORT: "3307"
+      DATABASE_HOSTNAME: "192.168.2.32"
+      DATABASE_PORT: "3306"
       DATABASE_USER: "app_scheduler"
       DATABASE_PASSWORD: "123456"
       DATABASE_NAME: "appscheduler"
