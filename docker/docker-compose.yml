@@ -1,7 +1,7 @@
 version: "2.18"
 services:
   app-scheduler-mysql:
-    image: mysql:latest
+    image: mysql:8.0.37
     container_name: app-scheduler-mysql
     # 使用该参数，容器内的root拥有真正的root权限，否则，容器内的root只是外部的一个普通用户权限
     # privileged: true
@@ -19,8 +19,14 @@ services:
       --interactive_timeout=31536000
       --max_connections=1000
       --default-authentication-plugin=mysql_native_password
+      --user=mysql
     volumes:
       - "./docker_data/mysql/data:/var/lib/mysql"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   app-scheduler-server:
     image: appscheduler:latest
@@ -30,11 +36,14 @@ services:
       context: ..
       dockerfile: ./docker/dockerfile
     container_name: app-scheduler-server
-    depends_on:
-      - app-scheduler-mysql
+    # 确保mysql服务已经正常启动
+    depends_on:  
+      app-scheduler-mysql:
+        condition: service_healthy
+
     environment:
       LOG_LEVEL: "INFO"
-      DATABASE_HOSTNAME: "192.168.2.32"
+      DATABASE_HOSTNAME: "app-scheduler-mysql"
       DATABASE_PORT: "3306"
       DATABASE_USER: "app_scheduler"
       DATABASE_PASSWORD: "123456"
@@ -47,5 +56,11 @@ services:
     expose:
       - "8000"
     restart: unless-stopped
-    entrypoint: "python3 ./cli.py database init && python3 ./run.py"
-
+    entrypoint: |
+      /bin/sh -c 'if [ ! -f /appscheduler/init_completed ]; then
+        sleep 8
+        python3 ./cli.py database init
+        touch /appscheduler/init_completed
+      fi
+      python3 ./run.py'
+      
