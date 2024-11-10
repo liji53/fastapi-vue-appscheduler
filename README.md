@@ -23,7 +23,7 @@ docker-compose -f docker/docker-compose.yml up -d
 ```
 
 ## 软件架构
-后端采用fastapi + sqlalchemy + MySql
+后端采用fastapi + sqlalchemy + MySql<br>
 前端基于开源项目[pure-admin-thin](https://github.com/pure-admin/pure-admin-thin)
 桌面端使用tauri来实现
 
